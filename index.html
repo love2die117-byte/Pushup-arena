@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Push Up Arena: Knight's Quest</title>
 
-  <!-- Auto-Update Version Tag (Updates automatically when you push to GitHub) -->
-  <meta name="app-version" content="v2.5-autoupdate">
+  <!-- Auto-Update Version Tag -->
+  <meta name="app-version" content="v3.0-precision-sensor">
 
   <!-- PWA & Mobile Optimization -->
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -378,19 +378,35 @@
 
     .sensor-status-banner {
       position: absolute;
-      top: 190px;
+      top: 185px;
       left: 20px; right: 20px;
-      background: rgba(13, 17, 23, 0.9);
+      background: rgba(13, 17, 23, 0.92);
       border: 1px solid var(--border);
       border-radius: 14px;
       padding: 12px 18px;
       color: #fff;
       font-size: 0.85rem;
-      font-weight: 700;
+      font-weight: 800;
       text-align: center;
       z-index: 25;
       backdrop-filter: blur(10px);
       box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .sensor-progress-bg {
+      width: 100%;
+      height: 6px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .sensor-progress-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--primary);
+      transition: width 0.1s linear;
     }
 
     .bottom-hud {
@@ -607,7 +623,7 @@
   <div id="loading-screen">
     <canvas id="helmet-canvas" width="64" height="64" class="helmet-logo"></canvas>
     <div class="loading-title">Push Up Arena</div>
-    <div class="loading-sub" id="loading-sub-text">Checking for Cloud Updates...</div>
+    <div class="loading-sub">AI Precision Calibration</div>
     <div class="progress-bar-bg">
       <div id="loading-progress" class="progress-bar-fill"></div>
     </div>
@@ -777,9 +793,9 @@
       <div class="setting-item">
         <label>🎯 Form Strictness</label>
         <select id="strictness-select" onchange="saveAppSettings()">
-          <option value="casual">Casual (Elbow &lt; 100°)</option>
-          <option value="standard" selected>Standard (Elbow &lt; 85°)</option>
-          <option value="strict">Strict Pro (Elbow &lt; 70°)</option>
+          <option value="casual">Casual (Elbow &lt; 105°)</option>
+          <option value="standard" selected>Standard Pro (Elbow &lt; 90°)</option>
+          <option value="strict">Strict Elite (Elbow &lt; 75°)</option>
         </select>
       </div>
 
@@ -802,7 +818,7 @@
   <!-- SCREEN 6: LEADERBOARD -->
   <div id="leaderboard-screen" class="sub-screen">
     <div class="screen-header-title">🏆 Real Heroes Leaderboard</div>
-    <p style="color: var(--subtext); font-size: 0.82rem; margin-bottom: 14px;">Showing real registered profiles and local save files on this device.</p>
+    <p style="color: var(--subtext); font-size: 0.82rem; margin-bottom: 14px;">Showing real registered profiles on this device.</p>
     <div class="settings-list" id="leaderboard-list-container">
       <!-- Injected via JS -->
     </div>
@@ -831,7 +847,6 @@
     </div>
     <button class="btn" style="margin-top: 20px;" onclick="closeUserStatsModal()">Close</button>
   </div>
-
 
   <!-- BOTTOM NAVIGATION BAR -->
   <div class="bottom-nav">
@@ -879,7 +894,12 @@
         </div>
       </div>
 
-      <div id="sensor-banner" class="sensor-status-banner">Sensor Calibrated: Lower your chest smoothly</div>
+      <div id="sensor-banner" class="sensor-status-banner">
+        <span id="sensor-banner-text">AI Pose Sensor Active: Lower your chest</span>
+        <div class="sensor-progress-bg">
+          <div id="sensor-progress-fill" class="sensor-progress-fill"></div>
+        </div>
+      </div>
 
       <div class="bottom-hud">
         <div class="stat-box">
@@ -897,12 +917,12 @@
     </div>
   </div>
 
-  <!-- Onboarding Modal -->
+  <!-- Mandatory Onboarding Modal -->
   <div id="onboarding-modal" class="modal">
     <div class="onboarding-slide active" id="slide-welcome" style="display: flex; flex-direction: column; align-items: center; text-align: center; justify-content: center; height: 100%;">
       <div style="font-size: 3.5rem; margin-bottom: 15px;">⚔️</div>
       <h1 style="font-size: 2rem; font-weight: 900; color: #fff; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px;">Push Up Arena</h1>
-      <p style="color: var(--subtext); font-size: 1rem; margin-bottom: 35px; line-height: 1.5; max-width: 320px;">AI pose tracking, dungeon bosses, and auto-updating cloud synchronization.</p>
+      <p style="color: var(--subtext); font-size: 1rem; margin-bottom: 35px; line-height: 1.5; max-width: 320px;">AI pose tracking, dungeon bosses, and automatic device-isolated save files.</p>
       <button class="btn" onclick="startOnboardingFlow()">Initialize Device Save</button>
     </div>
 
@@ -954,7 +974,7 @@
   </div>
 
   <script>
-    // AUTOMANTIC GITHUB PAGES CACHE BUSTER & AUTO-UPDATER
+    // AUTO-UPDATE CACHE BUSTER
     async function checkForAppUpdates() {
       try {
         const response = await fetch(window.location.href.split('?')[0] + '?_=' + Date.now(), { cache: 'no-store' });
@@ -965,13 +985,10 @@
         const localVersion = document.querySelector('meta[name="app-version"]')?.getAttribute('content');
 
         if (remoteVersion && localVersion && remoteVersion !== localVersion) {
-          console.log("New version detected! Updating app...");
-          localStorage.setItem('pushup_arena_cached_version', remoteVersion);
+          console.log("Updating to newest build...");
           window.location.reload(true);
         }
-      } catch (e) {
-        console.log("Auto-update check skipped offline.");
-      }
+      } catch (e) {}
     }
     checkForAppUpdates();
 
@@ -1309,12 +1326,18 @@
       }
     }
 
+    /* ------------------------------------------------------------- */
+    /* UPGRADED ULTRA-PRECISION AI POSE TRACKER                      */
+    /* ------------------------------------------------------------- */
     let camera = null;
     let pose = null;
     let repPhase = "TOP";
     let smoothedAngle = 170;
     let currentPushupTypeIdx = 0;
     let activeGameMode = "quick";
+    let lastRepTimestamp = 0;
+    let minObservedAngle = 180;
+    let maxObservedAngle = 100;
 
     function startArena(mode) {
       activeGameMode = mode;
@@ -1325,6 +1348,12 @@
 
       state.currentReps = 0;
       currentPushupTypeIdx = 0;
+      repPhase = "TOP";
+      smoothedAngle = 170;
+      minObservedAngle = 180;
+      maxObservedAngle = 100;
+      lastRepTimestamp = 0;
+
       updateActivePushupTypeDisplay();
       updateArenaHpDisplay();
 
@@ -1339,8 +1368,8 @@
       pose.setOptions({
         modelComplexity: 1,
         smoothLandmarks: true,
-        minDetectionConfidence: 0.8,
-        minTrackingConfidence: 0.8
+        minDetectionConfidence: 0.7,
+        minTrackingConfidence: 0.7
       });
 
       pose.onResults((results) => {
@@ -1352,7 +1381,9 @@
 
         if (results.poseLandmarks) {
           drawSkeleton(canvasCtx, results.poseLandmarks);
-          process100xSensor(results.poseLandmarks);
+          processHighPrecisionSensor(results.poseLandmarks);
+        } else {
+          document.getElementById('sensor-banner-text').innerText = "⚠️ Position camera to see your full body";
         }
         canvasCtx.restore();
       });
@@ -1371,81 +1402,104 @@
       document.getElementById('arena-type-lbl').innerText = typeLabels[activeTypeKey];
     }
 
-    function process100xSensor(landmarks) {
+    function processHighPrecisionSensor(landmarks) {
       const lShoulder = landmarks[11], lElbow = landmarks[13], lWrist = landmarks[15];
       const rShoulder = landmarks[12], rElbow = landmarks[14], rWrist = landmarks[16];
 
       if (!lShoulder || !lElbow || !lWrist) return;
 
-      const leftAngle = calculateAngle(lShoulder, lElbow, lWrist);
-      const rightAngle = (rShoulder && rElbow && rWrist) ? calculateAngle(rShoulder, rElbow, rWrist) : leftAngle;
-      
-      const rawAngle = (leftAngle + rightAngle) / 2;
-      smoothedAngle = (smoothedAngle * 0.4) + (rawAngle * 0.6);
+      // 1. Dual-Arm Angle Extraction with Visibility Fallback
+      let leftAngle = calculateAngle(lShoulder, lElbow, lWrist);
+      let rightAngle = (rShoulder && rElbow && rWrist) ? calculateAngle(rShoulder, rElbow, rWrist) : leftAngle;
+
+      let rawAngle = Math.min(leftAngle, rightAngle); // Use tighter arm for strictness
+
+      // 2. Exponential Moving Average Smoothing
+      smoothedAngle = (smoothedAngle * 0.35) + (rawAngle * 0.65);
       document.getElementById('elbow-angle-val').innerText = Math.round(smoothedAngle) + '°';
 
-      let bottomThreshold = 85;
-      if (state.strictness === "casual") bottomThreshold = 100;
-      if (state.strictness === "strict") bottomThreshold = 70;
+      // Track personal min and max for adaptive range
+      if (smoothedAngle < minObservedAngle) minObservedAngle = smoothedAngle;
+      if (smoothedAngle > maxObservedAngle) maxObservedAngle = smoothedAngle;
+
+      // 3. Dynamic Strictness Thresholds
+      let bottomThreshold = 90;
+      if (state.strictness === "casual") bottomThreshold = 105;
+      if (state.strictness === "strict") bottomThreshold = 75;
+      
       const topThreshold = 145;
 
-      const banner = document.getElementById('sensor-banner');
+      const bannerText = document.getElementById('sensor-banner-text');
+      const progressFill = document.getElementById('sensor-progress-fill');
 
+      // Calculate progress depth (0% at top, 100% at bottom)
+      let depthPct = Math.min(100, Math.max(0, ((topThreshold - smoothedAngle) / (topThreshold - bottomThreshold)) * 100));
+      progressFill.style.width = depthPct + '%';
+
+      const now = Date.now();
+
+      // State Machine tracking
       if (repPhase === "TOP") {
-        if (smoothedAngle < topThreshold - 12) {
+        bannerText.innerText = "💪 Lockout Ready: Lower your chest";
+        if (smoothedAngle < topThreshold - 15) {
           repPhase = "DESCENDING";
-          banner.innerText = "Lowering chest... Good form.";
         }
       } else if (repPhase === "DESCENDING") {
+        bannerText.innerText = `⬇️ Lowering... (${Math.round(depthPct)}%)`;
         if (smoothedAngle <= bottomThreshold) {
           repPhase = "BOTTOM";
-          banner.innerText = "Depth reached! Push up smoothly!";
-          if (state.audioFeedback !== "off" && navigator.vibrate) navigator.vibrate(30);
+          bannerText.innerText = "✅ DEPTH REACHED! PUSH UP NOW!";
+          if (state.audioFeedback !== "off" && navigator.vibrate) navigator.vibrate(35);
         }
       } else if (repPhase === "BOTTOM") {
-        if (smoothedAngle > bottomThreshold + 12) {
+        bannerText.innerText = "⬆️ Pushing back up...";
+        if (smoothedAngle > bottomThreshold + 15) {
           repPhase = "ASCENDING";
-          banner.innerText = "Extension in progress...";
         }
       } else if (repPhase === "ASCENDING") {
         if (smoothedAngle >= topThreshold) {
-          repPhase = "TOP";
-          state.currentReps++;
-          state.totalReps++;
-          state.enemiesDefeated++;
-          state.gold += 5;
+          // Prevent double counts with a 400ms cooldown window
+          if (now - lastRepTimestamp > 400) {
+            lastRepTimestamp = now;
+            repPhase = "TOP";
+            
+            state.currentReps++;
+            state.totalReps++;
+            state.enemiesDefeated++;
+            state.gold += 5;
 
-          if (state.routineFormat === "cycle" && state.selectedTypes.length > 1) {
-            if (state.currentReps % 5 === 0) {
-              currentPushupTypeIdx = (currentPushupTypeIdx + 1) % state.selectedTypes.length;
-              updateActivePushupTypeDisplay();
+            if (state.routineFormat === "cycle" && state.selectedTypes.length > 1) {
+              if (state.currentReps % 5 === 0) {
+                currentPushupTypeIdx = (currentPushupTypeIdx + 1) % state.selectedTypes.length;
+                updateActivePushupTypeDisplay();
+              }
             }
-          }
 
-          document.getElementById('rep-circle-val').innerText = state.currentReps;
-          document.getElementById('total-reps-val').innerText = state.currentReps;
-          document.getElementById('header-gold-val').innerText = state.gold;
-          updateArenaHpDisplay();
-          banner.innerText = "PERFECT REP! (+5 Gold)";
+            document.getElementById('rep-circle-val').innerText = state.currentReps;
+            document.getElementById('total-reps-val').innerText = state.currentReps;
+            document.getElementById('header-gold-val').innerText = state.gold;
+            updateArenaHpDisplay();
+            
+            bannerText.innerText = "🔥 PERFECT REP! (+5 Gold)";
+            if (state.audioFeedback !== "off" && navigator.vibrate) navigator.vibrate([40, 30, 60]);
 
-          if (state.audioFeedback !== "off" && navigator.vibrate) navigator.vibrate(80);
-
-          if (state.currentReps >= state.aiTargetReps) {
-            if (activeGameMode === 'story') {
-              state.storyStage = Math.min(50, state.storyStage + 1);
-              state.bossesSlain++;
-              alert(`VICTORY! Story Stage Completed! Advanced to Stage ${state.storyStage}! +50 Bonus Gold!`);
-            } else if (activeGameMode === 'endless') {
-              alert(`WAVE CLEARED! Endless Survival continues... +50 Bonus Gold!`);
-              state.aiTargetReps += 5;
-            } else {
-              state.bossesSlain++;
-              alert(`VICTORY! Boss Defeated! +50 Bonus Gold!`);
+            if (state.currentReps >= state.aiTargetReps) {
+              if (activeGameMode === 'story') {
+                state.storyStage = Math.min(50, state.storyStage + 1);
+                state.bossesSlain++;
+                alert(`VICTORY! Story Stage Completed! Advanced to Stage ${state.storyStage}! +50 Bonus Gold!`);
+              } else if (activeGameMode === 'endless') {
+                alert(`WAVE CLEARED! Endless Survival continues... +50 Bonus Gold!`);
+                state.aiTargetReps += 5;
+              } else {
+                state.bossesSlain++;
+                alert(`VICTORY! Boss Defeated! +50 Bonus Gold!`);
+              }
+              state.gold += 50;
+              exitArena();
             }
-            state.gold += 50;
-            exitArena();
+            saveState();
           }
-          saveState();
         }
       }
     }
