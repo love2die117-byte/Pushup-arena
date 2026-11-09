@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Push Up Arena: Knight's Quest</title>
 
+  <!-- Auto-Update Version Tag (Updates automatically when you push to GitHub) -->
+  <meta name="app-version" content="v2.5-autoupdate">
+
   <!-- PWA & Mobile Optimization -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -283,7 +286,7 @@
       box-shadow: 0 0 12px var(--primary-glow);
     }
 
-    /* Camera Arena View (Uninverted Natural Feed) */
+    /* Camera Arena View */
     #arena-screen { background: #000; padding-bottom: 0; }
     #video-container {
       position: relative;
@@ -457,7 +460,6 @@
       letter-spacing: 0.5px;
     }
 
-    /* Dashboard grids */
     .stats-dashboard {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -478,7 +480,6 @@
     .stat-card-num { font-size: 1.6rem; font-weight: 900; color: #fff; }
     .stat-card-label { font-size: 0.75rem; color: var(--subtext); text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px; }
 
-    /* Settings & Form Lists */
     .settings-list {
       display: flex;
       flex-direction: column;
@@ -515,7 +516,6 @@
     }
     input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 10px var(--primary-glow); }
 
-    /* Push-up Type Selector Pills */
     .type-pill-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -564,7 +564,6 @@
       box-shadow: none;
     }
 
-    /* Onboarding Modal */
     .modal {
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -608,7 +607,7 @@
   <div id="loading-screen">
     <canvas id="helmet-canvas" width="64" height="64" class="helmet-logo"></canvas>
     <div class="loading-title">Push Up Arena</div>
-    <div class="loading-sub">AI Precision Calibration</div>
+    <div class="loading-sub" id="loading-sub-text">Checking for Cloud Updates...</div>
     <div class="progress-bar-bg">
       <div id="loading-progress" class="progress-bar-fill"></div>
     </div>
@@ -862,7 +861,7 @@
     </div>
   </div>
 
-  <!-- Arena Camera Screen (Uninverted View) -->
+  <!-- Arena Camera Screen -->
   <div id="arena-screen" class="screen">
     <div id="video-container">
       <video id="webcam" playsinline muted></video>
@@ -898,13 +897,12 @@
     </div>
   </div>
 
-  <!-- Mandatory Onboarding Modal (Automatic Device Setup) -->
+  <!-- Onboarding Modal -->
   <div id="onboarding-modal" class="modal">
-    <!-- Welcome Intro Slide -->
     <div class="onboarding-slide active" id="slide-welcome" style="display: flex; flex-direction: column; align-items: center; text-align: center; justify-content: center; height: 100%;">
       <div style="font-size: 3.5rem; margin-bottom: 15px;">⚔️</div>
       <h1 style="font-size: 2rem; font-weight: 900; color: #fff; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px;">Push Up Arena</h1>
-      <p style="color: var(--subtext); font-size: 1rem; margin-bottom: 35px; line-height: 1.5; max-width: 320px;">AI pose tracking, dungeon bosses, and automatic device-isolated save files.</p>
+      <p style="color: var(--subtext); font-size: 1rem; margin-bottom: 35px; line-height: 1.5; max-width: 320px;">AI pose tracking, dungeon bosses, and auto-updating cloud synchronization.</p>
       <button class="btn" onclick="startOnboardingFlow()">Initialize Device Save</button>
     </div>
 
@@ -956,6 +954,27 @@
   </div>
 
   <script>
+    // AUTOMANTIC GITHUB PAGES CACHE BUSTER & AUTO-UPDATER
+    async function checkForAppUpdates() {
+      try {
+        const response = await fetch(window.location.href.split('?')[0] + '?_=' + Date.now(), { cache: 'no-store' });
+        const htmlText = await response.text();
+        const parser = new DOMParser();
+        const remoteDoc = parser.parseFromString(htmlText, 'text/html');
+        const remoteVersion = remoteDoc.querySelector('meta[name="app-version"]')?.getAttribute('content');
+        const localVersion = document.querySelector('meta[name="app-version"]')?.getAttribute('content');
+
+        if (remoteVersion && localVersion && remoteVersion !== localVersion) {
+          console.log("New version detected! Updating app...");
+          localStorage.setItem('pushup_arena_cached_version', remoteVersion);
+          window.location.reload(true);
+        }
+      } catch (e) {
+        console.log("Auto-update check skipped offline.");
+      }
+    }
+    checkForAppUpdates();
+
     let deviceSaveKey = localStorage.getItem('pushup_arena_device_uuid');
     if (!deviceSaveKey) {
       deviceSaveKey = 'device_save_' + Math.random().toString(36).substring(2, 10) + Date.now().toString(36);
@@ -1487,7 +1506,6 @@
       let registry = JSON.parse(localStorage.getItem('pushup_arena_global_registry') || '{}');
       
       let allUsers = Object.values(registry);
-      // Ensure current user is always reflected accurately
       let foundCurrent = allUsers.find(u => u.name === state.userName);
       if (!foundCurrent) {
         allUsers.push({ name: state.userName + " (You)", reps: state.totalReps, enemies: state.enemiesDefeated, bosses: state.bossesSlain, stage: state.storyStage });
