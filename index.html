@@ -865,8 +865,8 @@
 
   <!-- Onboarding Modal -->
   <div id="onboarding-modal" class="modal active">
-    <!-- Welcome Intro Slide (Slide 0) -->
-    <div class="onboarding-slide active" id="slide-welcome" style="display: flex; align-items: center; text-align: center; justify-content: center; height: 100%;">
+    <!-- Welcome Intro Slide -->
+    <div class="onboarding-slide active" id="slide-welcome" style="display: flex; flex-direction: column; align-items: center; text-align: center; justify-content: center; height: 100%;">
       <div style="font-size: 3rem; margin-bottom: 15px;">⚔️</div>
       <h1 style="font-size: 1.8rem; font-weight: 800; color: #fff; margin-bottom: 10px;">Welcome to Kaydens Push up App</h1>
       <p style="color: var(--subtext); font-size: 0.95rem; margin-bottom: 30px; line-height: 1.4;">Transform your fitness with AI pose tracking, campaign battles, and epic quests.</p>
@@ -881,7 +881,7 @@
     </div>
 
     <div class="slide-container" id="onboarding-slides-container" style="display: none;">
-      <div class="onboarding-slide active" id="slide-1">
+      <div class="onboarding-slide" id="slide-1">
         <h2>What's your hero name?</h2>
         <p style="color: var(--subtext); font-size: 0.85rem;">Personalizes your AI training profile.</p>
         <div class="form-group" style="margin-top: 10px;">
@@ -1029,7 +1029,6 @@
         }
       });
       const formatNames = { single: "Single Type Focus", multiple: "Multiple Selected Types", cycle: "Cycling Routine Formats" };
-      document.getElementById('mode-desc-types').innerText = `${formatNames[state.routineFormat]} (${state.selectedTypes.join(', ')})`;
     }
 
     function saveRoutineSettings() {
@@ -1087,13 +1086,21 @@
       saveState();
     }
 
-    
     function startOnboardingFlow() {
-      document.getElementById('slide-welcome').style.display = 'none';
-      document.getElementById('onboarding-progress-bar').style.display = 'flex';
-      document.getElementById('onboarding-slides-container').style.display = 'flex';
-      document.getElementById('onboarding-nav-btns').style.display = 'flex';
-      document.getElementById('slide-1').classList.add('active');
+      const welcome = document.getElementById('slide-welcome');
+      if (welcome) welcome.style.display = 'none';
+      
+      const progressBar = document.getElementById('onboarding-progress-bar');
+      if (progressBar) progressBar.style.display = 'flex';
+      
+      const slidesContainer = document.getElementById('onboarding-slides-container');
+      if (slidesContainer) slidesContainer.style.display = 'flex';
+      
+      const navBtns = document.getElementById('onboarding-nav-btns');
+      if (navBtns) navBtns.style.display = 'flex';
+      
+      const slide1 = document.getElementById('slide-1');
+      if (slide1) slide1.classList.add('active');
     }
 
     function updateSlideUI() {
@@ -1174,30 +1181,19 @@
       else if (state.storyStage <= 40) stageName = `Stage ${state.storyStage}: Volcanic Lair`;
       else stageName = `Stage ${state.storyStage}: Dragon Spire`;
 
-      if (confirm(`📜 HUGE STORY CAMPAIGN
-Current Progression: ${stageName} (Stage ${state.storyStage} of ${stages})
-
-Do you want to enter this battle?`)) {
+      if (confirm(`📜 HUGE STORY CAMPAIGN\nCurrent Progression: ${stageName} (Stage ${state.storyStage} of ${stages})\n\nDo you want to enter this battle?`)) {
         startArena('story');
       }
     }
 
     function openEndlessSurvival() {
-      if (confirm("💀 ENDLESS SURVIVAL MODE
-Waves of monsters will spawn continuously until failure. Ready your stamina?")) {
+      if (confirm("💀 ENDLESS SURVIVAL MODE\nWaves of monsters will spawn continuously until failure. Ready your stamina?")) {
         startArena('endless');
       }
     }
 
     function openArmory() {
-      let choice = prompt(`🛡️ HERO ARMORY & SHOP
-Your Gold: 🪙 ${state.gold}
-
-1. Equip Legendary Knight Armor (Free)
-2. Buy Glowing Aura (100 Gold)
-3. Buy Golden Crown (250 Gold)
-
-Enter choice (1-3):`, "1");
+      let choice = prompt(`🛡️ HERO ARMORY & SHOP\nYour Gold: 🪙 ${state.gold}\n\n1. Equip Legendary Knight Armor (Free)\n2. Buy Glowing Aura (100 Gold)\n3. Buy Golden Crown (250 Gold)\n\nEnter choice (1-3):`, "1");
       if (choice === "2") {
         if (state.gold >= 100) {
           state.gold -= 100;
@@ -1349,7 +1345,7 @@ Enter choice (1-3):`, "1");
               alert(`VICTORY! Story Stage Completed! Advanced to Stage ${state.storyStage}! +50 Bonus Gold!`);
             } else if (activeGameMode === 'endless') {
               alert(`WAVE CLEARED! Endless Survival continues... +50 Bonus Gold!`);
-              state.aiTargetReps += 5; // ramp difficulty
+              state.aiTargetReps += 5;
             } else {
               state.bossesSlain++;
               alert(`VICTORY! Boss Defeated! +50 Bonus Gold!`);
@@ -1413,7 +1409,6 @@ Enter choice (1-3):`, "1");
       saveState();
     }
 
-    
     const mockUsers = [
       { name: "Sir Arthur", reps: 340, enemies: 68, bosses: 14, stage: 32 },
       { name: "Valeria", reps: 290, enemies: 58, bosses: 11, stage: 27 },
@@ -1424,7 +1419,6 @@ Enter choice (1-3):`, "1");
 
     function renderLeaderboard() {
       const container = document.getElementById('leaderboard-list-container');
-      // combine mock users and current user state
       let allUsers = [...mockUsers, { name: state.userName + " (You)", reps: state.totalReps, enemies: state.enemiesDefeated, bosses: state.bossesSlain, stage: state.storyStage }];
       allUsers.sort((a, b) => b.reps - a.reps);
 
