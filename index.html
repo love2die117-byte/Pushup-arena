@@ -802,8 +802,8 @@
 
   <!-- SCREEN 6: LEADERBOARD -->
   <div id="leaderboard-screen" class="sub-screen">
-    <div class="screen-header-title">🏆 Global Hero Leaderboard</div>
-    <p style="color: var(--subtext); font-size: 0.82rem; margin-bottom: 14px;">Tap any hero to inspect their stats and combat achievements.</p>
+    <div class="screen-header-title">🏆 Real Heroes Leaderboard</div>
+    <p style="color: var(--subtext); font-size: 0.82rem; margin-bottom: 14px;">Showing real registered profiles and local save files on this device.</p>
     <div class="settings-list" id="leaderboard-list-container">
       <!-- Injected via JS -->
     </div>
@@ -1013,6 +1013,7 @@
       syncTypePillsUI();
       updateStatsDisplay();
       drawPixelHelmet();
+      registerGlobalRegistry();
 
       let progress = 0;
       const interval = setInterval(() => {
@@ -1130,6 +1131,7 @@
       document.getElementById('avatar').innerText = state.userName.charAt(0).toUpperCase();
       runAiTargetCalculation();
       saveState();
+      registerGlobalRegistry();
     }
 
     function saveAppSettings() {
@@ -1193,6 +1195,7 @@
       document.getElementById('avatar').innerText = state.userName.charAt(0).toUpperCase();
       document.getElementById('onboarding-modal').classList.remove('active');
       saveState();
+      registerGlobalRegistry();
       switchTab('home');
     }
 
@@ -1216,11 +1219,27 @@
 
     function saveState() {
       localStorage.setItem(`pushup_arena_file_${deviceSaveKey}`, JSON.stringify(state));
+      registerGlobalRegistry();
+    }
+
+    function registerGlobalRegistry() {
+      let registry = JSON.parse(localStorage.getItem('pushup_arena_global_registry') || '{}');
+      registry[deviceSaveKey] = {
+        name: state.userName,
+        reps: state.totalReps,
+        enemies: state.enemiesDefeated,
+        bosses: state.bossesSlain,
+        stage: state.storyStage
+      };
+      localStorage.setItem('pushup_arena_global_registry', JSON.stringify(registry));
     }
 
     function resetAllData() {
       if (confirm("Are you sure you want to factory reset this device save file?")) {
         localStorage.removeItem(`pushup_arena_file_${deviceSaveKey}`);
+        let registry = JSON.parse(localStorage.getItem('pushup_arena_global_registry') || '{}');
+        delete registry[deviceSaveKey];
+        localStorage.setItem('pushup_arena_global_registry', JSON.stringify(registry));
         location.reload();
       }
     }
@@ -1463,18 +1482,23 @@
       saveState();
     }
 
-    const mockUsers = [
-      { name: "Sir Arthur", reps: 340, enemies: 68, bosses: 14, stage: 32 },
-      { name: "Valeria", reps: 290, enemies: 58, bosses: 11, stage: 27 },
-      { name: "Gideon", reps: 210, enemies: 42, bosses: 8, stage: 19 },
-      { name: "Lyra", reps: 185, enemies: 37, bosses: 7, stage: 16 },
-      { name: "Thorin", reps: 140, enemies: 28, bosses: 5, stage: 12 }
-    ];
-
     function renderLeaderboard() {
       const container = document.getElementById('leaderboard-list-container');
-      let allUsers = [...mockUsers, { name: state.userName + " (You)", reps: state.totalReps, enemies: state.enemiesDefeated, bosses: state.bossesSlain, stage: state.storyStage }];
+      let registry = JSON.parse(localStorage.getItem('pushup_arena_global_registry') || '{}');
+      
+      let allUsers = Object.values(registry);
+      // Ensure current user is always reflected accurately
+      let foundCurrent = allUsers.find(u => u.name === state.userName);
+      if (!foundCurrent) {
+        allUsers.push({ name: state.userName + " (You)", reps: state.totalReps, enemies: state.enemiesDefeated, bosses: state.bossesSlain, stage: state.storyStage });
+      }
+
       allUsers.sort((a, b) => b.reps - a.reps);
+
+      if (allUsers.length === 0) {
+        container.innerHTML = `<div class="setting-item" style="text-align: center; color: var(--subtext);">No registered heroes yet. Complete a workout to join the ranks!</div>`;
+        return;
+      }
 
       let html = '';
       allUsers.forEach((u, idx) => {
