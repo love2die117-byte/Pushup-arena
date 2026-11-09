@@ -778,9 +778,9 @@
       <div class="setting-item">
         <label>🎯 Form Strictness</label>
         <select id="strictness-select" onchange="saveAppSettings()">
-          <option value="casual">Casual (Elbow < 100°)</option>
-          <option value="standard" selected>Standard (Elbow < 85°)</option>
-          <option value="strict">Strict Pro (Elbow < 70°)</option>
+          <option value="casual">Casual (Elbow &lt; 100°)</option>
+          <option value="standard" selected>Standard (Elbow &lt; 85°)</option>
+          <option value="strict">Strict Pro (Elbow &lt; 70°)</option>
         </select>
       </div>
 
@@ -956,7 +956,6 @@
   </div>
 
   <script>
-    // AUTOMATIC DEVICE SAVE FILE INITIALIZATION
     let deviceSaveKey = localStorage.getItem('pushup_arena_device_uuid');
     if (!deviceSaveKey) {
       deviceSaveKey = 'device_save_' + Math.random().toString(36).substring(2, 10) + Date.now().toString(36);
