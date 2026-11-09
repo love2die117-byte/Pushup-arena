@@ -19,14 +19,15 @@
     :root {
       --primary: #38bdf8;
       --primary-dark: #0284c7;
-      --primary-glow: rgba(56, 189, 248, 0.35);
-      --bg: #0d1117;
-      --card-bg: rgba(22, 27, 34, 0.85);
-      --border: rgba(255, 255, 255, 0.08);
-      --text: #e6edf3;
+      --primary-glow: rgba(56, 189, 248, 0.4);
+      --bg: #090d13;
+      --card-bg: rgba(18, 24, 33, 0.9);
+      --border: rgba(56, 189, 248, 0.15);
+      --text: #f0f6fc;
       --subtext: #8b949e;
       --danger: #f87171;
       --success: #34d399;
+      --gold: #fbbf24;
     }
 
     * {
@@ -60,44 +61,46 @@
     }
     .screen.active { display: flex; }
 
-    /* Chill Cinematic Loading Screen */
+    /* Cinematic Loading Screen */
     #loading-screen {
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
       padding-bottom: 0;
       justify-content: center;
       align-items: center;
-      z-index: 100;
-      background: radial-gradient(circle at center, #161b22 0%, #0d1117 100%);
+      z-index: 150;
+      background: radial-gradient(circle at center, #162032 0%, #090d13 100%);
     }
     .helmet-logo {
-      width: 110px;
-      height: 110px;
+      width: 120px;
+      height: 120px;
       image-rendering: pixelated;
       margin-bottom: 20px;
       animation: chillFloat 3s infinite ease-in-out;
-      filter: drop-shadow(0 0 15px var(--primary-glow));
+      filter: drop-shadow(0 0 20px var(--primary-glow));
     }
     @keyframes chillFloat {
       0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-8px); }
+      50% { transform: translateY(-10px); }
     }
     .loading-title {
-      font-size: 1.35rem;
-      font-weight: 800;
-      letter-spacing: 1px;
+      font-size: 1.5rem;
+      font-weight: 900;
+      letter-spacing: 2px;
       color: #fff;
       margin-bottom: 6px;
+      text-transform: uppercase;
     }
     .loading-sub {
       font-size: 0.75rem;
-      color: var(--subtext);
+      color: var(--primary);
       text-transform: uppercase;
-      letter-spacing: 1.5px;
-      margin-bottom: 22px;
+      letter-spacing: 2px;
+      margin-bottom: 24px;
+      font-weight: 700;
     }
     .progress-bar-bg {
-      width: 240px;
+      width: 260px;
       height: 8px;
       background: rgba(255,255,255,0.06);
       border-radius: 4px;
@@ -117,8 +120,8 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: rgba(22, 27, 34, 0.8);
-      backdrop-filter: blur(12px);
+      background: rgba(18, 24, 33, 0.85);
+      backdrop-filter: blur(16px);
       border-bottom: 1px solid var(--border);
       z-index: 15;
     }
@@ -128,29 +131,31 @@
       gap: 12px;
     }
     .user-avatar {
-      width: 40px;
-      height: 40px;
+      width: 42px;
+      height: 42px;
       border-radius: 50%;
       background: rgba(56, 189, 248, 0.15);
-      border: 1px solid var(--primary);
+      border: 2px solid var(--primary);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 800;
-      font-size: 1.05rem;
+      font-weight: 900;
+      font-size: 1.1rem;
       color: var(--primary);
+      box-shadow: 0 0 12px var(--primary-glow);
     }
     .currency-badge {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--border);
-      padding: 6px 12px;
+      background: rgba(251, 191, 36, 0.1);
+      border: 1px solid rgba(251, 191, 36, 0.3);
+      padding: 6px 14px;
       border-radius: 20px;
       display: flex;
       align-items: center;
       gap: 6px;
-      font-weight: 700;
-      font-size: 0.82rem;
-      color: #fff;
+      font-weight: 800;
+      font-size: 0.85rem;
+      color: var(--gold);
+      box-shadow: 0 0 10px rgba(251, 191, 36, 0.15);
     }
 
     /* Bottom Navigation Bar */
@@ -158,7 +163,7 @@
       position: absolute;
       bottom: 0; left: 0; right: 0;
       height: 72px;
-      background: rgba(13, 17, 23, 0.92);
+      background: rgba(9, 13, 19, 0.95);
       backdrop-filter: blur(20px);
       border-top: 1px solid var(--border);
       display: flex;
@@ -177,12 +182,12 @@
       font-size: 0.65rem;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.4px;
+      letter-spacing: 0.5px;
       transition: color 0.2s ease;
       flex: 1;
     }
-    .nav-item span:first-child { font-size: 1.2rem; }
-    .nav-item.active { color: var(--primary); }
+    .nav-item span:first-child { font-size: 1.25rem; }
+    .nav-item.active { color: var(--primary); text-shadow: 0 0 10px var(--primary-glow); }
 
     /* Menu Content */
     .menu-content {
@@ -194,34 +199,34 @@
       gap: 16px;
     }
 
-    /* Chill Hero Card */
+    /* Hero Banner Card */
     .hero-banner {
-      background: var(--card-bg);
+      background: linear-gradient(135deg, rgba(22, 30, 44, 0.95) 0%, rgba(13, 19, 28, 0.95) 100%);
       border: 1px solid var(--border);
       border-radius: 20px;
-      padding: 22px;
+      padding: 24px;
       position: relative;
       overflow: hidden;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
     }
     .hero-tag {
-      font-size: 0.65rem;
+      font-size: 0.68rem;
       font-weight: 800;
       color: var(--primary);
       text-transform: uppercase;
-      letter-spacing: 1.2px;
+      letter-spacing: 1.5px;
       margin-bottom: 6px;
     }
     .hero-title {
-      font-size: 1.35rem;
-      font-weight: 800;
+      font-size: 1.45rem;
+      font-weight: 900;
       color: #fff;
       margin-bottom: 6px;
     }
     .hero-sub {
-      font-size: 0.8rem;
+      font-size: 0.82rem;
       color: var(--subtext);
-      margin-bottom: 16px;
+      margin-bottom: 18px;
       line-height: 1.4;
     }
 
@@ -240,43 +245,45 @@
       align-items: center;
       gap: 16px;
       cursor: pointer;
-      transition: border-color 0.15s ease;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     }
-    .mode-card:active { transform: scale(0.98); }
+    .mode-card:active { transform: scale(0.98); border-color: var(--primary); }
     .mode-icon-box {
-      width: 48px;
-      height: 48px;
-      border-radius: 12px;
-      background: rgba(255,255,255,0.04);
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: rgba(56, 189, 248, 0.08);
       border: 1px solid var(--border);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.5rem;
+      font-size: 1.6rem;
       flex-shrink: 0;
     }
     .mode-info { flex: 1; }
     .mode-title {
-      font-size: 1.05rem;
-      font-weight: 800;
+      font-size: 1.1rem;
+      font-weight: 900;
       color: var(--text);
-      margin-bottom: 2px;
+      margin-bottom: 3px;
     }
     .mode-desc {
-      font-size: 0.76rem;
+      font-size: 0.78rem;
       color: var(--subtext);
-      line-height: 1.3;
+      line-height: 1.35;
     }
     .mode-action-pill {
       background: var(--primary);
-      color: #0d1117;
-      font-weight: 800;
+      color: #090d13;
+      font-weight: 900;
       font-size: 0.75rem;
-      padding: 8px 14px;
+      padding: 8px 16px;
       border-radius: 10px;
+      box-shadow: 0 0 12px var(--primary-glow);
     }
 
-    /* Camera Arena View (Uninverted / Natural Orientation) */
+    /* Camera Arena View (Uninverted Natural Feed) */
     #arena-screen { background: #000; padding-bottom: 0; }
     #video-container {
       position: relative;
@@ -289,7 +296,6 @@
       top: 0; left: 0;
       width: 100%; height: 100%;
       object-fit: cover;
-      /* Uninverted / Standard orientation view */
       transform: none !important;
       -webkit-transform: none !important;
     }
@@ -301,34 +307,35 @@
       z-index: 20;
     }
     .boss-card {
-      background: rgba(13, 17, 23, 0.9);
+      background: rgba(13, 17, 23, 0.92);
       border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 14px;
+      border-radius: 18px;
+      padding: 16px;
       display: flex;
       flex-direction: column;
       align-items: center;
       position: relative;
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.5);
     }
     .boss-lvl {
       font-size: 0.72rem;
       color: var(--primary);
-      font-weight: 800;
+      font-weight: 900;
       text-transform: uppercase;
-      letter-spacing: 1px;
+      letter-spacing: 1.2px;
     }
     .boss-name {
-      font-size: 1.1rem;
-      font-weight: 800;
+      font-size: 1.15rem;
+      font-weight: 900;
       color: #fff;
     }
     .hp-bar-bg {
       width: 100%;
-      height: 18px;
+      height: 20px;
       background: rgba(255,255,255,0.06);
-      border-radius: 6px;
-      margin-top: 8px;
+      border-radius: 8px;
+      margin-top: 10px;
       overflow: hidden;
       position: relative;
       border: 1px solid var(--border);
@@ -336,8 +343,9 @@
     .hp-bar-fill {
       height: 100%;
       width: 100%;
-      background: var(--primary);
+      background: linear-gradient(90deg, var(--primary-dark), var(--primary));
       transition: width 0.25s ease-out;
+      box-shadow: 0 0 12px var(--primary-glow);
     }
     .hp-text {
       position: absolute;
@@ -345,14 +353,15 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 800;
-      font-size: 0.75rem;
+      font-weight: 900;
+      font-size: 0.78rem;
       color: #fff;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.8);
     }
     .close-btn {
       position: absolute;
-      top: 10px; right: 12px;
-      width: 28px; height: 28px;
+      top: 12px; right: 14px;
+      width: 30px; height: 30px;
       background: rgba(255,255,255,0.08);
       border-radius: 50%;
       display: flex;
@@ -361,21 +370,24 @@
       font-weight: bold;
       color: #fff;
       cursor: pointer;
+      border: 1px solid var(--border);
     }
 
     .sensor-status-banner {
       position: absolute;
-      top: 175px;
+      top: 190px;
       left: 20px; right: 20px;
-      background: rgba(13, 17, 23, 0.85);
+      background: rgba(13, 17, 23, 0.9);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 10px 16px;
+      border-radius: 14px;
+      padding: 12px 18px;
       color: #fff;
-      font-size: 0.82rem;
+      font-size: 0.85rem;
+      font-weight: 700;
       text-align: center;
       z-index: 25;
-      backdrop-filter: blur(8px);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
     }
 
     .bottom-hud {
@@ -390,35 +402,38 @@
     .stat-box {
       background: rgba(13, 17, 23, 0.9);
       border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 10px 14px;
+      border-radius: 16px;
+      padding: 12px 16px;
       text-align: center;
       backdrop-filter: blur(10px);
-      min-width: 85px;
+      min-width: 90px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
     }
     .stat-val {
-      font-size: 1.3rem;
-      font-weight: 800;
+      font-size: 1.4rem;
+      font-weight: 900;
       color: #fff;
     }
     .stat-lbl {
-      font-size: 0.62rem;
+      font-size: 0.65rem;
       color: var(--subtext);
       text-transform: uppercase;
       letter-spacing: 0.8px;
+      font-weight: 800;
     }
     .rep-circle {
-      width: 85px;
-      height: 85px;
+      width: 90px;
+      height: 90px;
       border-radius: 50%;
       border: 4px solid var(--primary);
-      background: rgba(13, 17, 23, 0.9);
+      background: rgba(13, 17, 23, 0.92);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 2.2rem;
+      font-size: 2.4rem;
       font-weight: 900;
       color: var(--primary);
+      box-shadow: 0 0 25px var(--primary-glow);
     }
 
     /* Sub Screens */
@@ -435,10 +450,11 @@
     .sub-screen.active { display: flex; }
 
     .screen-header-title {
-      font-size: 1.3rem;
-      font-weight: 800;
+      font-size: 1.4rem;
+      font-weight: 900;
       margin-bottom: 16px;
       color: #fff;
+      letter-spacing: 0.5px;
     }
 
     /* Dashboard grids */
@@ -451,15 +467,16 @@
     .stat-card {
       background: var(--card-bg);
       border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 16px;
+      border-radius: 18px;
+      padding: 18px;
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 8px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     }
-    .stat-card-icon { font-size: 1.5rem; }
-    .stat-card-num { font-size: 1.5rem; font-weight: 800; color: #fff; }
-    .stat-card-label { font-size: 0.72rem; color: var(--subtext); text-transform: uppercase; font-weight: 700; }
+    .stat-card-icon { font-size: 1.6rem; }
+    .stat-card-num { font-size: 1.6rem; font-weight: 900; color: #fff; }
+    .stat-card-label { font-size: 0.75rem; color: var(--subtext); text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px; }
 
     /* Settings & Form Lists */
     .settings-list {
@@ -471,16 +488,19 @@
     .setting-item {
       background: var(--card-bg);
       border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 16px;
+      border-radius: 18px;
+      padding: 18px;
       display: flex;
       flex-direction: column;
       gap: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     }
     label {
-      font-size: 0.82rem;
+      font-size: 0.85rem;
       color: var(--subtext);
-      font-weight: 700;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
     input, select {
       width: 100%;
@@ -489,10 +509,11 @@
       border: 1px solid var(--border);
       border-radius: 12px;
       color: #fff;
-      font-size: 0.95rem;
+      font-size: 1rem;
       outline: none;
+      font-weight: 700;
     }
-    input:focus, select:focus { border-color: var(--primary); }
+    input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 10px var(--primary-glow); }
 
     /* Push-up Type Selector Pills */
     .type-pill-grid {
@@ -504,46 +525,51 @@
     .type-pill {
       background: rgba(255,255,255,0.03);
       border: 1px solid var(--border);
-      padding: 12px;
+      padding: 14px;
       border-radius: 12px;
       text-align: center;
-      font-size: 0.82rem;
-      font-weight: 700;
+      font-size: 0.85rem;
+      font-weight: 800;
       color: var(--subtext);
       cursor: pointer;
-      transition: all 0.15s ease;
+      transition: all 0.2s ease;
     }
     .type-pill.selected {
-      background: rgba(56, 189, 248, 0.12);
+      background: rgba(56, 189, 248, 0.15);
       border-color: var(--primary);
       color: var(--primary);
+      box-shadow: 0 0 12px var(--primary-glow);
     }
 
     .btn {
       width: 100%;
-      padding: 15px;
+      padding: 16px;
       border-radius: 14px;
       border: none;
       background: var(--primary);
-      color: #0d1117;
-      font-weight: 800;
-      font-size: 1rem;
+      color: #090d13;
+      font-weight: 900;
+      font-size: 1.05rem;
       cursor: pointer;
       text-align: center;
+      box-shadow: 0 0 20px var(--primary-glow);
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
-    .btn:active { opacity: 0.9; }
+    .btn:active { transform: scale(0.98); opacity: 0.9; }
     .btn-secondary {
       background: rgba(255,255,255,0.06);
       border: 1px solid var(--border);
       color: #fff;
+      box-shadow: none;
     }
 
     /* Onboarding Modal */
     .modal {
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(13, 17, 23, 0.98);
-      z-index: 100;
+      background: rgba(9, 13, 19, 0.98);
+      z-index: 200;
       display: none;
       flex-direction: column;
       padding: 40px 24px;
@@ -569,36 +595,36 @@
     }
     .progress-step {
       flex: 1;
-      height: 5px;
+      height: 6px;
       background: rgba(255,255,255,0.08);
       border-radius: 3px;
     }
-    .progress-step.active { background: var(--primary); }
+    .progress-step.active { background: var(--primary); box-shadow: 0 0 10px var(--primary-glow); }
   </style>
 </head>
 <body>
 
-  <!-- Chill Loading Screen -->
+  <!-- Cinematic Loading Screen -->
   <div id="loading-screen">
     <canvas id="helmet-canvas" width="64" height="64" class="helmet-logo"></canvas>
-    <div class="loading-title">PUSH UP ARENA</div>
+    <div class="loading-title">Push Up Arena</div>
     <div class="loading-sub">AI Precision Calibration</div>
     <div class="progress-bar-bg">
       <div id="loading-progress" class="progress-bar-fill"></div>
     </div>
-    <div id="loading-text" style="font-size: 0.72rem; color: var(--subtext); margin-top: 12px;">Analyzing AI Profile & Routine...</div>
+    <div id="loading-text" style="font-size: 0.75rem; color: var(--subtext); margin-top: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Loading Combat Arena...</div>
   </div>
 
   <!-- Top Header Bar -->
   <div class="app-header">
     <div class="user-pill">
-      <div id="avatar" class="user-avatar">K</div>
+      <div id="avatar" class="user-avatar">H</div>
       <div>
-        <div id="header-user-name" style="font-weight: 800; font-size: 1rem;">Kayden</div>
-        <div id="header-user-level" style="font-size: 0.72rem; color: var(--primary); font-weight: 700;">AI Goal: 18 Reps</div>
+        <div id="header-user-name" style="font-weight: 900; font-size: 1.05rem;">Hero</div>
+        <div id="header-user-level" style="font-size: 0.75rem; color: var(--primary); font-weight: 800; letter-spacing: 0.5px;">AI Goal: 15 Reps</div>
       </div>
     </div>
-    <div class="currency-badge">🪙 <span id="header-gold-val">150</span></div>
+    <div class="currency-badge">🪙 <span id="header-gold-val">100</span></div>
   </div>
 
   <!-- SCREEN 1: HOME / ARENA MODES -->
@@ -606,8 +632,8 @@
     <div class="menu-content">
       <div class="hero-banner">
         <div class="hero-tag">🎯 AI Tailored Routine</div>
-        <div class="hero-title" id="hero-goal-title">Target: 18 Reps / Wave</div>
-        <div class="hero-sub" id="hero-goal-desc">Customized based on your age, weight, and fitness background. Form strictness is locked in.</div>
+        <div class="hero-title" id="hero-goal-title">Target: 15 Reps / Wave</div>
+        <div class="hero-sub" id="hero-goal-desc">Customized based on your hero profile. Form strictness is locked in.</div>
         <button class="btn" onclick="startArena('quick')">⚔️ QUICK BATTLE</button>
       </div>
 
@@ -643,7 +669,7 @@
           <div class="mode-icon-box">🛡️</div>
           <div class="mode-info">
             <div class="mode-title">Hero Armory & Shop</div>
-            <div class="mode-desc">Equip legendary armor, helmets, and glowing aesthetic auras with gold.</div>
+            <div class="mode-desc">Equip legendary armor, helmets, and glowing auras with gold.</div>
           </div>
           <div class="mode-action-pill" style="background:rgba(255,255,255,0.06); color:#fff;">GEAR</div>
         </div>
@@ -676,8 +702,8 @@
       </div>
 
       <div class="setting-item">
-        <label>AI Target Reps per Wave (Auto-calculated)</label>
-        <input type="number" id="ai-target-reps-input" value="18" onchange="updateAiTargetReps(this.value)">
+        <label>AI Target Reps per Wave</label>
+        <input type="number" id="ai-target-reps-input" value="15" onchange="updateAiTargetReps(this.value)">
       </div>
     </div>
   </div>
@@ -699,7 +725,7 @@
       </div>
       <div class="stat-card">
         <div class="stat-card-icon">🔥</div>
-        <div id="stats-streak" class="stat-card-num">3 Days</div>
+        <div id="stats-streak" class="stat-card-num">1 Day</div>
         <div class="stat-card-label">Workout Streak</div>
       </div>
       <div class="stat-card">
@@ -712,7 +738,7 @@
 
   <!-- SCREEN 4: ACCOUNT & PROFILES -->
   <div id="account-screen" class="sub-screen">
-    <div class="screen-header-title">👤 Hero Profile & Multi-Device Accounts</div>
+    <div class="screen-header-title">👤 Hero Profile & Accounts</div>
 
     <div class="settings-list">
       <div class="setting-item">
@@ -725,13 +751,13 @@
 
       <div class="setting-item">
         <label>Hero Name</label>
-        <input type="text" id="account-name-input" value="Kayden" onchange="updateAccountName(this.value)">
+        <input type="text" id="account-name-input" value="Hero" onchange="updateAccountName(this.value)">
       </div>
       <div class="setting-item">
-        <label>Age & Weight (Used by AI for Rep Targets)</label>
+        <label>Age & Weight (Used by AI)</label>
         <div style="display:flex; gap:10px;">
           <input type="number" id="account-age-input" value="20" placeholder="Age" onchange="recalculateAiGoals()">
-          <input type="number" id="account-weight-input" value="140" placeholder="Weight" onchange="recalculateAiGoals()">
+          <input type="number" id="account-weight-input" value="150" placeholder="Weight" onchange="recalculateAiGoals()">
         </div>
       </div>
       <div class="setting-item">
@@ -791,19 +817,19 @@
     <div class="settings-list" style="margin-top: 10px;">
       <div class="setting-item">
         <label>Total Reps</label>
-        <div id="modal-hero-reps" style="font-size: 1.2rem; font-weight: 800; color: #fff;">0</div>
+        <div id="modal-hero-reps" style="font-size: 1.2rem; font-weight: 900; color: #fff;">0</div>
       </div>
       <div class="setting-item">
         <label>Enemies Defeated</label>
-        <div id="modal-hero-enemies" style="font-size: 1.2rem; font-weight: 800; color: #fff;">0</div>
+        <div id="modal-hero-enemies" style="font-size: 1.2rem; font-weight: 900; color: #fff;">0</div>
       </div>
       <div class="setting-item">
         <label>Bosses Slain</label>
-        <div id="modal-hero-bosses" style="font-size: 1.2rem; font-weight: 800; color: #fff;">0</div>
+        <div id="modal-hero-bosses" style="font-size: 1.2rem; font-weight: 900; color: #fff;">0</div>
       </div>
       <div class="setting-item">
         <label>Story Stage</label>
-        <div id="modal-hero-stage" style="font-size: 1.2rem; font-weight: 800; color: #fff;">Stage 1</div>
+        <div id="modal-hero-stage" style="font-size: 1.2rem; font-weight: 900; color: #fff;">Stage 1</div>
       </div>
     </div>
     <button class="btn" style="margin-top: 20px;" onclick="closeUserStatsModal()">Close</button>
@@ -851,7 +877,7 @@
           <div class="boss-name" id="boss-name-txt">Wave 1 Target</div>
           <div class="hp-bar-bg">
             <div id="hp-bar" class="hp-bar-fill"></div>
-            <div id="hp-txt" class="hp-text">0 / 18 Reps</div>
+            <div id="hp-txt" class="hp-text">0 / 15 Reps</div>
           </div>
         </div>
       </div>
@@ -874,14 +900,14 @@
     </div>
   </div>
 
-  <!-- Onboarding Modal -->
-  <div id="onboarding-modal" class="modal active">
+  <!-- Mandatory Onboarding Modal (Forces Fresh Account Setup) -->
+  <div id="onboarding-modal" class="modal">
     <!-- Welcome Intro Slide -->
     <div class="onboarding-slide active" id="slide-welcome" style="display: flex; flex-direction: column; align-items: center; text-align: center; justify-content: center; height: 100%;">
-      <div style="font-size: 3rem; margin-bottom: 15px;">⚔️</div>
-      <h1 style="font-size: 1.8rem; font-weight: 800; color: #fff; margin-bottom: 10px;">Welcome to Push Up Arena</h1>
-      <p style="color: var(--subtext); font-size: 0.95rem; margin-bottom: 30px; line-height: 1.4;">Transform your fitness with AI pose tracking, campaign battles, and multi-profile accounts.</p>
-      <button class="btn" onclick="startOnboardingFlow()">Get started</button>
+      <div style="font-size: 3.5rem; margin-bottom: 15px;">⚔️</div>
+      <h1 style="font-size: 2rem; font-weight: 900; color: #fff; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px;">Push Up Arena</h1>
+      <p style="color: var(--subtext); font-size: 1rem; margin-bottom: 35px; line-height: 1.5; max-width: 320px;">Transform your fitness with AI pose tracking, dungeon bosses, and epic multi-profile quests.</p>
+      <button class="btn" onclick="startOnboardingFlow()">Get Started</button>
     </div>
 
     <div class="slide-progress" id="onboarding-progress-bar" style="display: none;">
@@ -894,15 +920,15 @@
     <div class="slide-container" id="onboarding-slides-container" style="display: none;">
       <div class="onboarding-slide" id="slide-1">
         <h2>What's your hero name?</h2>
-        <p style="color: var(--subtext); font-size: 0.85rem;">Personalizes your AI training profile.</p>
+        <p style="color: var(--subtext); font-size: 0.88rem;">Personalizes your AI training profile.</p>
         <div class="form-group" style="margin-top: 10px;">
-          <input type="text" id="signup-name" value="Kayden" placeholder="Enter name">
+          <input type="text" id="signup-name" value="" placeholder="Enter hero name">
         </div>
       </div>
 
       <div class="onboarding-slide" id="slide-2">
         <h2>How old are you?</h2>
-        <p style="color: var(--subtext); font-size: 0.85rem;">Helps the AI calculate your optimal recovery & rep load.</p>
+        <p style="color: var(--subtext); font-size: 0.88rem;">Helps the AI calculate your optimal recovery & rep load.</p>
         <div class="form-group" style="margin-top: 10px;">
           <input type="number" id="signup-age" value="20">
         </div>
@@ -910,15 +936,15 @@
 
       <div class="onboarding-slide" id="slide-3">
         <h2>What is your weight? (lbs)</h2>
-        <p style="color: var(--subtext); font-size: 0.85rem;">Used to determine strength-to-weight ratios.</p>
+        <p style="color: var(--subtext); font-size: 0.88rem;">Used to determine strength-to-weight ratios.</p>
         <div class="form-group" style="margin-top: 10px;">
-          <input type="number" id="signup-weight" value="140">
+          <input type="number" id="signup-weight" value="150">
         </div>
       </div>
 
       <div class="onboarding-slide" id="slide-4">
         <h2>Max Push-ups in 1 Set?</h2>
-        <p style="color: var(--subtext); font-size: 0.85rem;">The AI uses this to calibrate your exact wave target.</p>
+        <p style="color: var(--subtext); font-size: 0.88rem;">The AI uses this to calibrate your exact wave target.</p>
         <div class="form-group" style="margin-top: 10px;">
           <input type="number" id="signup-max-reps" value="15">
         </div>
@@ -932,15 +958,15 @@
   </div>
 
   <script>
-    let currentProfileKey = localStorage.getItem('pushup_arena_active_profile') || 'Kayden';
+    let currentProfileKey = localStorage.getItem('pushup_arena_active_profile') || '';
     
     let state = {
-      userName: "Kayden",
+      userName: "Hero",
       age: 20,
-      weight: 140,
+      weight: 150,
       maxReps: 15,
       aiTargetReps: 18,
-      gold: 150,
+      gold: 100,
       themeColor: "#38bdf8",
       totalReps: 0,
       enemiesDefeated: 0,
@@ -957,16 +983,15 @@
     const totalSlides = 4;
 
     function initApp() {
-      loadProfileData(currentProfileKey);
-      populateProfileSelector();
-      
-      const savedCheck = localStorage.getItem(`pushup_arena_state_${currentProfileKey}`);
-      if (savedCheck) {
-        document.getElementById('onboarding-modal').classList.remove('active');
-      } else {
+      // Check if active profile exists and has save data; if not, force fresh onboarding signup
+      if (!currentProfileKey || !localStorage.getItem(`pushup_arena_state_${currentProfileKey}`)) {
         document.getElementById('onboarding-modal').classList.add('active');
+      } else {
+        loadProfileData(currentProfileKey);
+        document.getElementById('onboarding-modal').classList.remove('active');
       }
 
+      populateProfileSelector();
       runAiTargetCalculation();
       updateThemeColor(state.themeColor);
       document.getElementById('theme-color-picker').value = state.themeColor;
@@ -994,7 +1019,7 @@
           document.getElementById('loading-screen').style.opacity = '0';
           setTimeout(() => { document.getElementById('loading-screen').style.display = 'none'; }, 300);
         }
-      }, 80);
+      }, 70);
     }
 
     function loadProfileData(profileName) {
@@ -1003,17 +1028,18 @@
       const saved = localStorage.getItem(`pushup_arena_state_${profileName}`);
       if (saved) {
         try { state = { ...state, ...JSON.parse(saved) }; } catch(e){}
-      } else {
-        state.userName = profileName;
-        saveState();
       }
     }
 
     function populateProfileSelector() {
-      let profiles = JSON.parse(localStorage.getItem('pushup_arena_profiles_list') || '["Kayden"]');
-      if (!profiles.includes(currentProfileKey)) profiles.push(currentProfileKey);
+      let profiles = JSON.parse(localStorage.getItem('pushup_arena_profiles_list') || '[]');
+      if (currentProfileKey && !profiles.includes(currentProfileKey)) profiles.push(currentProfileKey);
       
       const sel = document.getElementById('profile-selector');
+      if (profiles.length === 0) {
+        sel.innerHTML = `<option value="">No accounts found - Create one</option>`;
+        return;
+      }
       let html = '';
       profiles.forEach(p => {
         html += `<option value="${p}" ${p === currentProfileKey ? 'selected' : ''}>👤 Account: ${p}</option>`;
@@ -1022,26 +1048,46 @@
     }
 
     function switchProfile(profileName) {
+      if (!profileName) return;
       loadProfileData(profileName);
       initApp();
       switchTab('home');
-      alert(`Switched to account profile: ${profileName}`);
     }
 
     function createNewProfilePrompt() {
-      let newName = prompt("Enter new account profile name:", "Player2");
+      let newName = prompt("Enter new hero account name:", "Knight");
       if (newName && newName.trim() !== "") {
         newName = newName.trim();
-        let profiles = JSON.parse(localStorage.getItem('pushup_arena_profiles_list') || '["Kayden"]');
+        let profiles = JSON.parse(localStorage.getItem('pushup_arena_profiles_list') || '[]');
         if (!profiles.includes(newName)) {
           profiles.push(newName);
           localStorage.setItem('pushup_arena_profiles_list', JSON.stringify(profiles));
         }
-        loadProfileData(newName);
+        // Initialize fresh state for new profile
+        state = {
+          userName: newName,
+          age: 20,
+          weight: 150,
+          maxReps: 15,
+          aiTargetReps: 18,
+          gold: 100,
+          themeColor: "#38bdf8",
+          totalReps: 0,
+          enemiesDefeated: 0,
+          bossesSlain: 0,
+          currentReps: 0,
+          strictness: "standard",
+          audioFeedback: "all",
+          routineFormat: "cycle",
+          selectedTypes: ["standard", "diamond"],
+          storyStage: 1
+        };
+        currentProfileKey = newName;
+        saveState();
         populateProfileSelector();
         initApp();
         switchTab('home');
-        alert(`Created and switched to new account: ${newName}`);
+        alert(`Successfully created fresh account for: ${newName}`);
       }
     }
 
@@ -1060,7 +1106,7 @@
 
     function recalculateAiGoals() {
       state.age = parseInt(document.getElementById('account-age-input').value) || 20;
-      state.weight = parseInt(document.getElementById('account-weight-input').value) || 140;
+      state.weight = parseInt(document.getElementById('account-weight-input').value) || 150;
       state.maxReps = parseInt(document.getElementById('account-max-reps-input').value) || 15;
       runAiTargetCalculation();
       saveState();
@@ -1171,7 +1217,7 @@
         document.getElementById(`p-step-${i}`).classList.toggle('active', i <= currentSlide);
       }
       document.getElementById('back-btn').style.display = currentSlide === 1 ? 'none' : 'block';
-      document.getElementById('next-btn').innerText = currentSlide === totalSlides ? 'Finish' : 'Next';
+      document.getElementById('next-btn').innerText = currentSlide === totalSlides ? 'Start Adventure' : 'Next';
     }
 
     function nextSlide() {
@@ -1191,17 +1237,29 @@
     }
 
     function completeOnboarding() {
-      state.userName = document.getElementById('signup-name').value || currentProfileKey;
+      let heroNameInput = document.getElementById('signup-name').value.trim();
+      let heroName = heroNameInput !== "" ? heroNameInput : "Hero";
+      
+      state.userName = heroName;
       state.age = parseInt(document.getElementById('signup-age').value) || 20;
-      state.weight = parseInt(document.getElementById('signup-weight').value) || 140;
+      state.weight = parseInt(document.getElementById('signup-weight').value) || 150;
       state.maxReps = parseInt(document.getElementById('signup-max-reps').value) || 15;
       
+      currentProfileKey = heroName;
+      let profiles = JSON.parse(localStorage.getItem('pushup_arena_profiles_list') || '[]');
+      if (!profiles.includes(heroName)) {
+        profiles.push(heroName);
+        localStorage.setItem('pushup_arena_profiles_list', JSON.stringify(profiles));
+      }
+
       runAiTargetCalculation();
       document.getElementById('header-user-name').innerText = state.userName;
       document.getElementById('account-name-input').value = state.userName;
       document.getElementById('avatar').innerText = state.userName.charAt(0).toUpperCase();
       document.getElementById('onboarding-modal').classList.remove('active');
       saveState();
+      populateProfileSelector();
+      switchTab('home');
     }
 
     function drawPixelHelmet() {
@@ -1210,7 +1268,7 @@
       ctx.fillStyle = state.themeColor;
       ctx.fillRect(16, 8, 32, 12);
       ctx.fillRect(12, 20, 40, 32);
-      ctx.fillStyle = "#0d1117";
+      ctx.fillStyle = "#090d13";
       ctx.fillRect(20, 28, 24, 8);
     }
 
@@ -1223,11 +1281,13 @@
     }
 
     function saveState() {
-      localStorage.setItem(`pushup_arena_state_${currentProfileKey}`, JSON.stringify(state));
+      if (currentProfileKey) {
+        localStorage.setItem(`pushup_arena_state_${currentProfileKey}`, JSON.stringify(state));
+      }
     }
 
     function resetAllData() {
-      if (confirm(`Are you sure you want to reset all stats for profile "${currentProfileKey}"?`)) {
+      if (confirm(`Are you sure you want to factory reset profile "${currentProfileKey}"?`)) {
         localStorage.removeItem(`pushup_arena_state_${currentProfileKey}`);
         location.reload();
       }
@@ -1306,7 +1366,7 @@
         locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`
       });
 
-      // Enhanced Tracking Parameters (Higher Precision & Strict Smoothing)
+      // Enhanced Tracking Parameters (High Precision 0.8 Confidence & Strict Smoothing)
       pose.setOptions({
         modelComplexity: 1,
         smoothLandmarks: true,
@@ -1495,15 +1555,15 @@
         html += `
           <div class="setting-item" style="cursor: pointer; flex-direction: row; justify-content: space-between; align-items: center;" onclick="inspectHero('${u.name}', ${u.reps}, ${u.enemies}, ${u.bosses}, ${u.stage})">
             <div style="display: flex; align-items: center; gap: 14px;">
-              <div style="font-weight: 800; font-size: 1.1rem; color: var(--primary); min-width: 40px;">${rankBadge}</div>
+              <div style="font-weight: 900; font-size: 1.1rem; color: var(--primary); min-width: 40px;">${rankBadge}</div>
               <div>
-                <div style="font-weight: 800; font-size: 1.05rem; color: #fff;">${u.name}</div>
-                <div style="font-size: 0.72rem; color: var(--subtext);">Stage ${u.stage} • ${u.bosses} Bosses Slain</div>
+                <div style="font-weight: 900; font-size: 1.05rem; color: #fff;">${u.name}</div>
+                <div style="font-size: 0.75rem; color: var(--subtext);">Stage ${u.stage} • ${u.bosses} Bosses Slain</div>
               </div>
             </div>
             <div style="text-align: right;">
-              <div style="font-weight: 800; font-size: 1.1rem; color: #fff;">💪 ${u.reps}</div>
-              <div style="font-size: 0.65rem; color: var(--subtext); text-transform: uppercase;">Total Reps</div>
+              <div style="font-weight: 900; font-size: 1.1rem; color: #fff;">💪 ${u.reps}</div>
+              <div style="font-size: 0.65rem; color: var(--subtext); text-transform: uppercase; font-weight: 800;">Total Reps</div>
             </div>
           </div>
         `;
