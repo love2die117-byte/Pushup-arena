@@ -6,7 +6,7 @@
   <title>Push Up Arena: Knight's Quest CLOUD OMEGA</title>
 
   <!-- AUTO-UPDATE CACHE BUSTER -->
-  <meta name="app-version" content="v12.0-firebase-auth-db">
+  <meta name="app-version" content="v12.1-firebase-auth-fixed">
 
   <!-- PWA & Mobile Optimization -->
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -717,7 +717,7 @@
         <div id="header-user-level" style="font-size: 0.75rem; color: var(--subtext); font-weight: 800;">AI Goal: 15 Reps</div>
       </div>
     </div>
-    <div class="version-badge">v12.0-FIREBASE</div>
+    <div class="version-badge">v12.1-FIREBASE</div>
   </div>
 
   <!-- SCREEN 1: HOME / ARENA MODES -->
@@ -1150,6 +1150,7 @@
       try {
         await window.fbAuthMethods.signInWithPopup(window.fbAuth, window.fbGoogleProvider);
       } catch (err) {
+        console.error("Google Auth Error:", err);
         alert("Google Sign-In Error: " + err.message);
       }
     }
@@ -1255,7 +1256,7 @@
 
     function updateStatsDisplay() {
       document.getElementById('stats-total-reps').innerText = window.state.totalReps;
-      document.getElementById('stats-enemies-killed').innerText = window.state.enemiesDefated;
+      document.getElementById('stats-enemies-killed').innerText = window.state.enemiesDefeated;
       document.getElementById('stats-bosses-slain').innerText = window.state.bossesSlain;
     }
 
