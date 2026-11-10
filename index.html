@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Push Up Arena: Knight's Quest</title>
+  <title>Push Up Arena: Knight's Quest OMEGA</title>
 
   <!-- AUTO-UPDATE CACHE BUSTER -->
-  <meta name="app-version" content="v7.0-pro-settings-hub">
+  <meta name="app-version" content="v10.0-omega-nexus">
 
   <!-- PWA & Mobile Optimization -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="PushUpArena">
-  <meta name="theme-color" content="#121214">
+  <meta name="theme-color" content="#0a0b0e">
 
   <!-- MediaPipe Pose & Camera Utils -->
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
@@ -20,15 +20,15 @@
 
   <style>
     :root {
-      --bg: #0d0e12;
-      --card-bg: #16181d;
+      --bg: #0a0b0e;
+      --card-bg: #13151b;
       --card-border: rgba(255, 255, 255, 0.08);
-      --card-border-active: rgba(255, 255, 255, 0.3);
+      --card-border-active: rgba(255, 255, 255, 0.35);
       --text: #f1f5f9;
-      --subtext: #94a3b8;
+      --subtext: #8b949e;
       --accent-gold: #fbbf24;
-      --danger: #ef4444;
-      --success: #10b981;
+      --danger: #f87171;
+      --success: #34d399;
     }
 
     * {
@@ -73,7 +73,7 @@
       justify-content: center;
       align-items: center;
       z-index: 150;
-      background: radial-gradient(circle at center, #1e2028 0%, #0d0e12 100%);
+      background: radial-gradient(circle at center, #181b24 0%, #0a0b0e 100%);
     }
     .helmet-logo {
       width: 110px;
@@ -81,22 +81,22 @@
       image-rendering: pixelated;
       margin-bottom: 20px;
       animation: chillFloat 3s infinite ease-in-out;
-      filter: drop-shadow(0 0 20px rgba(255,255,255,0.15));
+      filter: drop-shadow(0 0 25px rgba(255,255,255,0.2));
     }
     @keyframes chillFloat {
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-8px); }
     }
     .loading-title {
-      font-size: 1.5rem;
+      font-size: 1.6rem;
       font-weight: 900;
-      letter-spacing: 2.5px;
+      letter-spacing: 3px;
       color: #fff;
       margin-bottom: 6px;
       text-transform: uppercase;
     }
     .loading-sub {
-      font-size: 0.72rem;
+      font-size: 0.75rem;
       color: var(--subtext);
       text-transform: uppercase;
       letter-spacing: 2px;
@@ -104,7 +104,7 @@
       font-weight: 800;
     }
     .progress-bar-bg {
-      width: 240px;
+      width: 250px;
       height: 6px;
       background: rgba(255,255,255,0.06);
       border-radius: 3px;
@@ -124,7 +124,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: rgba(22, 24, 29, 0.95);
+      background: rgba(19, 21, 27, 0.95);
       backdrop-filter: blur(20px);
       border-bottom: 1px solid var(--card-border);
       z-index: 15;
@@ -139,7 +139,7 @@
       width: 42px;
       height: 42px;
       border-radius: 12px;
-      background: #22252e;
+      background: #1c1f2b;
       border: 2px solid rgba(255,255,255,0.2);
       display: flex;
       align-items: center;
@@ -148,17 +148,15 @@
       font-size: 1.1rem;
       color: #fff;
     }
-    .currency-badge {
-      background: rgba(251, 191, 36, 0.1);
-      border: 1px solid rgba(251, 191, 36, 0.3);
-      padding: 8px 14px;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+    .version-badge {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      padding: 6px 12px;
+      border-radius: 10px;
+      font-family: monospace;
+      font-size: 0.75rem;
       font-weight: 900;
-      font-size: 0.85rem;
-      color: var(--accent-gold);
+      color: var(--subtext);
     }
 
     /* Bottom Navigation Bar */
@@ -166,7 +164,7 @@
       position: absolute;
       bottom: 0; left: 0; right: 0;
       height: 76px;
-      background: #0f1015;
+      background: #0d0f14;
       backdrop-filter: blur(20px);
       border-top: 1px solid var(--card-border);
       display: flex;
@@ -191,12 +189,14 @@
       padding: 8px 0;
     }
     .nav-item span:first-child {
-      font-size: 1.3rem;
+      font-size: 1.2rem;
+      font-family: monospace;
+      font-weight: 900;
       transition: transform 0.15s ease;
     }
     .nav-item.active { color: #fff; }
-    .nav-item.active span:first-child { transform: scale(1.18); }
-    .nav-item:active span:first-child { transform: scale(1.25); }
+    .nav-item.active span:first-child { transform: scale(1.2); }
+    .nav-item:active span:first-child { transform: scale(1.28); }
 
     /* Scrollable Menu Content */
     .menu-content {
@@ -211,7 +211,7 @@
 
     /* Hero Banner Card */
     .hero-banner {
-      background: linear-gradient(135deg, #181a22 0%, #121318 100%);
+      background: linear-gradient(135deg, #171922 0%, #101219 100%);
       border: 1px solid var(--card-border);
       border-radius: 22px;
       padding: 24px;
@@ -266,12 +266,15 @@
       width: 56px;
       height: 56px;
       border-radius: 16px;
-      background: #1f222d;
+      background: #1c1f2b;
       border: 1px solid var(--card-border);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.7rem;
+      font-family: monospace;
+      font-size: 1.25rem;
+      font-weight: 900;
+      color: #fff;
       flex-shrink: 0;
     }
     .mode-info { flex: 1; }
@@ -288,7 +291,7 @@
     }
     .mode-action-pill {
       background: #f1f5f9;
-      color: #0d0e12;
+      color: #0a0b0e;
       font-weight: 900;
       font-size: 0.78rem;
       padding: 10px 18px;
@@ -315,6 +318,8 @@
       font-weight: 900;
       margin-bottom: 18px;
       color: #fff;
+      font-family: monospace;
+      letter-spacing: -0.5px;
     }
 
     .stats-dashboard {
@@ -332,7 +337,7 @@
       flex-direction: column;
       gap: 8px;
     }
-    .stat-card-icon { font-size: 1.6rem; }
+    .stat-card-icon { font-family: monospace; font-size: 1.3rem; font-weight: 900; color: var(--subtext); }
     .stat-card-num { font-size: 1.6rem; font-weight: 900; color: #fff; }
     .stat-card-label { font-size: 0.75rem; color: var(--subtext); text-transform: uppercase; font-weight: 800; }
 
@@ -367,7 +372,7 @@
     input, select {
       width: 100%;
       padding: 14px;
-      background: #111217;
+      background: #0f1117;
       border: 1px solid var(--card-border);
       border-radius: 12px;
       color: #fff;
@@ -390,7 +395,7 @@
       position: absolute;
       cursor: pointer;
       top: 0; left: 0; right: 0; bottom: 0;
-      background-color: #22252e;
+      background-color: #1c1f2b;
       transition: 0.2s;
       border-radius: 28px;
       border: 1px solid var(--card-border);
@@ -407,7 +412,7 @@
       border-radius: 50%;
     }
     input:checked + .slider { background-color: #f1f5f9; }
-    input:checked + .slider:before { transform: translateX(24px); background-color: #0d0e12; }
+    input:checked + .slider:before { transform: translateX(24px); background-color: #0a0b0e; }
 
     .type-pill-grid {
       display: grid;
@@ -416,7 +421,7 @@
       margin-top: 6px;
     }
     .type-pill {
-      background: #111217;
+      background: #0f1117;
       border: 1px solid var(--card-border);
       padding: 14px;
       border-radius: 12px;
@@ -427,7 +432,7 @@
       cursor: pointer;
     }
     .type-pill.selected {
-      background: #262935;
+      background: #232736;
       border-color: #fff;
       color: #fff;
     }
@@ -438,7 +443,7 @@
       border-radius: 14px;
       border: none;
       background: #f1f5f9;
-      color: #0d0e12;
+      color: #0a0b0e;
       font-weight: 900;
       font-size: 1.05rem;
       cursor: pointer;
@@ -448,7 +453,7 @@
     }
     .btn:active { transform: scale(0.98); opacity: 0.9; }
     .btn-secondary {
-      background: #1f222d;
+      background: #1c1f2b;
       border: 1px solid var(--card-border);
       color: #fff;
     }
@@ -457,7 +462,7 @@
     .modal {
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(13, 14, 18, 0.98);
+      background: rgba(10, 11, 14, 0.98);
       z-index: 200;
       display: none;
       flex-direction: column;
@@ -512,7 +517,7 @@
       z-index: 20;
     }
     .boss-card {
-      background: rgba(15, 16, 21, 0.92);
+      background: rgba(19, 21, 27, 0.92);
       border: 1px solid var(--card-border);
       border-radius: 18px;
       padding: 16px;
@@ -558,7 +563,7 @@
       justify-content: center;
       font-weight: 900;
       font-size: 0.78rem;
-      color: #0d0e12;
+      color: #0a0b0e;
     }
     .close-btn {
       position: absolute;
@@ -577,7 +582,7 @@
     .sensor-status-banner {
       position: absolute;
       top: 185px; left: 20px; right: 20px;
-      background: rgba(15, 16, 21, 0.92);
+      background: rgba(19, 21, 27, 0.92);
       border: 1px solid var(--card-border);
       border-radius: 14px;
       padding: 12px 18px;
@@ -613,7 +618,7 @@
       z-index: 20;
     }
     .stat-box {
-      background: rgba(15, 16, 21, 0.9);
+      background: rgba(19, 21, 27, 0.9);
       border: 1px solid var(--card-border);
       border-radius: 16px;
       padding: 12px 16px;
@@ -627,7 +632,7 @@
       width: 90px; height: 90px;
       border-radius: 50%;
       border: 4px solid #fff;
-      background: rgba(15, 16, 21, 0.92);
+      background: rgba(19, 21, 27, 0.92);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -644,7 +649,7 @@
   <div id="loading-screen">
     <canvas id="helmet-canvas" width="64" height="64" class="helmet-logo"></canvas>
     <div class="loading-title">Push Up Arena</div>
-    <div class="loading-sub">Loading Combat Arena...</div>
+    <div class="loading-sub">[INIT OMEGA ENGINE v10.0]</div>
     <div class="progress-bar-bg">
       <div id="loading-progress" class="progress-bar-fill"></div>
     </div>
@@ -659,54 +664,54 @@
         <div id="header-user-level" style="font-size: 0.75rem; color: var(--subtext); font-weight: 800;">AI Goal: 15 Reps</div>
       </div>
     </div>
-    <div class="currency-badge">🪙 <span id="header-gold-val">100</span></div>
+    <div class="version-badge">v10.0-OMEGA</div>
   </div>
 
   <!-- SCREEN 1: HOME / ARENA MODES -->
   <div id="home-screen" class="screen active">
     <div class="menu-content">
       <div class="hero-banner">
-        <div class="hero-tag">🎯 AI Tailored Routine</div>
+        <div class="hero-tag">[AI TACTICAL ROUTINE OMEGA]</div>
         <div class="hero-title" id="hero-goal-title">Target: 15 Reps / Wave</div>
         <div class="hero-sub" id="hero-goal-desc">Customized based on your hero profile. Form strictness is locked in.</div>
-        <button class="btn" onclick="startArena('quick')">⚔️ QUICK BATTLE</button>
+        <button class="btn" onclick="startArena('quick')">[ &gt; ] LAUNCH QUICK BATTLE</button>
       </div>
 
       <div class="modes-grid">
         <div class="mode-card" onclick="startArena('quick')">
-          <div class="mode-icon-box">👹</div>
+          <div class="mode-icon-box">[BSS]</div>
           <div class="mode-info">
             <div class="mode-title">Boss Arena Raid</div>
             <div class="mode-desc">Standard AI camera form tracking against dungeon bosses.</div>
           </div>
-          <div class="mode-action-pill">PLAY</div>
+          <div class="mode-action-pill">FIGHT</div>
         </div>
 
         <div class="mode-card" onclick="openStoryCampaign()">
-          <div class="mode-icon-box">📜</div>
+          <div class="mode-icon-box">[CAM]</div>
           <div class="mode-info">
             <div class="mode-title">Huge Story Campaign</div>
             <div class="mode-desc">50+ progression dungeons from Goblin Caves to Dragon Spire.</div>
           </div>
-          <div class="mode-action-pill" style="background:#1f222d; color:#fff;">ENTER</div>
+          <div class="mode-action-pill" style="background:#1c1f2b; color:#fff;">ENTER</div>
         </div>
 
         <div class="mode-card" onclick="openEndlessSurvival()">
-          <div class="mode-icon-box">💀</div>
+          <div class="mode-icon-box">[END]</div>
           <div class="mode-info">
             <div class="mode-title">Endless Survival Mode</div>
             <div class="mode-desc">Infinite waves of monsters. How many reps can you endure?</div>
           </div>
-          <div class="mode-action-pill" style="background:#1f222d; color:#fff;">SURVIVE</div>
+          <div class="mode-action-pill" style="background:#1c1f2b; color:#fff;">SURVIVE</div>
         </div>
 
         <div class="mode-card" onclick="openArmory()">
-          <div class="mode-icon-box">🛡️</div>
+          <div class="mode-icon-box">[ARM]</div>
           <div class="mode-info">
             <div class="mode-title">Hero Armory & Shop</div>
             <div class="mode-desc">Equip legendary armor, helmets, and glowing auras with gold.</div>
           </div>
-          <div class="mode-action-pill" style="background:#1f222d; color:#fff;">GEAR</div>
+          <div class="mode-action-pill" style="background:#1c1f2b; color:#fff;">GEAR</div>
         </div>
       </div>
     </div>
@@ -714,7 +719,7 @@
 
   <!-- SCREEN 2: PUSH-UP TYPES -->
   <div id="types-screen" class="sub-screen">
-    <div class="screen-header-title">🔄 Push-up Routine & Types</div>
+    <div class="screen-header-title">[ ROUTINE &amp; STYLES ]</div>
 
     <div class="settings-list">
       <div class="setting-item">
@@ -745,26 +750,26 @@
 
   <!-- SCREEN 3: STATS & ANALYTICS -->
   <div id="stats-screen" class="sub-screen">
-    <div class="screen-header-title">📊 Hero Analytics</div>
+    <div class="screen-header-title">[ HERO ANALYTICS ]</div>
     
     <div class="stats-dashboard">
       <div class="stat-card">
-        <div class="stat-card-icon">💪</div>
+        <div class="stat-card-icon">[ REP ]</div>
         <div id="stats-total-reps" class="stat-card-num">0</div>
         <div class="stat-card-label">Total Push-ups</div>
       </div>
       <div class="stat-card">
-        <div class="stat-card-icon">👹</div>
+        <div class="stat-card-icon">[ KIL ]</div>
         <div id="stats-enemies-killed" class="stat-card-num">0</div>
         <div class="stat-card-label">Enemies Defeated</div>
       </div>
       <div class="stat-card">
-        <div class="stat-card-icon">🔥</div>
+        <div class="stat-card-icon">[ STR ]</div>
         <div id="stats-streak" class="stat-card-num">1 Day</div>
         <div class="stat-card-label">Workout Streak</div>
       </div>
       <div class="stat-card">
-        <div class="stat-card-icon">🏆</div>
+        <div class="stat-card-icon">[ BSS ]</div>
         <div id="stats-bosses-slain" class="stat-card-num">0</div>
         <div class="stat-card-label">Bosses Slain</div>
       </div>
@@ -773,13 +778,13 @@
 
   <!-- SCREEN 4: ACCOUNT & PROFILES -->
   <div id="account-screen" class="sub-screen">
-    <div class="screen-header-title">👤 Hero Profile</div>
+    <div class="screen-header-title">[ PROFILE &amp; ID ]</div>
 
     <div class="settings-list">
       <div class="setting-item">
         <label>Active Profile Save Key</label>
         <input type="text" id="device-id-display" readonly style="color: var(--subtext); font-family: monospace;">
-        <button class="btn btn-secondary" style="margin-top: 10px;" onclick="createNewDeviceProfile()">➕ Create New Player Profile</button>
+        <button class="btn btn-secondary" style="margin-top: 10px;" onclick="createNewDeviceProfile()">[+] Create New Player Profile</button>
       </div>
 
       <div class="setting-item">
@@ -800,14 +805,13 @@
     </div>
   </div>
 
-  <!-- SCREEN 5: MASSIVE PRO SETTINGS HUB -->
+  <!-- SCREEN 5: EXPANDED PRO SETTINGS HUB -->
   <div id="settings-screen" class="sub-screen">
-    <div class="screen-header-title">⚙️ Pro Settings Hub</div>
+    <div class="screen-header-title">[ SYSTEM CONFIG ]</div>
 
     <div class="settings-list">
-      <!-- AI & Sensor Options -->
       <div class="setting-item">
-        <label>🎯 Form Strictness</label>
+        <label>Form Strictness Threshold</label>
         <select id="strictness-select" onchange="saveAppSettings()">
           <option value="casual">Casual (Elbow &lt; 105°)</option>
           <option value="standard" selected>Standard Pro (Elbow &lt; 90°)</option>
@@ -816,19 +820,27 @@
       </div>
 
       <div class="setting-item">
-        <label>📐 Camera Tracking Sensitivity</label>
+        <label>Camera Tracking Precision</label>
         <select id="camera-sensitivity-select" onchange="saveAppSettings()">
-          <option value="balanced" selected>Balanced AI Tracking</option>
-          <option value="high">High Precision (Strict Lighting)</option>
+          <option value="balanced" selected>Balanced AI Tracking (Default)</option>
+          <option value="high">High Precision (Requires Bright Light)</option>
           <option value="relaxed">Relaxed (Low Light Support)</option>
         </select>
       </div>
 
-      <!-- Audio & Haptics Options -->
       <div class="setting-item">
-        <label>🔊 Audio & Haptic Feedback</label>
+        <label>Rendering Frame Rate Cap</label>
+        <select id="fps-cap-select" onchange="saveAppSettings()">
+          <option value="60" selected>60 FPS (Smooth Motion)</option>
+          <option value="30">30 FPS (Battery Saver Mode)</option>
+          <option value="max">Uncapped (Performance)</option>
+        </select>
+      </div>
+
+      <div class="setting-item">
+        <label>Audio &amp; Haptic Mode</label>
         <select id="audio-feedback-select" onchange="saveAppSettings()">
-          <option value="all" selected>Vibration & Audio Cues Enabled</option>
+          <option value="all" selected>Vibration &amp; Audio Cues Enabled</option>
           <option value="vibrate">Vibration Only</option>
           <option value="off">Muted</option>
         </select>
@@ -837,8 +849,8 @@
       <div class="setting-item">
         <div class="setting-row">
           <div>
-            <label style="display:block; margin-bottom:2px;">Rep Completion Beep</label>
-            <span style="font-size:0.75rem; color:var(--subtext);">Play sound chime on every rep</span>
+            <label style="display:block; margin-bottom:2px;">Rep Completion Chime</label>
+            <span style="font-size:0.75rem; color:var(--subtext);">Play sound feedback on verified reps</span>
           </div>
           <label class="switch">
             <input type="checkbox" id="setting-rep-sound" checked onchange="saveAppSettings()">
@@ -860,12 +872,11 @@
         </div>
       </div>
 
-      <!-- Display Options -->
       <div class="setting-item">
         <div class="setting-row">
           <div>
-            <label style="display:block; margin-bottom:2px;">Show Live Skeleton Overlay</label>
-            <span style="font-size:0.75rem; color:var(--subtext);">Render AI skeletal tracking lines on camera</span>
+            <label style="display:block; margin-bottom:2px;">Live Skeleton Overlay</label>
+            <span style="font-size:0.75rem; color:var(--subtext);">Render AI skeletal tracing over camera stream</span>
           </div>
           <label class="switch">
             <input type="checkbox" id="setting-skeleton-overlay" checked onchange="saveAppSettings()">
@@ -877,8 +888,8 @@
       <div class="setting-item">
         <div class="setting-row">
           <div>
-            <label style="display:block; margin-bottom:2px;">Keep Screen Awake</label>
-            <span style="font-size:0.75rem; color:var(--subtext);">Prevent screen dimming during workouts</span>
+            <label style="display:block; margin-bottom:2px;">Keep Screen Awake (Wake Lock)</label>
+            <span style="font-size:0.75rem; color:var(--subtext);">Prevent display dimming during active workout</span>
           </div>
           <label class="switch">
             <input type="checkbox" id="setting-wake-lock" checked onchange="saveAppSettings()">
@@ -887,21 +898,20 @@
         </div>
       </div>
 
-      <!-- Data & Backup -->
       <div class="setting-item">
-        <label>💾 Save Data Management</label>
+        <label>Save Data &amp; Backup Hub</label>
         <div style="display:flex; gap:10px; margin-top:4px;">
-          <button class="btn btn-secondary" onclick="exportSaveBackup()">Export Backup</button>
+          <button class="btn btn-secondary" onclick="exportSaveBackup()">Export Backup JSON</button>
           <button class="btn btn-secondary" onclick="importSaveBackup()">Import Backup</button>
         </div>
-        <button class="btn btn-secondary" style="color: var(--danger); margin-top:8px;" onclick="resetAllData()">Factory Reset Profile</button>
+        <button class="btn btn-secondary" style="color: var(--danger); margin-top:8px;" onclick="resetAllData()">Factory Reset Player Profile</button>
       </div>
     </div>
   </div>
 
   <!-- SCREEN 6: LEADERBOARD -->
   <div id="leaderboard-screen" class="sub-screen">
-    <div class="screen-header-title">🏆 Live Real Leaderboard</div>
+    <div class="screen-header-title">[ GLOBAL LEADERBOARD ]</div>
     <p style="color: var(--subtext); font-size: 0.82rem; margin-bottom: 16px;">Real players and profiles ranked live by total verified push-up reps.</p>
     <div class="settings-list" id="leaderboard-list-container">
       <!-- Injected via JS -->
@@ -935,27 +945,27 @@
   <!-- BOTTOM NAVIGATION BAR -->
   <div class="bottom-nav">
     <div class="nav-item active" id="nav-home" onclick="switchTab('home')">
-      <span>⚔️</span>
+      <span>[⚔️]</span>
       <span>Arena</span>
     </div>
     <div class="nav-item" id="nav-types" onclick="switchTab('types')">
-      <span>🔄</span>
+      <span>[🔄]</span>
       <span>Types</span>
     </div>
     <div class="nav-item" id="nav-stats" onclick="switchTab('stats')">
-      <span>📊</span>
+      <span>[📊]</span>
       <span>Stats</span>
     </div>
     <div class="nav-item" id="nav-account" onclick="switchTab('account')">
-      <span>👤</span>
+      <span>[👤]</span>
       <span>Account</span>
     </div>
     <div class="nav-item" id="nav-settings" onclick="switchTab('settings')">
-      <span>⚙️</span>
+      <span>[⚙️]</span>
       <span>Settings</span>
     </div>
     <div class="nav-item" id="nav-leaderboard" onclick="switchTab('leaderboard')">
-      <span>🏆</span>
+      <span>[🏆]</span>
       <span>Rank</span>
     </div>
   </div>
@@ -1004,8 +1014,8 @@
   <!-- Onboarding Modal -->
   <div id="onboarding-modal" class="modal">
     <div class="onboarding-slide active" id="slide-welcome" style="display: flex; flex-direction: column; align-items: center; text-align: center; justify-content: center; height: 100%;">
-      <div style="font-size: 3.5rem; margin-bottom: 15px;">⚔️</div>
-      <h1 style="font-size: 2rem; font-weight: 900; color: #fff; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px;">Push Up Arena</h1>
+      <div style="font-family: monospace; font-size: 2.5rem; margin-bottom: 15px; font-weight: 900; letter-spacing: -2px;">[ PUSH_UP_ARENA ]</div>
+      <h1 style="font-size: 2rem; font-weight: 900; color: #fff; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px;">Knight's Quest</h1>
       <p style="color: var(--subtext); font-size: 1rem; margin-bottom: 35px; line-height: 1.5; max-width: 320px;">AI pose tracking, dungeon bosses, and live leaderboards.</p>
       <button class="btn" onclick="startOnboardingFlow()">Initialize Device Save</button>
     </div>
@@ -1090,13 +1100,13 @@
       weight: 150,
       maxReps: 15,
       aiTargetReps: 18,
-      gold: 100,
       totalReps: 0,
       enemiesDefeated: 0,
       bossesSlain: 0,
       currentReps: 0,
       strictness: "standard",
       cameraSensitivity: "balanced",
+      fpsCap: "60",
       audioFeedback: "all",
       repSound: true,
       hapticPulse: true,
@@ -1127,6 +1137,7 @@
       // Populate Settings UI
       document.getElementById('strictness-select').value = state.strictness;
       document.getElementById('camera-sensitivity-select').value = state.cameraSensitivity || "balanced";
+      document.getElementById('fps-cap-select').value = state.fpsCap || "60";
       document.getElementById('audio-feedback-select').value = state.audioFeedback;
       document.getElementById('routine-format-select').value = state.routineFormat;
       document.getElementById('setting-rep-sound').checked = state.repSound !== false;
@@ -1134,7 +1145,6 @@
       document.getElementById('setting-skeleton-overlay').checked = state.skeletonOverlay !== false;
       document.getElementById('setting-wake-lock').checked = state.wakeLock !== false;
 
-      document.getElementById('header-gold-val').innerText = state.gold;
       document.getElementById('header-user-name').innerText = state.userName;
       document.getElementById('avatar').innerText = state.userName.charAt(0).toUpperCase();
       document.getElementById('account-name-input').value = state.userName;
@@ -1232,6 +1242,7 @@
     function saveAppSettings() {
       state.strictness = document.getElementById('strictness-select').value;
       state.cameraSensitivity = document.getElementById('camera-sensitivity-select').value;
+      state.fpsCap = document.getElementById('fps-cap-select').value;
       state.audioFeedback = document.getElementById('audio-feedback-select').value;
       state.repSound = document.getElementById('setting-rep-sound').checked;
       state.hapticPulse = document.getElementById('setting-haptic-pulse').checked;
@@ -1303,7 +1314,6 @@
       document.getElementById('stats-total-reps').innerText = state.totalReps;
       document.getElementById('stats-enemies-killed').innerText = state.enemiesDefeated;
       document.getElementById('stats-bosses-slain').innerText = state.bossesSlain;
-      document.getElementById('header-gold-val').innerText = state.gold;
     }
 
     function updateAccountName(val) {
@@ -1378,7 +1388,7 @@
       ctx.fillStyle = "#ffffff";
       ctx.fillRect(16, 8, 32, 12);
       ctx.fillRect(12, 20, 40, 32);
-      ctx.fillStyle = "#0d0e12";
+      ctx.fillStyle = "#0a0b0e";
       ctx.fillRect(20, 28, 24, 8);
     }
 
@@ -1420,40 +1430,19 @@
       else if (state.storyStage <= 40) stageName = `Stage ${state.storyStage}: Volcanic Lair`;
       else stageName = `Stage ${state.storyStage}: Dragon Spire`;
 
-      if (confirm(`📜 HUGE STORY CAMPAIGN\nCurrent Progression: ${stageName} (Stage ${state.storyStage} of ${stages})\n\nDo you want to enter this battle?`)) {
+      if (confirm(`[STORY CAMPAIGN]\nCurrent Progression: ${stageName} (Stage ${state.storyStage} of ${stages})\n\nDo you want to enter this battle?`)) {
         startArena('story');
       }
     }
 
     function openEndlessSurvival() {
-      if (confirm("💀 ENDLESS SURVIVAL MODE\nWaves of monsters will spawn continuously until failure. Ready your stamina?")) {
+      if (confirm("[ENDLESS SURVIVAL]\nWaves of monsters will spawn continuously until failure. Ready your stamina?")) {
         startArena('endless');
       }
     }
 
     function openArmory() {
-      let choice = prompt(`🛡️ HERO ARMORY & SHOP\nYour Gold: 🪙 ${state.gold}\n\n1. Equip Legendary Knight Armor (Free)\n2. Buy Glowing Aura (100 Gold)\n3. Buy Golden Crown (250 Gold)\n\nEnter choice (1-3):`, "1");
-      if (choice === "2") {
-        if (state.gold >= 100) {
-          state.gold -= 100;
-          alert("Success! Glowing Aura equipped!");
-          updateStatsDisplay();
-          saveState();
-        } else {
-          alert("Not enough gold!");
-        }
-      } else if (choice === "3") {
-        if (state.gold >= 250) {
-          state.gold -= 250;
-          alert("Success! Golden Crown equipped!");
-          updateStatsDisplay();
-          saveState();
-        } else {
-          alert("Not enough gold!");
-        }
-      } else if (choice === "1") {
-        alert("Legendary Knight Armor equipped!");
-      }
+      alert("[ARMORY & SHOP]\nLegendary Knight Armor equipped! Keep training to unlock future enhancements.");
     }
 
     /* Precision Camera Sensor */
@@ -1510,7 +1499,7 @@
           }
           processHighPrecisionSensor(results.poseLandmarks);
         } else {
-          document.getElementById('sensor-banner-text').innerText = "⚠️ Position camera to see your full body";
+          document.getElementById('sensor-banner-text').innerText = "[!] Position camera to see your full body";
         }
         canvasCtx.restore();
       });
@@ -1556,19 +1545,19 @@
       const now = Date.now();
 
       if (repPhase === "TOP") {
-        bannerText.innerText = "💪 Lockout Ready: Lower your chest";
+        bannerText.innerText = "[ READY ] Lower your chest";
         if (smoothedAngle < topThreshold - 15) {
           repPhase = "DESCENDING";
         }
       } else if (repPhase === "DESCENDING") {
-        bannerText.innerText = `⬇️ Lowering... (${Math.round(depthPct)}%)`;
+        bannerText.innerText = `[ DESCENDING ] (${Math.round(depthPct)}%)`;
         if (smoothedAngle <= bottomThreshold) {
           repPhase = "BOTTOM";
-          bannerText.innerText = "✅ DEPTH REACHED! PUSH UP NOW!";
+          bannerText.innerText = "[ DEPTH REACHED ] PUSH UP!";
           if (state.audioFeedback !== "off" && state.hapticPulse !== false && navigator.vibrate) navigator.vibrate(35);
         }
       } else if (repPhase === "BOTTOM") {
-        bannerText.innerText = "⬆️ Pushing back up...";
+        bannerText.innerText = "[ PUSHING UP ]";
         if (smoothedAngle > bottomThreshold + 15) {
           repPhase = "ASCENDING";
         }
@@ -1581,7 +1570,6 @@
             state.currentReps++;
             state.totalReps++;
             state.enemiesDefeated++;
-            state.gold += 5;
 
             if (state.routineFormat === "cycle" && state.selectedTypes.length > 1) {
               if (state.currentReps % 5 === 0) {
@@ -1592,25 +1580,23 @@
 
             document.getElementById('rep-circle-val').innerText = state.currentReps;
             document.getElementById('total-reps-val').innerText = state.currentReps;
-            document.getElementById('header-gold-val').innerText = state.gold;
             updateArenaHpDisplay();
             
-            bannerText.innerText = "🔥 PERFECT REP! (+5 Gold)";
+            bannerText.innerText = "[ PERFECT REP RECORDED ]";
             if (state.audioFeedback !== "off" && state.hapticPulse !== false && navigator.vibrate) navigator.vibrate([40, 30, 60]);
 
             if (state.currentReps >= state.aiTargetReps) {
               if (activeGameMode === 'story') {
                 state.storyStage = Math.min(50, state.storyStage + 1);
                 state.bossesSlain++;
-                alert(`VICTORY! Story Stage Completed! Advanced to Stage ${state.storyStage}! +50 Bonus Gold!`);
+                alert(`VICTORY! Story Stage Completed! Advanced to Stage ${state.storyStage}!`);
               } else if (activeGameMode === 'endless') {
-                alert(`WAVE CLEARED! Endless Survival continues... +50 Bonus Gold!`);
+                alert(`WAVE CLEARED! Endless Survival continues...`);
                 state.aiTargetReps += 5;
               } else {
                 state.bossesSlain++;
-                alert(`VICTORY! Boss Defeated! +50 Bonus Gold!`);
+                alert(`VICTORY! Boss Defeated!`);
               }
-              state.gold += 50;
               exitArena();
             }
             saveState();
@@ -1684,9 +1670,9 @@
       let html = '';
       allUsers.forEach((u, idx) => {
         let rankBadge = `#${idx + 1}`;
-        if (idx === 0) rankBadge = "🥇 1";
-        else if (idx === 1) rankBadge = "🥈 2";
-        else if (idx === 2) rankBadge = "🥉 3";
+        if (idx === 0) rankBadge = "[1]";
+        else if (idx === 1) rankBadge = "[2]";
+        else if (idx === 2) rankBadge = "[3]";
 
         let isCurrent = u.key === deviceSaveKey || u.name === state.userName;
         let activeTag = isCurrent ? `<span style="color:#fff; font-size:0.75rem; font-weight:900;"> (YOU)</span>` : '';
@@ -1694,14 +1680,14 @@
         html += `
           <div class="setting-item" style="cursor: pointer; flex-direction: row; justify-content: space-between; align-items: center; border-color: ${isCurrent ? 'rgba(255,255,255,0.4)' : 'var(--card-border)'};" onclick="inspectHero('${u.name}', ${u.reps}, ${u.enemies}, ${u.bosses}, ${u.stage})">
             <div style="display: flex; align-items: center; gap: 14px;">
-              <div style="font-weight: 900; font-size: 1.15rem; color: #fff; min-width: 42px;">${rankBadge}</div>
+              <div style="font-family: monospace; font-weight: 900; font-size: 1.15rem; color: #fff; min-width: 42px;">${rankBadge}</div>
               <div>
                 <div style="font-weight: 900; font-size: 1.05rem; color: #fff;">${u.name}${activeTag}</div>
                 <div style="font-size: 0.75rem; color: var(--subtext);">Stage ${u.stage} • ${u.bosses} Bosses Slain</div>
               </div>
             </div>
             <div style="text-align: right;">
-              <div style="font-weight: 900; font-size: 1.15rem; color: #fff;">💪 ${u.reps}</div>
+              <div style="font-weight: 900; font-size: 1.15rem; color: #fff;">${u.reps}</div>
               <div style="font-size: 0.65rem; color: var(--subtext); text-transform: uppercase; font-weight: 800;">Total Reps</div>
             </div>
           </div>
