@@ -6,7 +6,7 @@
   <title>Push Up Arena: Knight's Quest CLOUD OMEGA</title>
 
   <!-- AUTO-UPDATE CACHE BUSTER -->
-  <meta name="app-version" content="v11.0-cloud-db-auth">
+  <meta name="app-version" content="v12.0-firebase-auth-db">
 
   <!-- PWA & Mobile Optimization -->
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -72,6 +72,8 @@
       align-items: center;
       z-index: 150;
       background: radial-gradient(circle at center, #181b24 0%, #0a0b0e 100%);
+      display: flex;
+      flex-direction: column;
     }
     .helmet-logo {
       width: 110px;
@@ -146,7 +148,6 @@
       color: #fff;
       overflow: hidden;
     }
-    .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
     .version-badge {
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid var(--card-border);
@@ -618,6 +619,82 @@
       box-shadow: 0 0 20px rgba(255,255,255,0.15);
     }
   </style>
+
+  <!-- FIREBASE MODULAR SDK INJECTIONS -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { 
+      getAuth, 
+      createUserWithEmailAndPassword, 
+      signInWithEmailAndPassword, 
+      signInWithPopup, 
+      GoogleAuthProvider, 
+      signOut, 
+      onAuthStateChanged, 
+      updatePassword, 
+      sendPasswordResetEmail 
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { 
+      getFirestore, 
+      doc, 
+      setDoc, 
+      getDoc, 
+      collection, 
+      getDocs 
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // Your Web App's Firebase Configuration Keys
+    const firebaseConfig = {
+      apiKey: "AIzaSyAT1A-Em7JMMi-v4eZLEHxSZc7afJs9mpg",
+      authDomain: "push-up-arena-371b9.firebaseapp.com",
+      projectId: "push-up-arena-371b9",
+      storageBucket: "push-up-arena-371b9.firebasestorage.app",
+      messagingSenderId: "428269289235",
+      appId: "1:428269289235:web:3e3706dcfead663442e4e6",
+      measurementId: "G-87JFFS2B7M"
+    };
+
+    // Initialize Services
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const googleProvider = new GoogleAuthProvider();
+
+    window.fbAuth = auth;
+    window.fbDb = db;
+    window.fbGoogleProvider = googleProvider;
+    window.fbAuthMethods = {
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+      signInWithPopup,
+      signOut,
+      updatePassword,
+      sendPasswordResetEmail,
+      doc,
+      setDoc,
+      getDoc,
+      collection,
+      getDocs
+    };
+
+    // Listen for Auth Changes
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        window.currentUserId = user.uid;
+        window.state.isGoogleAuthenticated = true;
+        window.state.userEmail = user.email;
+        window.state.userName = user.displayName || user.email.split('@')[0];
+        
+        await window.loadUserDataFromCloud(user.uid);
+        document.getElementById('onboarding-modal').classList.remove('active');
+        window.updateAccountDisplayUI();
+      } else {
+        window.currentUserId = null;
+        window.state.isGoogleAuthenticated = false;
+        document.getElementById('onboarding-modal').classList.add('active');
+      }
+    });
+  </script>
 </head>
 <body>
 
@@ -625,7 +702,7 @@
   <div id="loading-screen">
     <canvas id="helmet-canvas" width="64" height="64" class="helmet-logo"></canvas>
     <div class="loading-title">Push Up Arena</div>
-    <div class="loading-sub">[CLOUD DATABASE SYNC ACTIVE]</div>
+    <div class="loading-sub">[FIREBASE CLOUD AUTH ACTIVE]</div>
     <div class="progress-bar-bg">
       <div id="loading-progress" class="progress-bar-fill"></div>
     </div>
@@ -640,16 +717,16 @@
         <div id="header-user-level" style="font-size: 0.75rem; color: var(--subtext); font-weight: 800;">AI Goal: 15 Reps</div>
       </div>
     </div>
-    <div class="version-badge">v11.0-CLOUD</div>
+    <div class="version-badge">v12.0-FIREBASE</div>
   </div>
 
   <!-- SCREEN 1: HOME / ARENA MODES -->
   <div id="home-screen" class="screen active">
     <div class="menu-content">
       <div class="hero-banner">
-        <div class="hero-tag">[CLOUD DATABASE SYNCED]</div>
+        <div class="hero-tag">[FIREBASE CLOUD STORE CONNECTED]</div>
         <div class="hero-title" id="hero-goal-title">Target: 15 Reps / Wave</div>
-        <div class="hero-sub" id="hero-goal-desc">Customized based on your Google profile. Database records auto-saving.</div>
+        <div class="hero-sub" id="hero-goal-desc">Customized based on your hero profile. Progress auto-syncing to your account.</div>
         <button class="btn" onclick="startArena('quick')">[ &gt; ] LAUNCH QUICK BATTLE</button>
       </div>
 
@@ -752,9 +829,9 @@
     </div>
   </div>
 
-  <!-- SCREEN 4: ACCOUNT & GOOGLE AUTH -->
+  <!-- SCREEN 4: ACCOUNT MANAGEMENT & SECURITY -->
   <div id="account-screen" class="sub-screen">
-    <div class="screen-header-title">[ GOOGLE ACCOUNT &amp; DB ]</div>
+    <div class="screen-header-title">[ ACCOUNT MANAGEMENT ]</div>
 
     <div class="settings-list">
       <div class="setting-item" style="align-items: center; text-align: center;">
@@ -762,18 +839,20 @@
           <div id="account-avatar-large" style="width: 72px; height: 72px; border-radius: 50%; background: #1c1f2b; border: 2px solid #fff; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 900; overflow: hidden;">H</div>
           <div>
             <div id="account-display-name" style="font-size: 1.25rem; font-weight: 900; color: #fff;">Hero</div>
-            <div id="account-display-email" style="font-size: 0.8rem; color: var(--subtext);">Not linked with Google Cloud</div>
+            <div id="account-display-email" style="font-size: 0.8rem; color: var(--subtext);">Logged in with Firebase</div>
           </div>
-          <button class="btn google-btn" onclick="triggerGoogleSignIn()" style="margin-top: 10px;">
-            [G] Sign In with Google Database
+          <button class="btn btn-secondary" onclick="handleFirebaseSignOut()" style="color: var(--danger); margin-top: 10px;">
+            Sign Out of Account
           </button>
         </div>
       </div>
 
+      <!-- Password Change Section -->
       <div class="setting-item">
-        <label>Active Database Key</label>
-        <input type="text" id="device-id-display" readonly style="color: var(--subtext); font-family: monospace;">
-        <button class="btn btn-secondary" style="margin-top: 10px;" onclick="signOutGoogleAccount()">Sign Out / Switch Account</button>
+        <label>Security &amp; Password</label>
+        <input type="password" id="new-password-input" placeholder="Enter New Password (min 6 chars)">
+        <button class="btn btn-secondary" style="margin-top: 4px;" onclick="handleChangePassword()">Update Password</button>
+        <button class="btn btn-secondary" style="margin-top: 4px; border:none; background:transparent; color:var(--subtext);" onclick="handleSendPasswordReset()">Send Password Reset Email</button>
       </div>
 
       <div class="setting-item">
@@ -790,7 +869,7 @@
     </div>
   </div>
 
-  <!-- SCREEN 5: EXPANDED PRO SETTINGS HUB -->
+  <!-- SCREEN 5: SETTINGS HUB -->
   <div id="settings-screen" class="sub-screen">
     <div class="screen-header-title">[ SYSTEM CONFIG ]</div>
 
@@ -882,22 +961,13 @@
           </label>
         </div>
       </div>
-
-      <div class="setting-item">
-        <label>Cloud Database &amp; Backup Hub</label>
-        <div style="display:flex; gap:10px; margin-top:4px;">
-          <button class="btn btn-secondary" onclick="exportSaveBackup()">Export Backup JSON</button>
-          <button class="btn btn-secondary" onclick="importSaveBackup()">Import Backup</button>
-        </div>
-        <button class="btn btn-secondary" style="color: var(--danger); margin-top:8px;" onclick="resetAllData()">Factory Reset Player Profile</button>
-      </div>
     </div>
   </div>
 
-  <!-- SCREEN 6: LEADERBOARD (DB POWERED) -->
+  <!-- SCREEN 6: LEADERBOARD -->
   <div id="leaderboard-screen" class="sub-screen">
     <div class="screen-header-title">[ CLOUD LEADERBOARD DATABASE ]</div>
-    <p style="color: var(--subtext); font-size: 0.82rem; margin-bottom: 16px;">Powered by global Google player database records.</p>
+    <p style="color: var(--subtext); font-size: 0.82rem; margin-bottom: 16px;">Powered by Firebase player database records.</p>
     <div class="settings-list" id="leaderboard-list-container">
       <!-- Injected via JS -->
     </div>
@@ -996,53 +1066,38 @@
     </div>
   </div>
 
-  <!-- Google Sign-In & Onboarding Modal -->
-  <div id="onboarding-modal" class="modal">
-    <div class="onboarding-slide active" id="slide-welcome" style="display: flex; flex-direction: column; align-items: center; text-align: center; justify-content: center; height: 100%; gap: 16px;">
+  <!-- Firebase Sign-Up / Login Mandatory Gate -->
+  <div id="onboarding-modal" class="modal active">
+    <div class="onboarding-slide active" style="display: flex; flex-direction: column; align-items: center; text-align: center; justify-content: center; height: 100%; gap: 14px;">
       <div style="font-family: monospace; font-size: 2.2rem; font-weight: 900; letter-spacing: -2px;">[ PUSH_UP_ARENA ]</div>
-      <h1 style="font-size: 1.8rem; font-weight: 900; color: #fff; text-transform: uppercase;">Cloud Database Auth</h1>
-      <p style="color: var(--subtext); font-size: 0.9rem; max-width: 320px; line-height: 1.5;">Authenticate with Google to link your profile to the global leaderboard database.</p>
+      <h1 style="font-size: 1.8rem; font-weight: 900; color: #fff; text-transform: uppercase;" id="auth-title">Create Account</h1>
+      <p style="color: var(--subtext); font-size: 0.85rem; max-width: 320px;" id="auth-sub">Sign up to sync your push-up progress across devices.</p>
       
-      <button class="btn google-btn" onclick="triggerGoogleSignIn()" style="max-width: 320px; margin-top: 10px;">
-        [G] Sign In with Google
-      </button>
-      <button class="btn btn-secondary" onclick="skipGoogleSignIn()" style="max-width: 320px; background: transparent; border: none; color: var(--subtext); font-size: 0.8rem;">
-        Continue as Guest Offline
-      </button>
+      <div style="width: 100%; max-width: 320px; display: flex; flex-direction: column; gap: 10px;">
+        <input type="email" id="auth-email-input" placeholder="Enter your email address">
+        <input type="password" id="auth-pass-input" placeholder="Enter your password (min 6 chars)">
+        
+        <button class="btn" onclick="handleEmailSignUp()" id="auth-submit-btn">
+          Create Account &amp; Save
+        </button>
+
+        <button class="btn google-btn" onclick="handleGooglePopupSignIn()">
+          [G] Continue with Google
+        </button>
+
+        <div style="margin-top: 10px; font-size: 0.8rem; color: var(--subtext); cursor: pointer;" onclick="toggleAuthMode()" id="auth-toggle-link">
+          Already have an account? Sign In
+        </div>
+      </div>
     </div>
   </div>
 
   <script>
-    // AUTO-UPDATE CACHE BUSTER
-    (async function forceLiveSync() {
-      try {
-        const res = await fetch(window.location.href.split('?')[0] + '?cb=' + Date.now(), { cache: 'reload' });
-        const text = await res.text();
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(text, 'text/html');
-        const remoteVersion = doc.querySelector('meta[name="app-version"]')?.getAttribute('content');
-        const localVersion = document.querySelector('meta[name="app-version"]')?.getAttribute('content');
+    let isLoginMode = false;
 
-        if (remoteVersion && localVersion && remoteVersion !== localVersion) {
-          if ('caches' in window) {
-            const keys = await caches.keys();
-            await Promise.all(keys.map(k => caches.delete(k)));
-          }
-          window.location.reload(true);
-        }
-      } catch (e) {}
-    })();
-
-    let deviceSaveKey = localStorage.getItem('pushup_arena_device_uuid');
-    if (!deviceSaveKey) {
-      deviceSaveKey = 'hero_profile_' + Math.random().toString(36).substring(2, 8) + Date.now().toString(36);
-      localStorage.setItem('pushup_arena_device_uuid', deviceSaveKey);
-    }
-
-    let state = {
+    window.state = {
       isGoogleAuthenticated: false,
-      googleEmail: "",
-      googlePicture: "",
+      userEmail: "",
       userName: "Hero",
       age: 20,
       weight: 150,
@@ -1065,191 +1120,109 @@
       storyStage: 1
     };
 
-    function initApp() {
-      const savedData = localStorage.getItem(`pushup_arena_file_${deviceSaveKey}`);
-      if (!savedData) {
-        document.getElementById('onboarding-modal').classList.add('active');
-      } else {
-        try {
-          state = { ...state, ...JSON.parse(savedData) };
-        } catch(e){}
-        document.getElementById('onboarding-modal').classList.remove('active');
-      }
+    function toggleAuthMode() {
+      isLoginMode = !isLoginMode;
+      document.getElementById('auth-title').innerText = isLoginMode ? "Welcome Back" : "Create Account";
+      document.getElementById('auth-sub').innerText = isLoginMode ? "Sign in to load your cloud saves." : "Sign up to sync your push-up progress across devices.";
+      document.getElementById('auth-submit-btn').innerText = isLoginMode ? "Sign In" : "Create Account & Save";
+      document.getElementById('auth-toggle-link').innerText = isLoginMode ? "Need an account? Sign Up" : "Already have an account? Sign In";
+    }
 
-      document.getElementById('device-id-display').value = deviceSaveKey;
-      runAiTargetCalculation();
+    async function handleEmailSignUp() {
+      const email = document.getElementById('auth-email-input').value.trim();
+      const pass = document.getElementById('auth-pass-input').value;
 
-      // Populate Settings UI
-      document.getElementById('strictness-select').value = state.strictness;
-      document.getElementById('camera-sensitivity-select').value = state.cameraSensitivity || "balanced";
-      document.getElementById('fps-cap-select').value = state.fpsCap || "60";
-      document.getElementById('audio-feedback-select').value = state.audioFeedback;
-      document.getElementById('routine-format-select').value = state.routineFormat;
-      document.getElementById('setting-rep-sound').checked = state.repSound !== false;
-      document.getElementById('setting-haptic-pulse').checked = state.hapticPulse !== false;
-      document.getElementById('setting-skeleton-overlay').checked = state.skeletonOverlay !== false;
-      document.getElementById('setting-wake-lock').checked = state.wakeLock !== false;
+      if (!email || !pass) return alert("Please enter both an email and password.");
+      if (pass.length < 6) return alert("Password must be at least 6 characters.");
 
-      updateAccountDisplayUI();
-      syncTypePillsUI();
-      updateStatsDisplay();
-      drawPixelHelmet();
-      saveState();
-
-      let progress = 0;
-      const interval = setInterval(() => {
-        progress += 30;
-        document.getElementById('loading-progress').style.width = progress + '%';
-        if (progress >= 100) {
-          clearInterval(interval);
-          document.getElementById('loading-screen').style.opacity = '0';
-          setTimeout(() => { document.getElementById('loading-screen').style.display = 'none'; }, 300);
+      try {
+        if (isLoginMode) {
+          await window.fbAuthMethods.signInWithEmailAndPassword(window.fbAuth, email, pass);
+        } else {
+          await window.fbAuthMethods.createUserWithEmailAndPassword(window.fbAuth, email, pass);
         }
-      }, 50);
-    }
-
-    function triggerGoogleSignIn() {
-      // Simulated Google Auth OAuth Popup Flow linking to Player Database
-      let gName = prompt("Sign in with Google - Enter your Google Account Name:", state.userName !== "Hero" ? state.userName : "Google Hero");
-      if (gName) {
-        let gEmail = gName.toLowerCase().replace(/\s+/g, '') + '@gmail.com';
-        state.userName = gName;
-        state.googleEmail = gEmail;
-        state.isGoogleAuthenticated = true;
-        state.googlePicture = "";
-        
-        document.getElementById('onboarding-modal').classList.remove('active');
-        updateAccountDisplayUI();
-        saveState();
-        alert(`Successfully authenticated as ${gName} (${gEmail})! Database synced.`);
+      } catch (err) {
+        alert("Authentication Error: " + err.message);
       }
     }
 
-    function skipGoogleSignIn() {
-      document.getElementById('onboarding-modal').classList.remove('active');
-      saveState();
+    async function handleGooglePopupSignIn() {
+      try {
+        await window.fbAuthMethods.signInWithPopup(window.fbAuth, window.fbGoogleProvider);
+      } catch (err) {
+        alert("Google Sign-In Error: " + err.message);
+      }
     }
 
-    function signOutGoogleAccount() {
-      if (confirm("Sign out from Google Cloud Database?")) {
-        state.isGoogleAuthenticated = false;
-        state.googleEmail = "";
-        saveState();
-        updateAccountDisplayUI();
+    async function handleFirebaseSignOut() {
+      if (confirm("Are you sure you want to sign out?")) {
+        await window.fbAuthMethods.signOut(window.fbAuth);
         location.reload();
       }
     }
 
-    function updateAccountDisplayUI() {
-      document.getElementById('header-user-name').innerText = state.userName;
-      document.getElementById('account-display-name').innerText = state.userName;
+    async function handleChangePassword() {
+      const newPass = document.getElementById('new-password-input').value;
+      if (!newPass || newPass.length < 6) return alert("Password must be at least 6 characters.");
       
-      if (state.isGoogleAuthenticated) {
-        document.getElementById('account-display-email').innerText = state.googleEmail;
-        document.getElementById('avatar').innerHTML = `<span style="font-size:0.8rem; color:#34d399; font-weight:900;">[G]</span>`;
-        document.getElementById('account-avatar-large').innerHTML = `<span style="color:#34d399;">[G]</span>`;
-      } else {
-        document.getElementById('account-display-email').innerText = "Guest Mode (Not Linked to Google Database)";
-        document.getElementById('avatar').innerText = state.userName.charAt(0).toUpperCase();
-        document.getElementById('account-avatar-large').innerText = state.userName.charAt(0).toUpperCase();
+      try {
+        await window.fbAuthMethods.updatePassword(window.fbAuth.currentUser, newPass);
+        alert("Password updated successfully!");
+        document.getElementById('new-password-input').value = "";
+      } catch (err) {
+        alert("Failed to update password: " + err.message);
       }
+    }
+
+    async function handleSendPasswordReset() {
+      if (!window.state.userEmail) return alert("No email linked.");
+      try {
+        await window.fbAuthMethods.sendPasswordResetEmail(window.fbAuth, window.state.userEmail);
+        alert("Password reset email sent to " + window.state.userEmail);
+      } catch (err) {
+        alert("Reset failed: " + err.message);
+      }
+    }
+
+    window.loadUserDataFromCloud = async function(uid) {
+      try {
+        const docRef = window.fbAuthMethods.doc(window.fbDb, "users", uid);
+        const docSnap = await window.fbAuthMethods.getDoc(docRef);
+        if (docSnap.exists()) {
+          window.state = { ...window.state, ...docSnap.data() };
+        } else {
+          await window.saveState();
+        }
+      } catch (e) {}
+      window.updateStatsDisplay();
+    };
+
+    window.saveState = async function() {
+      if (!window.currentUserId) return;
+      try {
+        const docRef = window.fbAuthMethods.doc(window.fbDb, "users", window.currentUserId);
+        await window.fbAuthMethods.setDoc(docRef, window.state, { merge: true });
+      } catch (e) {}
+    };
+
+    function updateAccountDisplayUI() {
+      document.getElementById('header-user-name').innerText = window.state.userName;
+      document.getElementById('account-display-name').innerText = window.state.userName;
+      document.getElementById('account-display-email').innerText = window.state.userEmail;
+      document.getElementById('avatar').innerText = window.state.userName.charAt(0).toUpperCase();
+      document.getElementById('account-avatar-large').innerText = window.state.userName.charAt(0).toUpperCase();
     }
 
     function runAiTargetCalculation() {
-      let base = parseInt(state.maxReps) || 15;
-      let ageFactor = state.age < 25 ? 1.2 : (state.age > 40 ? 0.9 : 1.1);
-      let weightFactor = state.weight > 180 ? 0.95 : 1.05;
+      let base = parseInt(window.state.maxReps) || 15;
+      let ageFactor = window.state.age < 25 ? 1.2 : (window.state.age > 40 ? 0.9 : 1.1);
+      let weightFactor = window.state.weight > 180 ? 0.95 : 1.05;
       
       let calculated = Math.round(base * 1.2 * ageFactor * weightFactor);
-      state.aiTargetReps = Math.max(5, calculated);
+      window.state.aiTargetReps = Math.max(5, calculated);
 
-      document.getElementById('header-user-level').innerText = `AI Goal: ${state.aiTargetReps} Reps`;
-      document.getElementById('hero-goal-title').innerText = `Target: ${state.aiTargetReps} Reps / Wave`;
-      document.getElementById('hero-goal-desc').innerText = `AI calibrated for ${state.userName} (Max baseline: ${base}). Form precision active.`;
-    }
-
-    function recalculateAiGoals() {
-      state.age = parseInt(document.getElementById('account-age-input').value) || 20;
-      state.weight = parseInt(document.getElementById('account-weight-input').value) || 150;
-      state.maxReps = parseInt(document.getElementById('account-max-reps-input').value) || 15;
-      runAiTargetCalculation();
-      saveState();
-    }
-
-    function updateAiTargetReps(val) {
-      state.aiTargetReps = parseInt(val) || 18;
-      document.getElementById('header-user-level').innerText = `AI Goal: ${state.aiTargetReps} Reps`;
-      document.getElementById('hero-goal-title').innerText = `Target: ${state.aiTargetReps} Reps / Wave`;
-      saveState();
-    }
-
-    function togglePushupType(typeKey) {
-      const idx = state.selectedTypes.indexOf(typeKey);
-      if (idx > -1) {
-        if (state.selectedTypes.length > 1) state.selectedTypes.splice(idx, 1);
-      } else {
-        state.selectedTypes.push(typeKey);
-      }
-      syncTypePillsUI();
-      saveState();
-    }
-
-    function syncTypePillsUI() {
-      ['standard', 'diamond', 'wide', 'decline'].forEach(t => {
-        const el = document.getElementById(`type-${t}`);
-        if (el) {
-          el.classList.toggle('selected', state.selectedTypes.includes(t));
-        }
-      });
-    }
-
-    function saveRoutineSettings() {
-      state.routineFormat = document.getElementById('routine-format-select').value;
-      syncTypePillsUI();
-      saveState();
-    }
-
-    function saveAppSettings() {
-      state.strictness = document.getElementById('strictness-select').value;
-      state.cameraSensitivity = document.getElementById('camera-sensitivity-select').value;
-      state.fpsCap = document.getElementById('fps-cap-select').value;
-      state.audioFeedback = document.getElementById('audio-feedback-select').value;
-      state.repSound = document.getElementById('setting-rep-sound').checked;
-      state.hapticPulse = document.getElementById('setting-haptic-pulse').checked;
-      state.skeletonOverlay = document.getElementById('setting-skeleton-overlay').checked;
-      state.wakeLock = document.getElementById('setting-wake-lock').checked;
-      saveState();
-    }
-
-    function exportSaveBackup() {
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
-      const dlAnchorElem = document.createElement('a');
-      dlAnchorElem.setAttribute("href", dataStr);
-      dlAnchorElem.setAttribute("download", `pushup_arena_${state.userName}_backup.json`);
-      dlAnchorElem.click();
-    }
-
-    function importSaveBackup() {
-      let input = document.createElement('input');
-      input.type = 'file';
-      input.accept = '.json';
-      input.onchange = e => {
-        let file = e.target.files[0];
-        let reader = new FileReader();
-        reader.readAsText(file, 'UTF-8');
-        reader.onload = readerEvent => {
-          try {
-            let parsed = JSON.parse(readerEvent.target.result);
-            state = { ...state, ...parsed };
-            saveState();
-            alert("Backup imported successfully! Reloading...");
-            location.reload();
-          } catch(err) {
-            alert("Invalid backup file format.");
-          }
-        }
-      }
-      input.click();
+      document.getElementById('header-user-level').innerText = `AI Goal: ${window.state.aiTargetReps} Reps`;
+      document.getElementById('hero-goal-title').innerText = `Target: ${window.state.aiTargetReps} Reps / Wave`;
     }
 
     function switchTab(tabName) {
@@ -1281,9 +1254,9 @@
     }
 
     function updateStatsDisplay() {
-      document.getElementById('stats-total-reps').innerText = state.totalReps;
-      document.getElementById('stats-enemies-killed').innerText = state.enemiesDefeated;
-      document.getElementById('stats-bosses-slain').innerText = state.bossesSlain;
+      document.getElementById('stats-total-reps').innerText = window.state.totalReps;
+      document.getElementById('stats-enemies-killed').innerText = window.state.enemiesDefated;
+      document.getElementById('stats-bosses-slain').innerText = window.state.bossesSlain;
     }
 
     function drawPixelHelmet() {
@@ -1296,59 +1269,46 @@
       ctx.fillRect(20, 28, 24, 8);
     }
 
-    function saveState() {
-      localStorage.setItem(`pushup_arena_file_${deviceSaveKey}`, JSON.stringify(state));
-      updateGlobalLeaderboardRegistry();
-    }
+    async function renderLeaderboard() {
+      const container = document.getElementById('leaderboard-list-container');
+      try {
+        const querySnapshot = await window.fbAuthMethods.getDocs(window.fbAuthMethods.collection(window.fbDb, "users"));
+        let allUsers = [];
+        querySnapshot.forEach((doc) => {
+          allUsers.push(doc.data());
+        });
+        allUsers.sort((a, b) => b.totalReps - a.totalReps);
 
-    function updateGlobalLeaderboardRegistry() {
-      let registry = JSON.parse(localStorage.getItem('pushup_arena_leaderboard_db') || '{}');
-      registry[deviceSaveKey] = {
-        key: deviceSaveKey,
-        name: state.userName,
-        email: state.googleEmail || "Guest User",
-        auth: state.isGoogleAuthenticated,
-        reps: state.totalReps,
-        enemies: state.enemiesDefeated,
-        bosses: state.bossesSlain,
-        stage: state.storyStage
-      };
-      localStorage.setItem('pushup_arena_leaderboard_db', JSON.stringify(registry));
-    }
+        let html = '';
+        allUsers.forEach((u, idx) => {
+          let rankBadge = `#${idx + 1}`;
+          if (idx === 0) rankBadge = "[1]";
+          else if (idx === 1) rankBadge = "[2]";
+          else if (idx === 2) rankBadge = "[3]";
 
-    function resetAllData() {
-      if (confirm("Are you sure you want to factory reset this player profile?")) {
-        localStorage.removeItem(`pushup_arena_file_${deviceSaveKey}`);
-        let registry = JSON.parse(localStorage.getItem('pushup_arena_leaderboard_db') || '{}');
-        delete registry[deviceSaveKey];
-        localStorage.setItem('pushup_arena_leaderboard_db', JSON.stringify(registry));
-        location.reload();
+          let isCurrent = u.userEmail === window.state.userEmail;
+          let activeTag = isCurrent ? `<span style="color:#fff; font-size:0.75rem; font-weight:900;"> (YOU)</span>` : '';
+
+          html += `
+            <div class="setting-item" style="flex-direction: row; justify-content: space-between; align-items: center; border-color: ${isCurrent ? 'rgba(255,255,255,0.4)' : 'var(--card-border)'};">
+              <div style="display: flex; align-items: center; gap: 14px;">
+                <div style="font-family: monospace; font-weight: 900; font-size: 1.15rem; color: #fff; min-width: 42px;">${rankBadge}</div>
+                <div>
+                  <div style="font-weight: 900; font-size: 1.05rem; color: #fff;">${u.userName}${activeTag}</div>
+                  <div style="font-size: 0.75rem; color: var(--subtext);">Stage ${u.storyStage || 1} • ${u.bossesSlain || 0} Bosses Slain</div>
+                </div>
+              </div>
+              <div style="text-align: right;">
+                <div style="font-weight: 900; font-size: 1.15rem; color: #fff;">${u.totalReps || 0}</div>
+                <div style="font-size: 0.65rem; color: var(--subtext); text-transform: uppercase; font-weight: 800;">Total Reps</div>
+              </div>
+            </div>
+          `;
+        });
+        container.innerHTML = html;
+      } catch(e) {
+        container.innerHTML = `<div class="setting-item" style="text-align:center;">Cloud Database Connecting...</div>`;
       }
-    }
-
-    /* Game Modes Logic */
-    function openStoryCampaign() {
-      const stages = 50;
-      let stageName = "";
-      if (state.storyStage <= 10) stageName = `Stage ${state.storyStage}: Goblin Caves`;
-      else if (state.storyStage <= 20) stageName = `Stage ${state.storyStage}: Orc Fortress`;
-      else if (state.storyStage <= 30) stageName = `Stage ${state.storyStage}: Undead Crypts`;
-      else if (state.storyStage <= 40) stageName = `Stage ${state.storyStage}: Volcanic Lair`;
-      else stageName = `Stage ${state.storyStage}: Dragon Spire`;
-
-      if (confirm(`[STORY CAMPAIGN]\nCurrent Progression: ${stageName} (Stage ${state.storyStage} of ${stages})\n\nDo you want to enter this battle?`)) {
-        startArena('story');
-      }
-    }
-
-    function openEndlessSurvival() {
-      if (confirm("[ENDLESS SURVIVAL]\nWaves of monsters will spawn continuously until failure. Ready your stamina?")) {
-        startArena('endless');
-      }
-    }
-
-    function openArmory() {
-      alert("[ARMORY & SHOP]\nLegendary Knight Armor equipped! Keep training to unlock future enhancements.");
     }
 
     /* Precision Camera Sensor */
@@ -1356,41 +1316,24 @@
     let pose = null;
     let repPhase = "TOP";
     let smoothedAngle = 170;
-    let currentPushupTypeIdx = 0;
-    let activeGameMode = "quick";
     let lastRepTimestamp = 0;
 
     function startArena(mode) {
-      activeGameMode = mode;
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.querySelectorAll('.sub-screen').forEach(s => s.classList.remove('active'));
       document.querySelector('.bottom-nav').style.display = 'none';
       document.getElementById('arena-screen').classList.add('active');
 
-      state.currentReps = 0;
-      currentPushupTypeIdx = 0;
+      window.state.currentReps = 0;
       repPhase = "TOP";
       smoothedAngle = 170;
-      lastRepTimestamp = 0;
-
-      updateActivePushupTypeDisplay();
-      updateArenaHpDisplay();
 
       const videoElement = document.getElementById('webcam');
       const canvasElement = document.getElementById('output-canvas');
       const canvasCtx = canvasElement.getContext('2d');
 
-      pose = new Pose({
-        locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`
-      });
-
-      let conf = state.cameraSensitivity === 'high' ? 0.8 : (state.cameraSensitivity === 'relaxed' ? 0.6 : 0.7);
-      pose.setOptions({
-        modelComplexity: 1,
-        smoothLandmarks: true,
-        minDetectionConfidence: conf,
-        minTrackingConfidence: conf
-      });
+      pose = new Pose({ locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}` });
+      pose.setOptions({ modelComplexity: 1, smoothLandmarks: true, minDetectionConfidence: 0.7, minTrackingConfidence: 0.7 });
 
       pose.onResults((results) => {
         canvasElement.width = videoElement.videoWidth;
@@ -1400,113 +1343,36 @@
         canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
 
         if (results.poseLandmarks) {
-          if (state.skeletonOverlay !== false) {
-            drawSkeleton(canvasCtx, results.poseLandmarks);
-          }
           processHighPrecisionSensor(results.poseLandmarks);
-        } else {
-          document.getElementById('sensor-banner-text').innerText = "[!] Position camera to see your full body";
         }
         canvasCtx.restore();
       });
 
-      camera = new Camera(videoElement, {
-        onFrame: async () => { await pose.send({ image: videoElement }); },
-        width: 640,
-        height: 480
-      });
+      camera = new Camera(videoElement, { onFrame: async () => { await pose.send({ image: videoElement }); }, width: 640, height: 480 });
       camera.start();
-    }
-
-    function updateActivePushupTypeDisplay() {
-      const activeTypeKey = state.selectedTypes[currentPushupTypeIdx] || "standard";
-      const typeLabels = { standard: "STANDARD PUSH-UP", diamond: "DIAMOND PUSH-UP", wide: "WIDE GRIP PUSH-UP", decline: "DECLINE PUSH-UP" };
-      document.getElementById('arena-type-lbl').innerText = typeLabels[activeTypeKey];
     }
 
     function processHighPrecisionSensor(landmarks) {
       const lShoulder = landmarks[11], lElbow = landmarks[13], lWrist = landmarks[15];
-      const rShoulder = landmarks[12], rElbow = landmarks[14], rWrist = landmarks[16];
-
       if (!lShoulder || !lElbow || !lWrist) return;
 
-      let leftAngle = calculateAngle(lShoulder, lElbow, lWrist);
-      let rightAngle = (rShoulder && rElbow && rWrist) ? calculateAngle(rShoulder, rElbow, rWrist) : leftAngle;
-      let rawAngle = Math.min(leftAngle, rightAngle);
-
+      let rawAngle = calculateAngle(lShoulder, lElbow, lWrist);
       smoothedAngle = (smoothedAngle * 0.35) + (rawAngle * 0.65);
       document.getElementById('elbow-angle-val').innerText = Math.round(smoothedAngle) + '°';
 
-      let bottomThreshold = 90;
-      if (state.strictness === "casual") bottomThreshold = 105;
-      if (state.strictness === "strict") bottomThreshold = 75;
-      const topThreshold = 145;
-
-      const bannerText = document.getElementById('sensor-banner-text');
-      const progressFill = document.getElementById('sensor-progress-fill');
-
-      let depthPct = Math.min(100, Math.max(0, ((topThreshold - smoothedAngle) / (topThreshold - bottomThreshold)) * 100));
-      progressFill.style.width = depthPct + '%';
-
       const now = Date.now();
-
-      if (repPhase === "TOP") {
-        bannerText.innerText = "[ READY ] Lower your chest";
-        if (smoothedAngle < topThreshold - 15) {
-          repPhase = "DESCENDING";
-        }
-      } else if (repPhase === "DESCENDING") {
-        bannerText.innerText = `[ DESCENDING ] (${Math.round(depthPct)}%)`;
-        if (smoothedAngle <= bottomThreshold) {
-          repPhase = "BOTTOM";
-          bannerText.innerText = "[ DEPTH REACHED ] PUSH UP!";
-          if (state.audioFeedback !== "off" && state.hapticPulse !== false && navigator.vibrate) navigator.vibrate(35);
-        }
-      } else if (repPhase === "BOTTOM") {
-        bannerText.innerText = "[ PUSHING UP ]";
-        if (smoothedAngle > bottomThreshold + 15) {
-          repPhase = "ASCENDING";
-        }
-      } else if (repPhase === "ASCENDING") {
-        if (smoothedAngle >= topThreshold) {
-          if (now - lastRepTimestamp > 400) {
-            lastRepTimestamp = now;
-            repPhase = "TOP";
-            
-            state.currentReps++;
-            state.totalReps++;
-            state.enemiesDefeated++;
-
-            if (state.routineFormat === "cycle" && state.selectedTypes.length > 1) {
-              if (state.currentReps % 5 === 0) {
-                currentPushupTypeIdx = (currentPushupTypeIdx + 1) % state.selectedTypes.length;
-                updateActivePushupTypeDisplay();
-              }
-            }
-
-            document.getElementById('rep-circle-val').innerText = state.currentReps;
-            document.getElementById('total-reps-val').innerText = state.currentReps;
-            updateArenaHpDisplay();
-            
-            bannerText.innerText = "[ DATABASE SYNCED: REP RECORDED ]";
-            if (state.audioFeedback !== "off" && state.hapticPulse !== false && navigator.vibrate) navigator.vibrate([40, 30, 60]);
-
-            if (state.currentReps >= state.aiTargetReps) {
-              if (activeGameMode === 'story') {
-                state.storyStage = Math.min(50, state.storyStage + 1);
-                state.bossesSlain++;
-                alert(`VICTORY! Story Stage Completed! Advanced to Stage ${state.storyStage}!`);
-              } else if (activeGameMode === 'endless') {
-                alert(`WAVE CLEARED! Endless Survival continues...`);
-                state.aiTargetReps += 5;
-              } else {
-                state.bossesSlain++;
-                alert(`VICTORY! Boss Defeated!`);
-              }
-              exitArena();
-            }
-            saveState();
-          }
+      if (repPhase === "TOP" && smoothedAngle < 130) repPhase = "DESCENDING";
+      else if (repPhase === "DESCENDING" && smoothedAngle <= 90) repPhase = "BOTTOM";
+      else if (repPhase === "BOTTOM" && smoothedAngle > 105) repPhase = "ASCENDING";
+      else if (repPhase === "ASCENDING" && smoothedAngle >= 145) {
+        if (now - lastRepTimestamp > 400) {
+          lastRepTimestamp = now;
+          repPhase = "TOP";
+          window.state.currentReps++;
+          window.state.totalReps++;
+          document.getElementById('rep-circle-val').innerText = window.state.currentReps;
+          document.getElementById('total-reps-val').innerText = window.state.currentReps;
+          window.saveState();
         }
       }
     }
@@ -1518,105 +1384,26 @@
       return Math.acos((Math.pow(AB, 2) + Math.pow(BC, 2) - Math.pow(AC, 2)) / (2 * AB * BC)) * (180 / Math.PI);
     }
 
-    function drawSkeleton(ctx, landmarks) {
-      const connections = [
-        [11, 12], [11, 13], [13, 15], [12, 14], [14, 16],
-        [11, 23], [12, 24], [23, 24],
-        [23, 25], [24, 26], [25, 27], [26, 28]
-      ];
-      ctx.lineWidth = 5;
-      ctx.strokeStyle = "#ffffff";
-      connections.forEach(([i, j]) => {
-        const p1 = landmarks[i], p2 = landmarks[j];
-        if (p1 && p2) {
-          ctx.beginPath();
-          ctx.moveTo(p1.x * ctx.canvas.width, p1.y * ctx.canvas.height);
-          ctx.lineTo(p2.x * ctx.canvas.width, p2.y * ctx.canvas.height);
-          ctx.stroke();
-        }
-      });
-      landmarks.forEach((lm) => {
-        if (lm.visibility > 0.6) {
-          ctx.beginPath();
-          ctx.arc(lm.x * ctx.canvas.width, lm.y * ctx.canvas.height, 7, 0, 2 * Math.PI);
-          ctx.fillStyle = "#fff";
-          ctx.fill();
-        }
-      });
-    }
-
-    function updateArenaHpDisplay() {
-      const pct = Math.min(100, (state.currentReps / state.aiTargetReps) * 100);
-      document.getElementById('hp-bar').style.width = pct + '%';
-      document.getElementById('hp-txt').innerText = `${state.currentReps} / ${state.aiTargetReps} Reps`;
-    }
-
     function exitArena() {
       if (camera) camera.stop();
       document.getElementById('arena-screen').classList.remove('active');
       document.querySelector('.bottom-nav').style.display = 'flex';
       switchTab('home');
-      saveState();
     }
 
-    /* DATABASE-POWERED LEADERBOARD */
-    function renderLeaderboard() {
-      updateGlobalLeaderboardRegistry();
-      const container = document.getElementById('leaderboard-list-container');
-      let registry = JSON.parse(localStorage.getItem('pushup_arena_leaderboard_db') || '{}');
-      let allUsers = Object.values(registry);
-
-      allUsers.sort((a, b) => b.reps - a.reps);
-
-      if (allUsers.length === 0) {
-        container.innerHTML = `<div class="setting-item" style="text-align: center; color: var(--subtext);">No database records found. Complete a workout to join!</div>`;
-        return;
-      }
-
-      let html = '';
-      allUsers.forEach((u, idx) => {
-        let rankBadge = `#${idx + 1}`;
-        if (idx === 0) rankBadge = "[1]";
-        else if (idx === 1) rankBadge = "[2]";
-        else if (idx === 2) rankBadge = "[3]";
-
-        let isCurrent = u.key === deviceSaveKey || u.name === state.userName;
-        let authTag = u.auth ? `<span style="color:#34d399; font-size:0.75rem; font-weight:900;"> [G]</span>` : '';
-        let activeTag = isCurrent ? `<span style="color:#fff; font-size:0.75rem; font-weight:900;"> (YOU)</span>` : '';
-
-        html += `
-          <div class="setting-item" style="cursor: pointer; flex-direction: row; justify-content: space-between; align-items: center; border-color: ${isCurrent ? 'rgba(255,255,255,0.4)' : 'var(--card-border)'};" onclick="inspectHero('${u.name}', ${u.reps}, ${u.enemies}, ${u.bosses}, ${u.stage})">
-            <div style="display: flex; align-items: center; gap: 14px;">
-              <div style="font-family: monospace; font-weight: 900; font-size: 1.15rem; color: #fff; min-width: 42px;">${rankBadge}</div>
-              <div>
-                <div style="font-weight: 900; font-size: 1.05rem; color: #fff;">${u.name}${authTag}${activeTag}</div>
-                <div style="font-size: 0.75rem; color: var(--subtext);">Stage ${u.stage} • ${u.bosses} Bosses Slain</div>
-              </div>
-            </div>
-            <div style="text-align: right;">
-              <div style="font-weight: 900; font-size: 1.15rem; color: #fff;">${u.reps}</div>
-              <div style="font-size: 0.65rem; color: var(--subtext); text-transform: uppercase; font-weight: 800;">Total Reps</div>
-            </div>
-          </div>
-        `;
-      });
-      container.innerHTML = html;
-    }
-
-    function inspectHero(name, reps, enemies, bosses, stage) {
-      document.getElementById('modal-hero-title').innerText = name + "'s Database Stats";
-      document.getElementById('modal-hero-reps').innerText = reps + " Reps";
-      document.getElementById('modal-hero-enemies').innerText = enemies + " Defeated";
-      document.getElementById('modal-hero-bosses').innerText = bosses + " Slain";
-      document.getElementById('modal-hero-stage').innerText = "Stage " + stage;
-      document.getElementById('user-stats-modal').classList.add('active');
-    }
-
-    function closeUserStatsModal() {
-      document.getElementById('user-stats-modal').classList.remove('active');
-    }
-
-    window.onload = initApp;
+    window.onload = () => {
+      drawPixelHelmet();
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += 30;
+        document.getElementById('loading-progress').style.width = progress + '%';
+        if (progress >= 100) {
+          clearInterval(interval);
+          document.getElementById('loading-screen').style.opacity = '0';
+          setTimeout(() => { document.getElementById('loading-screen').style.display = 'none'; }, 300);
+        }
+      }, 50);
+    };
   </script>
 </body>
 </html>
