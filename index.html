@@ -574,7 +574,7 @@
       font-weight: 700;
     }
 
-    /* Onboarding Modal */
+    /* Modal Screens */
     .modal {
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -905,19 +905,20 @@
     </div>
   </div>
 
-  <!-- Onboarding Modal (Firebase Sign-In & Starting Questions) -->
+  <!-- Auth & Onboarding Modal (Google Sign In First, then questions only if new account) -->
   <div id="onboarding-modal" class="modal">
-    <!-- Welcome Slide / Sign In with Google -->
-    <div class="onboarding-slide active" id="slide-welcome" style="display: flex; align-items: center; text-align: center; justify-content: center; height: 100%;">
+    <!-- Step A: Google Sign In Screen -->
+    <div class="onboarding-slide active" id="slide-auth" style="display: flex; align-items: center; text-align: center; justify-content: center; height: 100%;">
       <div style="font-size: 3rem; margin-bottom: 15px;">⚔️</div>
       <h1 style="font-size: 1.8rem; font-weight: 800; color: #fff; margin-bottom: 10px;">Push Up Arena</h1>
-      <p style="color: var(--subtext); font-size: 0.95rem; margin-bottom: 30px; line-height: 1.4;">Sign in with Google to sync your hero progress across devices, track form AI, and compete globally.</p>
+      <p style="color: var(--subtext); font-size: 0.95rem; margin-bottom: 30px; line-height: 1.4;">Sign in with Google to sync your hero progress. Returning accounts load instantly; new accounts set up their profile.</p>
       <button class="btn btn-google" onclick="loginWithGoogle()">
         <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.18v3.15C3.16 21.32 7.23 24 12 24z"/><path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.6H1.18C.43 8.12 0 9.82 0 12s.43 3.88 1.18 5.4l4.09-3.16z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.23 0 3.16 2.68 1.18 6.6l4.09 3.15c.95-2.85 3.6-4.96 6.73-4.96z"/></svg>
         Sign In with Google
       </button>
     </div>
 
+    <!-- Step B: New Account Starting Questions Flow -->
     <div class="slide-progress" id="onboarding-progress-bar" style="display: none;">
       <div class="progress-step active" id="p-step-1"></div>
       <div class="progress-step" id="p-step-2"></div>
@@ -998,27 +999,28 @@
           state.userName = user.displayName || state.userName;
           state.photoURL = user.photoURL || "";
           
-          // Check if local storage has existing customized settings for this user
+          // Check if this account already has saved profile data in localStorage
           const saved = localStorage.getItem('pushup_arena_state_' + user.uid);
           if (saved) {
+            // Existing account: bypass questions and enter app directly
             try { state = { ...state, ...JSON.parse(saved) }; } catch(e){}
             document.getElementById('onboarding-modal').classList.remove('active');
+            postLoginInit();
           } else {
-            // New account or first login on this device -> Prompt starting questions
+            // New account: require user to go through starting questions
             document.getElementById('onboarding-modal').classList.add('active');
-            document.getElementById('slide-welcome').style.display = 'none';
+            document.getElementById('slide-auth').style.display = 'none';
             document.getElementById('onboarding-progress-bar').style.display = 'flex';
             document.getElementById('onboarding-slides-container').style.display = 'flex';
             document.getElementById('onboarding-nav-btns').style.display = 'flex';
             document.getElementById('signup-name').value = state.userName;
             updateSlideUI();
           }
-          postLoginInit();
         } else {
-          // Not logged in -> Show Google Sign In screen
+          // Not logged in: Show Google Sign In screen first
           state.signedIn = false;
           document.getElementById('onboarding-modal').classList.add('active');
-          document.getElementById('slide-welcome').style.display = 'flex';
+          document.getElementById('slide-auth').style.display = 'flex';
           document.getElementById('onboarding-progress-bar').style.display = 'none';
           document.getElementById('onboarding-slides-container').style.display = 'none';
           document.getElementById('onboarding-nav-btns').style.display = 'none';
@@ -1040,7 +1042,7 @@
     function loginWithGoogle() {
       window.signInWithPopup(window.firebaseAuth, window.firebaseProvider)
         .then((result) => {
-          // Successful Google login
+          // onAuthStateChanged handles the rest automatically
         })
         .catch((error) => {
           alert("Google Sign-In Error: " + error.message);
@@ -1209,17 +1211,9 @@
       state.weight = parseInt(document.getElementById('signup-weight').value) || 140;
       state.maxReps = parseInt(document.getElementById('signup-max-reps').value) || 15;
       
-      runAiTargetCalculation();
-      document.getElementById('header-user-name').innerText = state.userName;
-      document.getElementById('account-name-input').value = state.userName;
-      
-      const avatarEl = document.getElementById('avatar');
-      if (!state.photoURL) {
-        avatarEl.innerText = state.userName.charAt(0).toUpperCase();
-      }
-
       document.getElementById('onboarding-modal').classList.remove('active');
       saveState();
+      postLoginInit();
     }
 
     function triggerSignOut() {
