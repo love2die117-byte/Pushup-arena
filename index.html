@@ -15,6 +15,34 @@
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
 
+  <!-- Firebase SDKs -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAT1A-Em7JMMi-v4eZLEHxSZc7afJs9mpg",
+      authDomain: "push-up-arena-371b9.firebaseapp.com",
+      projectId: "push-up-arena-371b9",
+      storageBucket: "push-up-arena-371b9.firebasestorage.app",
+      messagingSenderId: "428269289235",
+      appId: "1:428269289235:web:3e3706dcfead663442e4e6",
+      measurementId: "G-87JFFS2B7M"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+
+    window.firebaseAuth = auth;
+    window.firebaseProvider = provider;
+    window.signInWithPopup = signInWithPopup;
+    window.signOut = signOut;
+    window.onAuthStateChanged = onAuthStateChanged;
+  </script>
+
   <style>
     :root {
       --primary: #38bdf8;
@@ -139,7 +167,9 @@
       font-weight: 800;
       font-size: 1.05rem;
       color: var(--primary);
+      overflow: hidden;
     }
+    .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
     .currency-badge {
       background: rgba(255, 255, 255, 0.04);
       border: 1px solid var(--border);
@@ -534,6 +564,15 @@
       border: 1px solid var(--border);
       color: #fff;
     }
+    .btn-google {
+      background: #fff;
+      color: #202124;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-weight: 700;
+    }
 
     /* Onboarding Modal */
     .modal {
@@ -583,7 +622,7 @@
     <div class="progress-bar-bg">
       <div id="loading-progress" class="progress-bar-fill"></div>
     </div>
-    <div id="loading-text" style="font-size: 0.72rem; color: var(--subtext); margin-top: 12px;">Analyzing AI Profile & Routine...</div>
+    <div id="loading-text" style="font-size: 0.72rem; color: var(--subtext); margin-top: 12px;">Connecting to Firebase & AI...</div>
   </div>
 
   <!-- Top Header Bar -->
@@ -728,8 +767,8 @@
         <input type="number" id="account-max-reps-input" value="15" onchange="recalculateAiGoals()">
       </div>
       <div class="setting-item">
-        <label>Account Management</label>
-        <button class="btn btn-secondary" onclick="triggerSignOut()">Sign Out / Switch Account</button>
+        <label>Firebase Cloud Account</label>
+        <button class="btn btn-secondary" style="color: var(--danger);" onclick="triggerSignOut()">Sign Out from Google</button>
       </div>
     </div>
   </div>
@@ -866,14 +905,17 @@
     </div>
   </div>
 
-  <!-- Onboarding Modal (Sign-in / Starting Questions Flow) -->
+  <!-- Onboarding Modal (Firebase Sign-In & Starting Questions) -->
   <div id="onboarding-modal" class="modal">
-    <!-- Welcome Intro Slide (Slide 0) -->
+    <!-- Welcome Slide / Sign In with Google -->
     <div class="onboarding-slide active" id="slide-welcome" style="display: flex; align-items: center; text-align: center; justify-content: center; height: 100%;">
       <div style="font-size: 3rem; margin-bottom: 15px;">⚔️</div>
-      <h1 style="font-size: 1.8rem; font-weight: 800; color: #fff; margin-bottom: 10px;">Welcome to Push Up Arena</h1>
-      <p style="color: var(--subtext); font-size: 0.95rem; margin-bottom: 30px; line-height: 1.4;">Transform your fitness with AI pose tracking, campaign battles, and epic quests.</p>
-      <button class="btn" onclick="startOnboardingFlow()">Sign In / Create Account</button>
+      <h1 style="font-size: 1.8rem; font-weight: 800; color: #fff; margin-bottom: 10px;">Push Up Arena</h1>
+      <p style="color: var(--subtext); font-size: 0.95rem; margin-bottom: 30px; line-height: 1.4;">Sign in with Google to sync your hero progress across devices, track form AI, and compete globally.</p>
+      <button class="btn btn-google" onclick="loginWithGoogle()">
+        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.18v3.15C3.16 21.32 7.23 24 12 24z"/><path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.6H1.18C.43 8.12 0 9.82 0 12s.43 3.88 1.18 5.4l4.09-3.16z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.23 0 3.16 2.68 1.18 6.6l4.09 3.15c.95-2.85 3.6-4.96 6.73-4.96z"/></svg>
+        Sign In with Google
+      </button>
     </div>
 
     <div class="slide-progress" id="onboarding-progress-bar" style="display: none;">
@@ -941,48 +983,47 @@
       routineFormat: "cycle",
       selectedTypes: ["standard", "diamond"],
       storyStage: 1,
-      signedIn: false
+      signedIn: false,
+      photoURL: ""
     };
 
     let currentSlide = 1;
     const totalSlides = 4;
 
     function initApp() {
-      const saved = localStorage.getItem('pushup_arena_state');
-      if (saved) {
-        try { state = { ...state, ...JSON.parse(saved) }; } catch(e){}
-      }
-
-      // Check if user is signed in / completed onboarding
-      if (!state.signedIn) {
-        document.getElementById('onboarding-modal').classList.add('active');
-        // Reset slide UI to welcome screen
-        document.getElementById('slide-welcome').style.display = 'flex';
-        document.getElementById('onboarding-progress-bar').style.display = 'none';
-        document.getElementById('onboarding-slides-container').style.display = 'none';
-        document.getElementById('onboarding-nav-btns').style.display = 'none';
-      } else {
-        document.getElementById('onboarding-modal').classList.remove('active');
-      }
-
-      runAiTargetCalculation();
-      updateThemeColor(state.themeColor);
-      document.getElementById('theme-color-picker').value = state.themeColor;
-      document.getElementById('strictness-select').value = state.strictness;
-      document.getElementById('audio-feedback-select').value = state.audioFeedback;
-      document.getElementById('routine-format-select').value = state.routineFormat;
-      document.getElementById('header-gold-val').innerText = state.gold;
-      document.getElementById('header-user-name').innerText = state.userName;
-      document.getElementById('avatar').innerText = state.userName.charAt(0).toUpperCase();
-      document.getElementById('account-name-input').value = state.userName;
-      document.getElementById('account-age-input').value = state.age;
-      document.getElementById('account-weight-input').value = state.weight;
-      document.getElementById('account-max-reps-input').value = state.maxReps;
-      document.getElementById('ai-target-reps-input').value = state.aiTargetReps;
-
-      syncTypePillsUI();
-      updateStatsDisplay();
-      drawPixelHelmet();
+      // Listen to Firebase Auth state
+      window.onAuthStateChanged(window.firebaseAuth, (user) => {
+        if (user) {
+          state.signedIn = true;
+          state.userName = user.displayName || state.userName;
+          state.photoURL = user.photoURL || "";
+          
+          // Check if local storage has existing customized settings for this user
+          const saved = localStorage.getItem('pushup_arena_state_' + user.uid);
+          if (saved) {
+            try { state = { ...state, ...JSON.parse(saved) }; } catch(e){}
+            document.getElementById('onboarding-modal').classList.remove('active');
+          } else {
+            // New account or first login on this device -> Prompt starting questions
+            document.getElementById('onboarding-modal').classList.add('active');
+            document.getElementById('slide-welcome').style.display = 'none';
+            document.getElementById('onboarding-progress-bar').style.display = 'flex';
+            document.getElementById('onboarding-slides-container').style.display = 'flex';
+            document.getElementById('onboarding-nav-btns').style.display = 'flex';
+            document.getElementById('signup-name').value = state.userName;
+            updateSlideUI();
+          }
+          postLoginInit();
+        } else {
+          // Not logged in -> Show Google Sign In screen
+          state.signedIn = false;
+          document.getElementById('onboarding-modal').classList.add('active');
+          document.getElementById('slide-welcome').style.display = 'flex';
+          document.getElementById('onboarding-progress-bar').style.display = 'none';
+          document.getElementById('onboarding-slides-container').style.display = 'none';
+          document.getElementById('onboarding-nav-btns').style.display = 'none';
+        }
+      });
 
       let progress = 0;
       const interval = setInterval(() => {
@@ -994,6 +1035,44 @@
           setTimeout(() => { document.getElementById('loading-screen').style.display = 'none'; }, 300);
         }
       }, 80);
+    }
+
+    function loginWithGoogle() {
+      window.signInWithPopup(window.firebaseAuth, window.firebaseProvider)
+        .then((result) => {
+          // Successful Google login
+        })
+        .catch((error) => {
+          alert("Google Sign-In Error: " + error.message);
+        });
+    }
+
+    function postLoginInit() {
+      runAiTargetCalculation();
+      updateThemeColor(state.themeColor);
+      document.getElementById('theme-color-picker').value = state.themeColor;
+      document.getElementById('strictness-select').value = state.strictness;
+      document.getElementById('audio-feedback-select').value = state.audioFeedback;
+      document.getElementById('routine-format-select').value = state.routineFormat;
+      document.getElementById('header-gold-val').innerText = state.gold;
+      document.getElementById('header-user-name').innerText = state.userName;
+      
+      const avatarEl = document.getElementById('avatar');
+      if (state.photoURL) {
+        avatarEl.innerHTML = `<img src="${state.photoURL}" alt="Avatar">`;
+      } else {
+        avatarEl.innerText = state.userName.charAt(0).toUpperCase();
+      }
+
+      document.getElementById('account-name-input').value = state.userName;
+      document.getElementById('account-age-input').value = state.age;
+      document.getElementById('account-weight-input').value = state.weight;
+      document.getElementById('account-max-reps-input').value = state.maxReps;
+      document.getElementById('ai-target-reps-input').value = state.aiTargetReps;
+
+      syncTypePillsUI();
+      updateStatsDisplay();
+      drawPixelHelmet();
     }
 
     function runAiTargetCalculation() {
@@ -1099,15 +1178,6 @@
       saveState();
     }
 
-    function startOnboardingFlow() {
-      document.getElementById('slide-welcome').style.display = 'none';
-      document.getElementById('onboarding-progress-bar').style.display = 'flex';
-      document.getElementById('onboarding-slides-container').style.display = 'flex';
-      document.getElementById('onboarding-nav-btns').style.display = 'flex';
-      currentSlide = 1;
-      updateSlideUI();
-    }
-
     function updateSlideUI() {
       for (let i = 1; i <= totalSlides; i++) {
         document.getElementById(`slide-${i}`).classList.toggle('active', i === currentSlide);
@@ -1138,22 +1208,24 @@
       state.age = parseInt(document.getElementById('signup-age').value) || 20;
       state.weight = parseInt(document.getElementById('signup-weight').value) || 140;
       state.maxReps = parseInt(document.getElementById('signup-max-reps').value) || 15;
-      state.signedIn = true;
       
       runAiTargetCalculation();
       document.getElementById('header-user-name').innerText = state.userName;
       document.getElementById('account-name-input').value = state.userName;
-      document.getElementById('avatar').innerText = state.userName.charAt(0).toUpperCase();
+      
+      const avatarEl = document.getElementById('avatar');
+      if (!state.photoURL) {
+        avatarEl.innerText = state.userName.charAt(0).toUpperCase();
+      }
+
       document.getElementById('onboarding-modal').classList.remove('active');
       saveState();
     }
 
     function triggerSignOut() {
-      if (confirm("Are you sure you want to sign out? You can sign back in or create a new account profile.")) {
-        state.signedIn = false;
-        saveState();
+      window.signOut(window.firebaseAuth).then(() => {
         location.reload();
-      }
+      });
     }
 
     function drawPixelHelmet() {
@@ -1175,12 +1247,16 @@
     }
 
     function saveState() {
-      localStorage.setItem('pushup_arena_state', JSON.stringify(state));
+      const user = window.firebaseAuth.currentUser;
+      const key = user ? 'pushup_arena_state_' + user.uid : 'pushup_arena_state_guest';
+      localStorage.setItem(key, JSON.stringify(state));
     }
 
     function resetAllData() {
       if (confirm("Are you sure you want to reset all app stats and progress?")) {
-        localStorage.removeItem('pushup_arena_state');
+        const user = window.firebaseAuth.currentUser;
+        const key = user ? 'pushup_arena_state_' + user.uid : 'pushup_arena_state_guest';
+        localStorage.removeItem(key);
         location.reload();
       }
     }
