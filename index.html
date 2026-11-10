@@ -6,13 +6,13 @@
   <title>Push Up Arena: Knight's Quest</title>
 
   <!-- AUTO-UPDATE CACHE BUSTER -->
-  <meta name="app-version" content="v5.0-pro-arena-ui">
+  <meta name="app-version" content="v6.0-grey-obsidian-pro">
 
   <!-- PWA & Mobile Optimization -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="PushUpArena">
-  <meta name="theme-color" content="#070a0f">
+  <meta name="theme-color" content="#121214">
 
   <!-- MediaPipe Pose & Camera Utils -->
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
@@ -20,16 +20,16 @@
 
   <style>
     :root {
-      --primary: #38bdf8;
-      --primary-dark: #0284c7;
-      --primary-glow: rgba(56, 189, 248, 0.45);
+      --primary: #e2e8f0;
+      --primary-dark: #cbd5e1;
+      --primary-glow: rgba(226, 232, 240, 0.25);
       --accent-gold: #fbbf24;
-      --accent-glow: rgba(251, 191, 36, 0.35);
-      --bg: #070a0f;
-      --card-bg: rgba(15, 23, 42, 0.85);
-      --card-border: rgba(56, 189, 248, 0.2);
-      --card-border-active: rgba(56, 189, 248, 0.6);
-      --text: #f8fafc;
+      --accent-glow: rgba(251, 191, 36, 0.2);
+      --bg: #0d0e12;
+      --card-bg: #16181d;
+      --card-border: rgba(255, 255, 255, 0.08);
+      --card-border-active: rgba(255, 255, 255, 0.25);
+      --text: #f1f5f9;
       --subtext: #94a3b8;
       --danger: #ef4444;
       --success: #10b981;
@@ -54,7 +54,7 @@
       flex-direction: column;
     }
 
-    /* Screen Management */
+    /* Screen Management with Smooth Scrolling */
     .screen {
       display: none;
       position: absolute;
@@ -64,6 +64,8 @@
       background: var(--bg);
       flex-direction: column;
       padding-bottom: 75px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
     .screen.active { display: flex; }
 
@@ -75,59 +77,58 @@
       justify-content: center;
       align-items: center;
       z-index: 150;
-      background: radial-gradient(circle at center, #0f172a 0%, #070a0f 100%);
+      background: radial-gradient(circle at center, #1e2028 0%, #0d0e12 100%);
     }
     .helmet-logo {
-      width: 120px;
-      height: 120px;
+      width: 110px;
+      height: 110px;
       image-rendering: pixelated;
       margin-bottom: 20px;
       animation: chillFloat 3s infinite ease-in-out;
-      filter: drop-shadow(0 0 25px var(--primary-glow));
+      filter: drop-shadow(0 0 20px rgba(255,255,255,0.15));
     }
     @keyframes chillFloat {
       0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
+      50% { transform: translateY(-8px); }
     }
     .loading-title {
-      font-size: 1.6rem;
+      font-size: 1.5rem;
       font-weight: 900;
-      letter-spacing: 3px;
+      letter-spacing: 2.5px;
       color: #fff;
       margin-bottom: 6px;
       text-transform: uppercase;
-      text-shadow: 0 0 15px var(--primary-glow);
     }
     .loading-sub {
-      font-size: 0.75rem;
-      color: var(--primary);
+      font-size: 0.72rem;
+      color: var(--subtext);
       text-transform: uppercase;
       letter-spacing: 2px;
       margin-bottom: 24px;
       font-weight: 800;
     }
     .progress-bar-bg {
-      width: 260px;
-      height: 8px;
+      width: 240px;
+      height: 6px;
       background: rgba(255,255,255,0.06);
-      border-radius: 4px;
+      border-radius: 3px;
       overflow: hidden;
       border: 1px solid var(--card-border);
     }
     .progress-bar-fill {
       height: 100%;
       width: 0%;
-      background: linear-gradient(90deg, var(--primary-dark), var(--primary));
+      background: #f1f5f9;
       transition: width 0.15s ease;
     }
 
-    /* Professional Top Header Bar */
+    /* Grey Obsidian Header Bar */
     .app-header {
-      padding: 46px 20px 16px 20px;
+      padding: 44px 20px 14px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: rgba(15, 23, 42, 0.9);
+      background: rgba(22, 24, 29, 0.95);
       backdrop-filter: blur(20px);
       border-bottom: 1px solid var(--card-border);
       z-index: 15;
@@ -138,39 +139,37 @@
       gap: 12px;
     }
     .user-avatar {
-      width: 44px;
-      height: 44px;
+      width: 42px;
+      height: 42px;
       border-radius: 12px;
-      background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(2, 132, 199, 0.4));
-      border: 2px solid var(--primary);
+      background: #22252e;
+      border: 2px solid rgba(255,255,255,0.2);
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 900;
-      font-size: 1.2rem;
-      color: var(--primary);
-      box-shadow: 0 0 15px var(--primary-glow);
+      font-size: 1.1rem;
+      color: #fff;
     }
     .currency-badge {
-      background: rgba(251, 191, 36, 0.12);
-      border: 1px solid rgba(251, 191, 36, 0.4);
-      padding: 8px 16px;
+      background: rgba(251, 191, 36, 0.1);
+      border: 1px solid rgba(251, 191, 36, 0.3);
+      padding: 8px 14px;
       border-radius: 12px;
       display: flex;
       align-items: center;
       gap: 8px;
       font-weight: 900;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       color: var(--accent-gold);
-      box-shadow: 0 0 15px var(--accent-glow);
     }
 
-    /* Pro Bottom Navigation Bar */
+    /* Bottom Navigation Bar with Tiny Scale Up on Click */
     .bottom-nav {
       position: absolute;
       bottom: 0; left: 0; right: 0;
       height: 72px;
-      background: rgba(7, 10, 15, 0.96);
+      background: #0f1015;
       backdrop-filter: blur(20px);
       border-top: 1px solid var(--card-border);
       display: flex;
@@ -190,126 +189,121 @@
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.8px;
-      transition: all 0.2s ease;
+      transition: transform 0.15s ease, color 0.15s ease;
       flex: 1;
     }
-    .nav-item span:first-child { font-size: 1.3rem; }
+    .nav-item span:first-child {
+      font-size: 1.25rem;
+      transition: transform 0.15s ease;
+    }
     .nav-item.active {
-      color: var(--primary);
-      text-shadow: 0 0 12px var(--primary-glow);
+      color: #fff;
+    }
+    .nav-item.active span:first-child {
+      transform: scale(1.18);
+    }
+    .nav-item:active span:first-child {
+      transform: scale(1.25);
     }
 
-    /* Menu Content Container */
+    /* Scrollable Menu Content */
     .menu-content {
       padding: 20px;
       overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
       flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 18px;
+      gap: 16px;
     }
 
     /* Hero Banner Card */
     .hero-banner {
-      background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
+      background: linear-gradient(135deg, #181a22 0%, #121318 100%);
       border: 1px solid var(--card-border);
-      border-radius: 22px;
-      padding: 24px;
+      border-radius: 20px;
+      padding: 22px;
       position: relative;
       overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
-    }
-    .hero-banner::before {
-      content: '';
-      position: absolute;
-      top: -50%; left: -50%;
-      width: 200%; height: 200%;
-      background: radial-gradient(circle, var(--primary-glow) 0%, transparent 60%);
-      opacity: 0.15;
-      pointer-events: none;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
     }
     .hero-tag {
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       font-weight: 900;
-      color: var(--primary);
+      color: var(--subtext);
       text-transform: uppercase;
-      letter-spacing: 1.8px;
-      margin-bottom: 8px;
+      letter-spacing: 1.5px;
+      margin-bottom: 6px;
     }
     .hero-title {
-      font-size: 1.55rem;
+      font-size: 1.45rem;
       font-weight: 900;
       color: #fff;
       margin-bottom: 6px;
-      letter-spacing: 0.5px;
     }
     .hero-sub {
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       color: var(--subtext);
-      margin-bottom: 20px;
-      line-height: 1.45;
+      margin-bottom: 18px;
+      line-height: 1.4;
     }
 
-    /* Arena Game Modes Grid */
+    /* Game Mode Cards Grid */
     .modes-grid {
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 12px;
     }
     .mode-card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 18px;
-      padding: 20px;
+      border-radius: 16px;
+      padding: 18px;
       display: flex;
       align-items: center;
-      gap: 18px;
+      gap: 16px;
       cursor: pointer;
-      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     }
     .mode-card:active {
-      transform: scale(0.97);
-      border-color: var(--primary);
-      box-shadow: 0 0 20px var(--primary-glow);
+      transform: scale(0.98);
+      border-color: rgba(255,255,255,0.3);
     }
     .mode-icon-box {
-      width: 56px;
-      height: 56px;
-      border-radius: 16px;
-      background: rgba(56, 189, 248, 0.1);
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: #1f222d;
       border: 1px solid var(--card-border);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.75rem;
+      font-size: 1.5rem;
       flex-shrink: 0;
-      box-shadow: inset 0 0 12px rgba(56, 189, 248, 0.15);
     }
     .mode-info { flex: 1; }
     .mode-title {
-      font-size: 1.15rem;
+      font-size: 1.1rem;
       font-weight: 900;
       color: var(--text);
-      margin-bottom: 4px;
+      margin-bottom: 3px;
     }
     .mode-desc {
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       color: var(--subtext);
-      line-height: 1.4;
+      line-height: 1.35;
     }
     .mode-action-pill {
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      color: #070a0f;
+      background: #f1f5f9;
+      color: #0d0e12;
       font-weight: 900;
-      font-size: 0.78rem;
-      padding: 10px 18px;
-      border-radius: 12px;
-      box-shadow: 0 0 15px var(--primary-glow);
-      letter-spacing: 0.5px;
+      font-size: 0.75rem;
+      padding: 8px 16px;
+      border-radius: 10px;
     }
 
-    /* Sub Screens & Headers */
+    /* Sub Screens & Scrollable Lists */
     .sub-screen {
       display: none;
       position: absolute;
@@ -317,17 +311,17 @@
       background: var(--bg);
       z-index: 20;
       flex-direction: column;
-      padding: 24px;
+      padding: 20px;
       overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
     .sub-screen.active { display: flex; }
 
     .screen-header-title {
-      font-size: 1.5rem;
+      font-size: 1.4rem;
       font-weight: 900;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
       color: #fff;
-      letter-spacing: 0.5px;
     }
 
     .stats-dashboard {
@@ -344,17 +338,16 @@
       display: flex;
       flex-direction: column;
       gap: 8px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     }
-    .stat-card-icon { font-size: 1.6rem; }
-    .stat-card-num { font-size: 1.6rem; font-weight: 900; color: #fff; }
-    .stat-card-label { font-size: 0.75rem; color: var(--subtext); text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px; }
+    .stat-card-icon { font-size: 1.5rem; }
+    .stat-card-num { font-size: 1.5rem; font-weight: 900; color: #fff; }
+    .stat-card-label { font-size: 0.72rem; color: var(--subtext); text-transform: uppercase; font-weight: 800; }
 
     .settings-list {
       display: flex;
       flex-direction: column;
       gap: 14px;
-      padding-bottom: 20px;
+      padding-bottom: 30px;
     }
     .setting-item {
       background: var(--card-bg);
@@ -364,10 +357,9 @@
       display: flex;
       flex-direction: column;
       gap: 10px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     }
     label {
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       color: var(--subtext);
       font-weight: 800;
       text-transform: uppercase;
@@ -376,7 +368,7 @@
     input, select {
       width: 100%;
       padding: 14px;
-      background: rgba(255,255,255,0.03);
+      background: #111217;
       border: 1px solid var(--card-border);
       border-radius: 12px;
       color: #fff;
@@ -384,7 +376,7 @@
       outline: none;
       font-weight: 700;
     }
-    input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 10px var(--primary-glow); }
+    input:focus, select:focus { border-color: rgba(255,255,255,0.4); }
 
     .type-pill-grid {
       display: grid;
@@ -393,7 +385,7 @@
       margin-top: 6px;
     }
     .type-pill {
-      background: rgba(255,255,255,0.03);
+      background: #111217;
       border: 1px solid var(--card-border);
       padding: 14px;
       border-radius: 12px;
@@ -402,13 +394,11 @@
       font-weight: 800;
       color: var(--subtext);
       cursor: pointer;
-      transition: all 0.2s ease;
     }
     .type-pill.selected {
-      background: rgba(56, 189, 248, 0.15);
-      border-color: var(--primary);
-      color: var(--primary);
-      box-shadow: 0 0 12px var(--primary-glow);
+      background: #262935;
+      border-color: #fff;
+      color: #fff;
     }
 
     .btn {
@@ -416,29 +406,27 @@
       padding: 16px;
       border-radius: 14px;
       border: none;
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      color: #070a0f;
+      background: #f1f5f9;
+      color: #0d0e12;
       font-weight: 900;
       font-size: 1.05rem;
       cursor: pointer;
       text-align: center;
-      box-shadow: 0 0 20px var(--primary-glow);
       text-transform: uppercase;
       letter-spacing: 1px;
     }
     .btn:active { transform: scale(0.98); opacity: 0.9; }
     .btn-secondary {
-      background: rgba(255,255,255,0.06);
+      background: #1f222d;
       border: 1px solid var(--card-border);
       color: #fff;
-      box-shadow: none;
     }
 
     /* Modal Styling */
     .modal {
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(7, 10, 15, 0.98);
+      background: rgba(13, 14, 18, 0.98);
       z-index: 200;
       display: none;
       flex-direction: column;
@@ -469,7 +457,7 @@
       background: rgba(255,255,255,0.08);
       border-radius: 3px;
     }
-    .progress-step.active { background: var(--primary); box-shadow: 0 0 10px var(--primary-glow); }
+    .progress-step.active { background: #fff; }
 
     /* Arena View HUD */
     #arena-screen { background: #000; padding-bottom: 0; }
@@ -493,7 +481,7 @@
       z-index: 20;
     }
     .boss-card {
-      background: rgba(7, 10, 15, 0.92);
+      background: rgba(15, 16, 21, 0.92);
       border: 1px solid var(--card-border);
       border-radius: 18px;
       padding: 16px;
@@ -502,11 +490,10 @@
       align-items: center;
       position: relative;
       backdrop-filter: blur(12px);
-      box-shadow: 0 8px 25px rgba(0,0,0,0.5);
     }
     .boss-lvl {
       font-size: 0.72rem;
-      color: var(--primary);
+      color: var(--subtext);
       font-weight: 900;
       text-transform: uppercase;
       letter-spacing: 1.2px;
@@ -529,9 +516,8 @@
     .hp-bar-fill {
       height: 100%;
       width: 100%;
-      background: linear-gradient(90deg, var(--primary-dark), var(--primary));
+      background: #f1f5f9;
       transition: width 0.25s ease-out;
-      box-shadow: 0 0 12px var(--primary-glow);
     }
     .hp-text {
       position: absolute;
@@ -541,8 +527,7 @@
       justify-content: center;
       font-weight: 900;
       font-size: 0.78rem;
-      color: #fff;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+      color: #0d0e12;
     }
     .close-btn {
       position: absolute;
@@ -561,7 +546,7 @@
     .sensor-status-banner {
       position: absolute;
       top: 185px; left: 20px; right: 20px;
-      background: rgba(7, 10, 15, 0.92);
+      background: rgba(15, 16, 21, 0.92);
       border: 1px solid var(--card-border);
       border-radius: 14px;
       padding: 12px 18px;
@@ -571,7 +556,6 @@
       text-align: center;
       z-index: 25;
       backdrop-filter: blur(10px);
-      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
       display: flex;
       flex-direction: column;
       gap: 6px;
@@ -586,7 +570,7 @@
     .sensor-progress-fill {
       height: 100%;
       width: 0%;
-      background: var(--primary);
+      background: #f1f5f9;
       transition: width 0.1s linear;
     }
     .bottom-hud {
@@ -598,29 +582,28 @@
       z-index: 20;
     }
     .stat-box {
-      background: rgba(7, 10, 15, 0.9);
+      background: rgba(15, 16, 21, 0.9);
       border: 1px solid var(--card-border);
       border-radius: 16px;
       padding: 12px 16px;
       text-align: center;
       backdrop-filter: blur(10px);
       min-width: 90px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
     }
     .stat-val { font-size: 1.4rem; font-weight: 900; color: #fff; }
     .stat-lbl { font-size: 0.65rem; color: var(--subtext); text-transform: uppercase; letter-spacing: 0.8px; font-weight: 800; }
     .rep-circle {
       width: 90px; height: 90px;
       border-radius: 50%;
-      border: 4px solid var(--primary);
-      background: rgba(7, 10, 15, 0.92);
+      border: 4px solid #fff;
+      background: rgba(15, 16, 21, 0.92);
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 2.4rem;
       font-weight: 900;
-      color: var(--primary);
-      box-shadow: 0 0 25px var(--primary-glow);
+      color: #fff;
+      box-shadow: 0 0 20px rgba(255,255,255,0.15);
     }
   </style>
 </head>
@@ -630,20 +613,19 @@
   <div id="loading-screen">
     <canvas id="helmet-canvas" width="64" height="64" class="helmet-logo"></canvas>
     <div class="loading-title">Push Up Arena</div>
-    <div class="loading-sub" id="loading-sub-text">Syncing Live Rankings...</div>
+    <div class="loading-sub">Loading Combat Arena...</div>
     <div class="progress-bar-bg">
       <div id="loading-progress" class="progress-bar-fill"></div>
     </div>
-    <div id="loading-text" style="font-size: 0.75rem; color: var(--subtext); margin-top: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Loading Combat Arena...</div>
   </div>
 
-  <!-- Professional Header Bar -->
+  <!-- Header Bar -->
   <div class="app-header">
     <div class="user-pill">
       <div id="avatar" class="user-avatar">H</div>
       <div>
         <div id="header-user-name" style="font-weight: 900; font-size: 1.05rem;">Hero</div>
-        <div id="header-user-level" style="font-size: 0.75rem; color: var(--primary); font-weight: 800; letter-spacing: 0.5px;">AI Goal: 15 Reps</div>
+        <div id="header-user-level" style="font-size: 0.75rem; color: var(--subtext); font-weight: 800;">AI Goal: 15 Reps</div>
       </div>
     </div>
     <div class="currency-badge">🪙 <span id="header-gold-val">100</span></div>
@@ -675,7 +657,7 @@
             <div class="mode-title">Huge Story Campaign</div>
             <div class="mode-desc">50+ progression dungeons from Goblin Caves to Dragon Spire.</div>
           </div>
-          <div class="mode-action-pill" style="background:rgba(255,255,255,0.06); color:#fff;">ENTER</div>
+          <div class="mode-action-pill" style="background:#1f222d; color:#fff;">ENTER</div>
         </div>
 
         <div class="mode-card" onclick="openEndlessSurvival()">
@@ -684,7 +666,7 @@
             <div class="mode-title">Endless Survival Mode</div>
             <div class="mode-desc">Infinite waves of monsters. How many reps can you endure?</div>
           </div>
-          <div class="mode-action-pill" style="background:rgba(255,255,255,0.06); color:#fff;">SURVIVE</div>
+          <div class="mode-action-pill" style="background:#1f222d; color:#fff;">SURVIVE</div>
         </div>
 
         <div class="mode-card" onclick="openArmory()">
@@ -693,7 +675,7 @@
             <div class="mode-title">Hero Armory & Shop</div>
             <div class="mode-desc">Equip legendary armor, helmets, and glowing auras with gold.</div>
           </div>
-          <div class="mode-action-pill" style="background:rgba(255,255,255,0.06); color:#fff;">GEAR</div>
+          <div class="mode-action-pill" style="background:#1f222d; color:#fff;">GEAR</div>
         </div>
       </div>
     </div>
@@ -760,12 +742,12 @@
 
   <!-- SCREEN 4: ACCOUNT & PROFILES -->
   <div id="account-screen" class="sub-screen">
-    <div class="screen-header-title">👤 Hero Profile & Profiles</div>
+    <div class="screen-header-title">👤 Hero Profile</div>
 
     <div class="settings-list">
       <div class="setting-item">
         <label>Active Profile Save Key</label>
-        <input type="text" id="device-id-display" readonly style="color: var(--primary); font-family: monospace;">
+        <input type="text" id="device-id-display" readonly style="color: var(--subtext); font-family: monospace;">
         <button class="btn btn-secondary" style="margin-top: 10px;" onclick="createNewDeviceProfile()">➕ Create New Player Profile</button>
       </div>
 
@@ -794,7 +776,7 @@
     <div class="settings-list">
       <div class="setting-item">
         <label>🎨 Theme Accent Color</label>
-        <input type="color" id="theme-color-picker" value="#38bdf8" onchange="updateThemeColor(this.value)">
+        <input type="color" id="theme-color-picker" value="#f1f5f9" onchange="updateThemeColor(this.value)">
       </div>
 
       <div class="setting-item">
@@ -822,7 +804,7 @@
     </div>
   </div>
 
-  <!-- SCREEN 6: WORKING REAL LEADERBOARD -->
+  <!-- SCREEN 6: LEADERBOARD -->
   <div id="leaderboard-screen" class="sub-screen">
     <div class="screen-header-title">🏆 Live Real Leaderboard</div>
     <p style="color: var(--subtext); font-size: 0.82rem; margin-bottom: 16px;">Real players and profiles ranked live by total verified push-up reps.</p>
@@ -855,7 +837,7 @@
     <button class="btn" style="margin-top: 20px;" onclick="closeUserStatsModal()">Close Inspection</button>
   </div>
 
-  <!-- BOTTOM NAVIGATION BAR -->
+  <!-- BOTTOM NAVIGATION BAR (Scales icons slightly bigger on click) -->
   <div class="bottom-nav">
     <div class="nav-item active" id="nav-home" onclick="switchTab('home')">
       <span>⚔️</span>
@@ -924,7 +906,7 @@
     </div>
   </div>
 
-  <!-- Mandatory Onboarding Modal -->
+  <!-- Onboarding Modal -->
   <div id="onboarding-modal" class="modal">
     <div class="onboarding-slide active" id="slide-welcome" style="display: flex; flex-direction: column; align-items: center; text-align: center; justify-content: center; height: 100%;">
       <div style="font-size: 3.5rem; margin-bottom: 15px;">⚔️</div>
@@ -943,7 +925,7 @@
     <div class="slide-container" id="onboarding-slides-container" style="display: none;">
       <div class="onboarding-slide" id="slide-1">
         <h2>What's your hero name?</h2>
-        <p style="color: var(--subtext); font-size: 0.88rem;">Personalizes your profile on the real leaderboard.</p>
+        <p style="color: var(--subtext); font-size: 0.88rem;">Personalizes your profile on the leaderboard.</p>
         <div class="form-group" style="margin-top: 10px;">
           <input type="text" id="signup-name" value="" placeholder="Enter hero name">
         </div>
@@ -1014,7 +996,7 @@
       maxReps: 15,
       aiTargetReps: 18,
       gold: 100,
-      themeColor: "#38bdf8",
+      themeColor: "#f1f5f9",
       totalReps: 0,
       enemiesDefeated: 0,
       bossesSlain: 0,
@@ -1063,14 +1045,14 @@
 
       let progress = 0;
       const interval = setInterval(() => {
-        progress += 25;
+        progress += 30;
         document.getElementById('loading-progress').style.width = progress + '%';
         if (progress >= 100) {
           clearInterval(interval);
           document.getElementById('loading-screen').style.opacity = '0';
           setTimeout(() => { document.getElementById('loading-screen').style.display = 'none'; }, 300);
         }
-      }, 70);
+      }, 60);
     }
 
     function createNewDeviceProfile() {
@@ -1252,17 +1234,15 @@
     function drawPixelHelmet() {
       const cvs = document.getElementById('helmet-canvas');
       const ctx = cvs.getContext('2d');
-      ctx.fillStyle = state.themeColor;
+      ctx.fillStyle = "#ffffff";
       ctx.fillRect(16, 8, 32, 12);
       ctx.fillRect(12, 20, 40, 32);
-      ctx.fillStyle = "#070a0f";
+      ctx.fillStyle = "#0d0e12";
       ctx.fillRect(20, 28, 24, 8);
     }
 
     function updateThemeColor(hex) {
       state.themeColor = hex;
-      document.documentElement.style.setProperty('--primary', hex);
-      document.documentElement.style.setProperty('--primary-glow', hex + '66');
       saveState();
       drawPixelHelmet();
     }
@@ -1515,7 +1495,7 @@
         [23, 25], [24, 26], [25, 27], [26, 28]
       ];
       ctx.lineWidth = 5;
-      ctx.strokeStyle = state.themeColor;
+      ctx.strokeStyle = "#ffffff";
       connections.forEach(([i, j]) => {
         const p1 = landmarks[i], p2 = landmarks[j];
         if (p1 && p2) {
@@ -1549,14 +1529,13 @@
       saveState();
     }
 
-    /* REAL WORKING LEADERBOARD SYSTEM */
+    /* REAL LEADERBOARD SYSTEM */
     function renderLeaderboard() {
       updateGlobalLeaderboardRegistry();
       const container = document.getElementById('leaderboard-list-container');
       let registry = JSON.parse(localStorage.getItem('pushup_arena_leaderboard_registry') || '{}');
       let allUsers = Object.values(registry);
 
-      // Sort by total reps descending
       allUsers.sort((a, b) => b.reps - a.reps);
 
       if (allUsers.length === 0) {
@@ -1572,12 +1551,12 @@
         else if (idx === 2) rankBadge = "🥉 3";
 
         let isCurrent = u.key === deviceSaveKey || u.name === state.userName;
-        let activeTag = isCurrent ? `<span style="color:var(--primary); font-size:0.75rem; font-weight:900;"> (YOU)</span>` : '';
+        let activeTag = isCurrent ? `<span style="color:#fff; font-size:0.75rem; font-weight:900;"> (YOU)</span>` : '';
 
         html += `
-          <div class="setting-item" style="cursor: pointer; flex-direction: row; justify-content: space-between; align-items: center; border-color: ${isCurrent ? 'var(--primary)' : 'var(--card-border)'};" onclick="inspectHero('${u.name}', ${u.reps}, ${u.enemies}, ${u.bosses}, ${u.stage})">
+          <div class="setting-item" style="cursor: pointer; flex-direction: row; justify-content: space-between; align-items: center; border-color: ${isCurrent ? 'rgba(255,255,255,0.4)' : 'var(--card-border)'};" onclick="inspectHero('${u.name}', ${u.reps}, ${u.enemies}, ${u.bosses}, ${u.stage})">
             <div style="display: flex; align-items: center; gap: 14px;">
-              <div style="font-weight: 900; font-size: 1.15rem; color: var(--primary); min-width: 42px;">${rankBadge}</div>
+              <div style="font-weight: 900; font-size: 1.15rem; color: #fff; min-width: 42px;">${rankBadge}</div>
               <div>
                 <div style="font-weight: 900; font-size: 1.05rem; color: #fff;">${u.name}${activeTag}</div>
                 <div style="font-size: 0.75rem; color: var(--subtext);">Stage ${u.stage} • ${u.bosses} Bosses Slain</div>
