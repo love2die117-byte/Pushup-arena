@@ -3,56 +3,30 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Push Up Arena: Knight's Quest</title>
-
-  <!-- PWA & Mobile Optimization -->
+  <title>Push Up Arena: Knight's Quest S-RANK MASTERY</title>
+  <meta name="app-version" content="v16.7-full-game-restored-auth">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="PushUpArena">
-  <meta name="theme-color" content="#0d1117">
+  <meta name="theme-color" content="#0a0b0e">
 
   <!-- MediaPipe Pose & Camera Utils -->
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
 
-  <!-- Firebase SDKs -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
-    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyAT1A-Em7JMMi-v4eZLEHxSZc7afJs9mpg",
-      authDomain: "push-up-arena-371b9.firebaseapp.com",
-      projectId: "push-up-arena-371b9",
-      storageBucket: "push-up-arena-371b9.firebasestorage.app",
-      messagingSenderId: "428269289235",
-      appId: "1:428269289235:web:3e3706dcfead663442e4e6",
-      measurementId: "G-87JFFS2B7M"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const analytics = getAnalytics(app);
-    const auth = getAuth(app);
-    const provider = new GoogleAuthProvider();
-
-    window.firebaseAuth = auth;
-    window.firebaseProvider = provider;
-    window.signInWithPopup = signInWithPopup;
-    window.signOut = signOut;
-    window.onAuthStateChanged = onAuthStateChanged;
-  </script>
-
   <style>
     :root {
+      --bg: #0a0b0e;
+      --card-bg: #13151b;
+      --card-border: rgba(255, 255, 255, 0.08);
+      --card-border-active: rgba(255, 255, 255, 0.35);
       --primary: #38bdf8;
       --primary-dark: #0284c7;
       --primary-glow: rgba(56, 189, 248, 0.35);
-      --bg: #0d1117;
-      --card-bg: rgba(22, 27, 34, 0.85);
-      --border: rgba(255, 255, 255, 0.08);
-      --text: #e6edf3;
+      --text: #f1f5f9;
       --subtext: #8b949e;
+      --accent-gold: #fbbf24;
+      --rank-s: #f43f5e;
       --danger: #f87171;
       --success: #34d399;
     }
@@ -84,19 +58,22 @@
       z-index: 10;
       background: var(--bg);
       flex-direction: column;
-      padding-bottom: 75px;
+      padding-bottom: 90px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
     .screen.active { display: flex; }
 
-    /* Cinematic Loading Screen */
     #loading-screen {
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
       padding-bottom: 0;
       justify-content: center;
       align-items: center;
-      z-index: 100;
-      background: radial-gradient(circle at center, #161b22 0%, #0d1117 100%);
+      z-index: 150;
+      background: radial-gradient(circle at center, #181b24 0%, #0a0b0e 100%);
+      display: flex;
+      flex-direction: column;
     }
     .helmet-logo {
       width: 110px;
@@ -104,51 +81,53 @@
       image-rendering: pixelated;
       margin-bottom: 20px;
       animation: chillFloat 3s infinite ease-in-out;
-      filter: drop-shadow(0 0 15px var(--primary-glow));
+      filter: drop-shadow(0 0 25px rgba(255,255,255,0.2));
     }
     @keyframes chillFloat {
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-8px); }
     }
     .loading-title {
-      font-size: 1.35rem;
-      font-weight: 800;
-      letter-spacing: 1px;
+      font-size: 1.6rem;
+      font-weight: 900;
+      letter-spacing: 3px;
       color: #fff;
       margin-bottom: 6px;
+      text-transform: uppercase;
     }
     .loading-sub {
       font-size: 0.75rem;
       color: var(--subtext);
       text-transform: uppercase;
-      letter-spacing: 1.5px;
-      margin-bottom: 22px;
+      letter-spacing: 2px;
+      margin-bottom: 24px;
+      font-weight: 800;
     }
     .progress-bar-bg {
-      width: 240px;
-      height: 8px;
+      width: 250px;
+      height: 6px;
       background: rgba(255,255,255,0.06);
-      border-radius: 4px;
+      border-radius: 3px;
       overflow: hidden;
-      border: 1px solid var(--border);
+      border: 1px solid var(--card-border);
     }
     .progress-bar-fill {
       height: 100%;
       width: 0%;
-      background: linear-gradient(90deg, var(--primary-dark), var(--primary));
+      background: #f1f5f9;
       transition: width 0.15s ease;
     }
 
-    /* Top App Header */
     .app-header {
-      padding: 46px 20px 14px 20px;
+      padding: 44px 20px 14px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: rgba(22, 27, 34, 0.8);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
+      background: rgba(19, 21, 27, 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--card-border);
       z-index: 15;
+      flex-shrink: 0;
     }
     .user-pill {
       display: flex;
@@ -156,41 +135,38 @@
       gap: 12px;
     }
     .user-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: rgba(56, 189, 248, 0.15);
-      border: 1px solid var(--primary);
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: #1c1f2b;
+      border: 2px solid rgba(255,255,255,0.2);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 800;
-      font-size: 1.05rem;
-      color: var(--primary);
+      font-weight: 900;
+      font-size: 1.1rem;
+      color: #fff;
       overflow: hidden;
     }
     .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
     .currency-badge {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
       padding: 6px 12px;
-      border-radius: 20px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-weight: 700;
-      font-size: 0.82rem;
+      border-radius: 10px;
+      font-family: monospace;
+      font-size: 0.8rem;
+      font-weight: 900;
       color: #fff;
     }
 
-    /* Bottom Navigation Bar */
     .bottom-nav {
       position: absolute;
       bottom: 0; left: 0; right: 0;
-      height: 72px;
-      background: rgba(13, 17, 23, 0.92);
+      height: 76px;
+      background: #0d0f14;
       backdrop-filter: blur(20px);
-      border-top: 1px solid var(--border);
+      border-top: 1px solid var(--card-border);
       display: flex;
       justify-content: space-around;
       align-items: center;
@@ -205,108 +181,283 @@
       color: var(--subtext);
       cursor: pointer;
       font-size: 0.65rem;
-      font-weight: 700;
+      font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.4px;
-      transition: color 0.2s ease;
+      letter-spacing: 0.8px;
+      transition: transform 0.15s ease, color 0.15s ease;
       flex: 1;
+      padding: 8px 0;
     }
-    .nav-item span:first-child { font-size: 1.2rem; }
-    .nav-item.active { color: var(--primary); }
+    .nav-item span:first-child {
+      font-size: 1.2rem;
+      font-family: monospace;
+      font-weight: 900;
+      transition: transform 0.15s ease;
+    }
+    .nav-item.active { color: #fff; }
+    .nav-item.active span:first-child { transform: scale(1.2); }
 
-    /* Menu Content */
     .menu-content {
-      padding: 20px;
+      padding: 24px 20px 40px 20px;
       overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
       flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 18px;
     }
 
-    /* Modern Hero Card */
     .hero-banner {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 22px;
+      background: linear-gradient(135deg, #171922 0%, #101219 100%);
+      border: 1px solid var(--card-border);
+      border-radius: 22px;
+      padding: 24px;
       position: relative;
       overflow: hidden;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
     }
     .hero-tag {
-      font-size: 0.65rem;
-      font-weight: 800;
+      font-size: 0.72rem;
+      font-weight: 900;
       color: var(--primary);
       text-transform: uppercase;
-      letter-spacing: 1.2px;
+      letter-spacing: 1.5px;
       margin-bottom: 6px;
     }
     .hero-title {
-      font-size: 1.35rem;
-      font-weight: 800;
+      font-size: 1.5rem;
+      font-weight: 900;
       color: #fff;
       margin-bottom: 6px;
     }
     .hero-sub {
-      font-size: 0.8rem;
+      font-size: 0.85rem;
       color: var(--subtext);
-      margin-bottom: 16px;
-      line-height: 1.4;
+      margin-bottom: 20px;
+      line-height: 1.45;
     }
 
-    /* Game Mode Cards Grid */
     .modes-grid {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 14px;
     }
     .mode-card {
       background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 18px;
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 20px;
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 18px;
       cursor: pointer;
-      transition: border-color 0.15s ease, transform 0.15s ease;
+      transition: all 0.2s ease;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.25);
     }
-    .mode-card:active { transform: scale(0.98); }
+    .mode-card:active {
+      transform: scale(0.97);
+      border-color: rgba(255,255,255,0.4);
+    }
     .mode-icon-box {
-      width: 48px;
-      height: 48px;
-      border-radius: 12px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid var(--border);
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      background: #1c1f2b;
+      border: 1px solid var(--card-border);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.5rem;
+      font-family: monospace;
+      font-size: 1.25rem;
+      font-weight: 900;
+      color: #fff;
       flex-shrink: 0;
     }
     .mode-info { flex: 1; }
     .mode-title {
-      font-size: 1.05rem;
-      font-weight: 800;
+      font-size: 1.15rem;
+      font-weight: 900;
       color: var(--text);
-      margin-bottom: 2px;
+      margin-bottom: 4px;
     }
     .mode-desc {
-      font-size: 0.76rem;
+      font-size: 0.8rem;
       color: var(--subtext);
-      line-height: 1.3;
+      line-height: 1.4;
     }
     .mode-action-pill {
-      background: var(--primary);
-      color: #0d1117;
-      font-weight: 800;
-      font-size: 0.75rem;
-      padding: 8px 14px;
-      border-radius: 10px;
+      background: #f1f5f9;
+      color: #0a0b0e;
+      font-weight: 900;
+      font-size: 0.78rem;
+      padding: 10px 18px;
+      border-radius: 12px;
+      flex-shrink: 0;
     }
 
-    /* Camera Arena View */
+    .sub-screen {
+      display: none;
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 76px;
+      background: var(--bg);
+      z-index: 20;
+      flex-direction: column;
+      padding: 24px 20px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .sub-screen.active { display: flex; }
+
+    .screen-header-title {
+      font-size: 1.5rem;
+      font-weight: 900;
+      margin-bottom: 18px;
+      color: #fff;
+      font-family: monospace;
+      letter-spacing: -0.5px;
+    }
+
+    .stats-dashboard {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .stat-card-icon { font-family: monospace; font-size: 1.3rem; font-weight: 900; color: var(--subtext); }
+    .stat-card-num { font-size: 1.6rem; font-weight: 900; color: #fff; }
+    .stat-card-label { font-size: 0.75rem; color: var(--subtext); text-transform: uppercase; font-weight: 800; }
+
+    .settings-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding-bottom: 50px;
+    }
+    .setting-item {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    label {
+      font-size: 0.85rem;
+      color: var(--subtext);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    input, select {
+      width: 100%;
+      padding: 14px;
+      background: #0f1117;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      color: #fff;
+      font-size: 1rem;
+      outline: none;
+      font-weight: 700;
+      -webkit-user-select: text;
+      user-select: text;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 16px;
+      border-radius: 14px;
+      border: none;
+      background: #f1f5f9;
+      color: #0a0b0e;
+      font-weight: 900;
+      font-size: 1.05rem;
+      cursor: pointer;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .btn:active { transform: scale(0.98); opacity: 0.9; }
+    .btn-secondary {
+      background: #1c1f2b;
+      border: 1px solid var(--card-border);
+      color: #fff;
+    }
+    .btn-google {
+      background: #fff;
+      color: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      font-weight: 900;
+    }
+
+    .type-pill-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 6px;
+    }
+    .type-pill {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--card-border);
+      padding: 12px;
+      border-radius: 12px;
+      text-align: center;
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--subtext);
+      cursor: pointer;
+    }
+    .type-pill.selected {
+      background: rgba(56, 189, 248, 0.12);
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .modal {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(10, 11, 14, 0.98);
+      z-index: 200;
+      display: none;
+      flex-direction: column;
+      padding: 40px 24px;
+      overflow-y: auto;
+    }
+    .modal.active { display: flex; }
+
+    .slide-progress {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+    .progress-step {
+      flex: 1;
+      height: 5px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 3px;
+    }
+    .progress-step.active { background: var(--primary); }
+
+    .onboarding-slide {
+      display: none;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .onboarding-slide.active { display: flex; }
+
     #arena-screen { background: #000; padding-bottom: 0; }
     #video-container {
       position: relative;
@@ -320,45 +471,43 @@
       width: 100%; height: 100%;
       object-fit: cover;
     }
-
     .top-hud {
       position: absolute;
-      top: 45px;
-      left: 16px; right: 16px;
+      top: 45px; left: 16px; right: 16px;
       z-index: 20;
     }
     .boss-card {
-      background: rgba(13, 17, 23, 0.9);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 14px;
+      background: rgba(19, 21, 27, 0.92);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 16px;
       display: flex;
       flex-direction: column;
       align-items: center;
       position: relative;
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(12px);
     }
     .boss-lvl {
       font-size: 0.72rem;
       color: var(--primary);
-      font-weight: 800;
+      font-weight: 900;
       text-transform: uppercase;
-      letter-spacing: 1px;
+      letter-spacing: 1.2px;
     }
     .boss-name {
-      font-size: 1.1rem;
-      font-weight: 800;
+      font-size: 1.15rem;
+      font-weight: 900;
       color: #fff;
     }
     .hp-bar-bg {
       width: 100%;
-      height: 18px;
+      height: 20px;
       background: rgba(255,255,255,0.06);
-      border-radius: 6px;
-      margin-top: 8px;
+      border-radius: 8px;
+      margin-top: 10px;
       overflow: hidden;
       position: relative;
-      border: 1px solid var(--border);
+      border: 1px solid var(--card-border);
     }
     .hp-bar-fill {
       height: 100%;
@@ -372,14 +521,14 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 800;
-      font-size: 0.75rem;
-      color: #fff;
+      font-weight: 900;
+      font-size: 0.78rem;
+      color: #0a0b0e;
     }
     .close-btn {
       position: absolute;
-      top: 10px; right: 12px;
-      width: 28px; height: 28px;
+      top: 12px; right: 14px;
+      width: 30px; height: 30px;
       background: rgba(255,255,255,0.08);
       border-radius: 50%;
       display: flex;
@@ -388,250 +537,130 @@
       font-weight: bold;
       color: #fff;
       cursor: pointer;
+      border: 1px solid var(--card-border);
     }
-
     .sensor-status-banner {
       position: absolute;
-      top: 175px;
-      left: 20px; right: 20px;
-      background: rgba(13, 17, 23, 0.85);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 10px 16px;
+      top: 185px; left: 20px; right: 20px;
+      background: rgba(19, 21, 27, 0.92);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 12px 18px;
       color: #fff;
-      font-size: 0.82rem;
+      font-size: 0.85rem;
+      font-weight: 800;
       text-align: center;
       z-index: 25;
-      backdrop-filter: blur(8px);
+      backdrop-filter: blur(10px);
     }
-
     .bottom-hud {
       position: absolute;
-      bottom: 40px;
-      left: 20px; right: 20px;
+      bottom: 40px; left: 20px; right: 20px;
       display: flex;
       justify-content: space-between;
       align-items: flex-end;
       z-index: 20;
     }
     .stat-box {
-      background: rgba(13, 17, 23, 0.9);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 10px 14px;
+      background: rgba(19, 21, 27, 0.9);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 12px 16px;
       text-align: center;
       backdrop-filter: blur(10px);
-      min-width: 85px;
+      min-width: 90px;
     }
-    .stat-val {
-      font-size: 1.3rem;
-      font-weight: 800;
-      color: #fff;
-    }
-    .stat-lbl {
-      font-size: 0.62rem;
-      color: var(--subtext);
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-    }
+    .stat-val { font-size: 1.4rem; font-weight: 900; color: #fff; }
+    .stat-lbl { font-size: 0.65rem; color: var(--subtext); text-transform: uppercase; letter-spacing: 0.8px; font-weight: 800; }
     .rep-circle {
-      width: 85px;
-      height: 85px;
+      width: 90px; height: 90px;
       border-radius: 50%;
       border: 4px solid var(--primary);
-      background: rgba(13, 17, 23, 0.9);
+      background: rgba(19, 21, 27, 0.92);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 2.2rem;
+      font-size: 2.4rem;
       font-weight: 900;
       color: var(--primary);
     }
-
-    /* Sub Screens */
-    .sub-screen {
-      display: none;
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 72px;
-      background: var(--bg);
-      z-index: 20;
-      flex-direction: column;
-      padding: 20px;
-      overflow-y: auto;
-    }
-    .sub-screen.active { display: flex; }
-
-    .screen-header-title {
-      font-size: 1.3rem;
-      font-weight: 800;
-      margin-bottom: 16px;
-      color: #fff;
-    }
-
-    /* Dashboard grids */
-    .stats-dashboard {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      margin-bottom: 20px;
-    }
-    .stat-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .stat-card-icon { font-size: 1.5rem; }
-    .stat-card-num { font-size: 1.5rem; font-weight: 800; color: #fff; }
-    .stat-card-label { font-size: 0.72rem; color: var(--subtext); text-transform: uppercase; font-weight: 700; }
-
-    /* Settings & Form Lists */
-    .settings-list {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      padding-bottom: 20px;
-    }
-    .setting-item {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    label {
-      font-size: 0.82rem;
-      color: var(--subtext);
-      font-weight: 700;
-    }
-    input, select {
-      width: 100%;
-      padding: 14px;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      color: #fff;
-      font-size: 0.95rem;
-      outline: none;
-    }
-    input:focus, select:focus { border-color: var(--primary); }
-
-    /* Push-up Type Selector Pills */
-    .type-pill-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 6px;
-    }
-    .type-pill {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid var(--border);
-      padding: 12px;
-      border-radius: 12px;
-      text-align: center;
-      font-size: 0.82rem;
-      font-weight: 700;
-      color: var(--subtext);
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-    .type-pill.selected {
-      background: rgba(56, 189, 248, 0.12);
-      border-color: var(--primary);
-      color: var(--primary);
-    }
-
-    .btn {
-      width: 100%;
-      padding: 15px;
-      border-radius: 14px;
-      border: none;
-      background: var(--primary);
-      color: #0d1117;
-      font-weight: 800;
-      font-size: 1rem;
-      cursor: pointer;
-      text-align: center;
-    }
-    .btn:active { opacity: 0.9; }
-    .btn-secondary {
-      background: rgba(255,255,255,0.06);
-      border: 1px solid var(--border);
-      color: #fff;
-    }
-    .btn-google {
-      background: #fff;
-      color: #202124;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      font-weight: 700;
-    }
-
-    /* Modal Screens */
-    .modal {
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(13, 17, 23, 0.98);
-      z-index: 100;
-      display: none;
-      flex-direction: column;
-      padding: 40px 24px;
-      overflow-y: auto;
-    }
-    .modal.active { display: flex; }
-    .slide-container {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-    .onboarding-slide {
-      display: none;
-      flex-direction: column;
-      gap: 14px;
-    }
-    .onboarding-slide.active { display: flex; }
-    .slide-progress {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 24px;
-    }
-    .progress-step {
-      flex: 1;
-      height: 5px;
-      background: rgba(255,255,255,0.08);
-      border-radius: 3px;
-    }
-    .progress-step.active { background: var(--primary); }
   </style>
+
+  <!-- FIREBASE INITIALIZATION -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAT1A-Em7JMMi-v4eZLEHxSZc7afJs9mpg",
+      authDomain: "push-up-arena-371b9.firebaseapp.com",
+      projectId: "push-up-arena-371b9",
+      storageBucket: "push-up-arena-371b9.firebasestorage.app",
+      messagingSenderId: "428269289235",
+      appId: "1:428269289235:web:3e3706dcfead663442e4e6"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const googleProvider = new GoogleAuthProvider();
+
+    window.fbAuth = auth;
+    window.fbGoogleProvider = googleProvider;
+    window.signInWithPopup = signInWithPopup;
+    window.signOut = signOut;
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        window.state.signedIn = true;
+        window.state.userName = user.displayName || "Kayden";
+        window.state.photoURL = user.photoURL || "";
+
+        const saved = localStorage.getItem('pushup_arena_state_' + user.uid);
+        if (saved) {
+          try { window.state = { ...window.state, ...JSON.parse(saved) }; } catch(e){}
+          document.getElementById('onboarding-modal').classList.remove('active');
+          postLoginInit();
+        } else {
+          // New account -> Show setup questionnaire
+          document.getElementById('onboarding-modal').classList.add('active');
+          document.getElementById('slide-auth').style.display = 'none';
+          document.getElementById('onboarding-progress-bar').style.display = 'flex';
+          document.getElementById('onboarding-slides-container').style.display = 'flex';
+          document.getElementById('onboarding-nav-btns').style.display = 'flex';
+          document.getElementById('signup-name').value = window.state.userName;
+          updateSlideUI();
+        }
+      } else {
+        // Unauthenticated -> Show Google Sign In screen
+        window.state.signedIn = false;
+        document.getElementById('onboarding-modal').classList.add('active');
+        document.getElementById('slide-auth').style.display = 'flex';
+        document.getElementById('onboarding-progress-bar').style.display = 'none';
+        document.getElementById('onboarding-slides-container').style.display = 'none';
+        document.getElementById('onboarding-nav-btns').style.display = 'none';
+      }
+    });
+  </script>
 </head>
 <body>
 
   <!-- Cinematic Loading Screen -->
   <div id="loading-screen">
     <canvas id="helmet-canvas" width="64" height="64" class="helmet-logo"></canvas>
-    <div class="loading-title">PUSH UP ARENA</div>
+    <div class="loading-title">Push Up Arena</div>
     <div class="loading-sub">AI Precision Calibration</div>
     <div class="progress-bar-bg">
       <div id="loading-progress" class="progress-bar-fill"></div>
     </div>
-    <div id="loading-text" style="font-size: 0.72rem; color: var(--subtext); margin-top: 12px;">Connecting to Firebase & AI...</div>
   </div>
 
-  <!-- Top Header Bar -->
+  <!-- App Header Bar -->
   <div class="app-header">
-    <div class="user-pill">
+    <div class="user-pill" onclick="switchTab('account')" style="cursor: pointer;">
       <div id="avatar" class="user-avatar">K</div>
       <div>
-        <div id="header-user-name" style="font-weight: 800; font-size: 1rem;">Kayden</div>
-        <div id="header-user-level" style="font-size: 0.72rem; color: var(--primary); font-weight: 700;">AI Goal: 18 Reps</div>
+        <div id="header-user-name" style="font-weight: 900; font-size: 1rem;">Kayden</div>
+        <div id="header-user-level" style="font-size: 0.75rem; color: var(--primary); font-weight: 800;">AI Goal: 18 Reps</div>
       </div>
     </div>
     <div class="currency-badge">🪙 <span id="header-gold-val">150</span></div>
@@ -643,7 +672,7 @@
       <div class="hero-banner">
         <div class="hero-tag">🎯 AI Tailored Routine</div>
         <div class="hero-title" id="hero-goal-title">Target: 18 Reps / Wave</div>
-        <div class="hero-sub" id="hero-goal-desc">Customized based on your age, weight, and fitness background. Form strictness is locked in.</div>
+        <div class="hero-sub" id="hero-goal-desc">Customized based on your age, weight, and baseline strength.</div>
         <button class="btn" onclick="startArena('quick')">⚔️ QUICK BATTLE</button>
       </div>
 
@@ -663,34 +692,33 @@
             <div class="mode-title">Huge Story Campaign</div>
             <div class="mode-desc">50+ progression dungeons from Goblin Caves to Dragon Spire.</div>
           </div>
-          <div class="mode-action-pill" style="background:rgba(255,255,255,0.06); color:#fff;">ENTER</div>
+          <div class="mode-action-pill" style="background:#1c1f2b; color:#fff;">ENTER</div>
         </div>
 
-        <div class="mode-card" onclick="openEndlessSurvival()">
+        <div class="mode-card" onclick="startArena('endless')">
           <div class="mode-icon-box">💀</div>
           <div class="mode-info">
             <div class="mode-title">Endless Survival Mode</div>
             <div class="mode-desc">Infinite waves of monsters. How many reps can you endure?</div>
           </div>
-          <div class="mode-action-pill" style="background:rgba(255,255,255,0.06); color:#fff;">SURVIVE</div>
+          <div class="mode-action-pill" style="background:#1c1f2b; color:#fff;">SURVIVE</div>
         </div>
 
         <div class="mode-card" onclick="openArmory()">
           <div class="mode-icon-box">🛡️</div>
           <div class="mode-info">
             <div class="mode-title">Hero Armory & Shop</div>
-            <div class="mode-desc">Equip legendary armor, helmets, and glowing aesthetic auras with gold.</div>
+            <div class="mode-desc">Equip legendary armor, helmets, and glowing aesthetic auras.</div>
           </div>
-          <div class="mode-action-pill" style="background:rgba(255,255,255,0.06); color:#fff;">GEAR</div>
+          <div class="mode-action-pill" style="background:#1c1f2b; color:#fff;">GEAR</div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- SCREEN 2: PUSH-UP TYPES & ROUTINE SELECTOR -->
+  <!-- SCREEN 2: PUSH-UP TYPES -->
   <div id="types-screen" class="sub-screen">
     <div class="screen-header-title">🔄 Push-up Routine & Types</div>
-
     <div class="settings-list">
       <div class="setting-item">
         <label>Select Workout Format</label>
@@ -702,7 +730,7 @@
       </div>
 
       <div class="setting-item">
-        <label>Choose Push-up Styles (Tap to toggle)</label>
+        <label>Choose Push-up Styles</label>
         <div class="type-pill-grid">
           <div class="type-pill selected" id="type-standard" onclick="togglePushupType('standard')">Standard</div>
           <div class="type-pill" id="type-diamond" onclick="togglePushupType('diamond')">Diamond</div>
@@ -712,16 +740,15 @@
       </div>
 
       <div class="setting-item">
-        <label>AI Target Reps per Wave (Auto-calculated)</label>
+        <label>AI Target Reps per Wave</label>
         <input type="number" id="ai-target-reps-input" value="18" onchange="updateAiTargetReps(this.value)">
       </div>
     </div>
   </div>
 
-  <!-- SCREEN 3: STATS & ANALYTICS -->
+  <!-- SCREEN 3: STATS -->
   <div id="stats-screen" class="sub-screen">
     <div class="screen-header-title">📊 Hero Analytics</div>
-    
     <div class="stats-dashboard">
       <div class="stat-card">
         <div class="stat-card-icon">💪</div>
@@ -749,14 +776,13 @@
   <!-- SCREEN 4: ACCOUNT -->
   <div id="account-screen" class="sub-screen">
     <div class="screen-header-title">👤 Hero Profile</div>
-
     <div class="settings-list">
       <div class="setting-item">
         <label>Hero Name</label>
         <input type="text" id="account-name-input" value="Kayden" onchange="updateAccountName(this.value)">
       </div>
       <div class="setting-item">
-        <label>Age & Weight (Used by AI for Rep Targets)</label>
+        <label>Age & Weight</label>
         <div style="display:flex; gap:10px;">
           <input type="number" id="account-age-input" value="20" placeholder="Age" onchange="recalculateAiGoals()">
           <input type="number" id="account-weight-input" value="140" placeholder="Weight" onchange="recalculateAiGoals()">
@@ -767,7 +793,7 @@
         <input type="number" id="account-max-reps-input" value="15" onchange="recalculateAiGoals()">
       </div>
       <div class="setting-item">
-        <label>Firebase Cloud Account</label>
+        <label>Google Cloud Session</label>
         <button class="btn btn-secondary" style="color: var(--danger);" onclick="triggerSignOut()">Sign Out from Google</button>
       </div>
     </div>
@@ -776,31 +802,11 @@
   <!-- SCREEN 5: SETTINGS -->
   <div id="settings-screen" class="sub-screen">
     <div class="screen-header-title">⚙️ App Settings</div>
-
     <div class="settings-list">
       <div class="setting-item">
         <label>🎨 Theme Accent Color</label>
         <input type="color" id="theme-color-picker" value="#38bdf8" onchange="updateThemeColor(this.value)">
       </div>
-
-      <div class="setting-item">
-        <label>🎯 Form Strictness</label>
-        <select id="strictness-select" onchange="saveAppSettings()">
-          <option value="casual">Casual (Elbow &lt; 100°)</option>
-          <option value="standard" selected>Standard (Elbow &lt; 85°)</option>
-          <option value="strict">Strict Pro (Elbow &lt; 70°)</option>
-        </select>
-      </div>
-
-      <div class="setting-item">
-        <label>🔊 Audio & Haptic Feedback</label>
-        <select id="audio-feedback-select" onchange="saveAppSettings()">
-          <option value="all" selected>Vibration & Audio Cues Enabled</option>
-          <option value="vibrate">Vibration Only</option>
-          <option value="off">Muted</option>
-        </select>
-      </div>
-
       <div class="setting-item">
         <label>🛠️ Data Management</label>
         <button class="btn btn-secondary" style="color: var(--danger);" onclick="resetAllData()">Factory Reset App Data</button>
@@ -811,34 +817,7 @@
   <!-- SCREEN 6: LEADERBOARD -->
   <div id="leaderboard-screen" class="sub-screen">
     <div class="screen-header-title">🏆 Global Hero Leaderboard</div>
-    <p style="color: var(--subtext); font-size: 0.82rem; margin-bottom: 14px;">Tap any hero to inspect their stats and combat achievements.</p>
-    <div class="settings-list" id="leaderboard-list-container">
-      <!-- Injected via JS -->
-    </div>
-  </div>
-
-  <!-- User Stats Inspection Modal -->
-  <div id="user-stats-modal" class="modal" style="padding: 30px 20px; z-index: 110;">
-    <div class="screen-header-title" id="modal-hero-title">Hero Stats</div>
-    <div class="settings-list" style="margin-top: 10px;">
-      <div class="setting-item">
-        <label>Total Reps</label>
-        <div id="modal-hero-reps" style="font-size: 1.2rem; font-weight: 800; color: #fff;">0</div>
-      </div>
-      <div class="setting-item">
-        <label>Enemies Defeated</label>
-        <div id="modal-hero-enemies" style="font-size: 1.2rem; font-weight: 800; color: #fff;">0</div>
-      </div>
-      <div class="setting-item">
-        <label>Bosses Slain</label>
-        <div id="modal-hero-bosses" style="font-size: 1.2rem; font-weight: 800; color: #fff;">0</div>
-      </div>
-      <div class="setting-item">
-        <label>Story Stage</label>
-        <div id="modal-hero-stage" style="font-size: 1.2rem; font-weight: 800; color: #fff;">Stage 1</div>
-      </div>
-    </div>
-    <button class="btn" style="margin-top: 20px;" onclick="closeUserStatsModal()">Close</button>
+    <div class="settings-list" id="leaderboard-list-container"></div>
   </div>
 
   <!-- BOTTOM NAVIGATION BAR -->
@@ -869,7 +848,7 @@
     </div>
   </div>
 
-  <!-- Arena Camera Screen -->
+  <!-- Arena Camera View -->
   <div id="arena-screen" class="screen">
     <div id="video-container">
       <video id="webcam" playsinline muted></video>
@@ -905,20 +884,18 @@
     </div>
   </div>
 
-  <!-- Auth & Onboarding Modal (Google Sign In First, then questions only if new account) -->
+  <!-- Onboarding Modal (Google Sign In FIRST, Question Setup for NEW accounts) -->
   <div id="onboarding-modal" class="modal">
-    <!-- Step A: Google Sign In Screen -->
-    <div class="onboarding-slide active" id="slide-auth" style="display: flex; align-items: center; text-align: center; justify-content: center; height: 100%;">
+    <div class="onboarding-slide active" id="slide-auth" style="display: flex; flex-direction: column; align-items: center; text-align: center; justify-content: center; height: 100%;">
       <div style="font-size: 3rem; margin-bottom: 15px;">⚔️</div>
       <h1 style="font-size: 1.8rem; font-weight: 800; color: #fff; margin-bottom: 10px;">Push Up Arena</h1>
-      <p style="color: var(--subtext); font-size: 0.95rem; margin-bottom: 30px; line-height: 1.4;">Sign in with Google to sync your hero progress. Returning accounts load instantly; new accounts set up their profile.</p>
+      <p style="color: var(--subtext); font-size: 0.95rem; margin-bottom: 30px; line-height: 1.4;">Sign in with Google to sync progress. Returning accounts load instantly; new accounts set up their profile.</p>
       <button class="btn btn-google" onclick="loginWithGoogle()">
         <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.18v3.15C3.16 21.32 7.23 24 12 24z"/><path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.6H1.18C.43 8.12 0 9.82 0 12s.43 3.88 1.18 5.4l4.09-3.16z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.23 0 3.16 2.68 1.18 6.6l4.09 3.15c.95-2.85 3.6-4.96 6.73-4.96z"/></svg>
         Sign In with Google
       </button>
     </div>
 
-    <!-- Step B: New Account Starting Questions Flow -->
     <div class="slide-progress" id="onboarding-progress-bar" style="display: none;">
       <div class="progress-step active" id="p-step-1"></div>
       <div class="progress-step" id="p-step-2"></div>
@@ -929,32 +906,32 @@
     <div class="slide-container" id="onboarding-slides-container" style="display: none;">
       <div class="onboarding-slide" id="slide-1">
         <h2>What's your hero name?</h2>
-        <p style="color: var(--subtext); font-size: 0.85rem;">Personalizes your AI training profile and leaderboard standing.</p>
-        <div class="form-group" style="margin-top: 10px;">
+        <p style="color: var(--subtext); font-size: 0.85rem;">Personalizes your AI profile and leaderboard standing.</p>
+        <div style="margin-top: 10px;">
           <input type="text" id="signup-name" value="Kayden" placeholder="Enter name">
         </div>
       </div>
 
       <div class="onboarding-slide" id="slide-2">
         <h2>How old are you?</h2>
-        <p style="color: var(--subtext); font-size: 0.85rem;">Helps the AI calculate your optimal recovery &amp; rep load.</p>
-        <div class="form-group" style="margin-top: 10px;">
+        <p style="color: var(--subtext); font-size: 0.85rem;">Helps the AI calculate your target load.</p>
+        <div style="margin-top: 10px;">
           <input type="number" id="signup-age" value="20">
         </div>
       </div>
 
       <div class="onboarding-slide" id="slide-3">
         <h2>What is your weight? (lbs)</h2>
-        <p style="color: var(--subtext); font-size: 0.85rem;">Used to determine strength-to-weight ratios.</p>
-        <div class="form-group" style="margin-top: 10px;">
+        <p style="color: var(--subtext); font-size: 0.85rem;">Used to determine strength ratios.</p>
+        <div style="margin-top: 10px;">
           <input type="number" id="signup-weight" value="140">
         </div>
       </div>
 
       <div class="onboarding-slide" id="slide-4">
         <h2>Max Push-ups in 1 Set?</h2>
-        <p style="color: var(--subtext); font-size: 0.85rem;">The AI uses this to calibrate your exact wave target.</p>
-        <div class="form-group" style="margin-top: 10px;">
+        <p style="color: var(--subtext); font-size: 0.85rem;">Calibrates your initial rep targets.</p>
+        <div style="margin-top: 10px;">
           <input type="number" id="signup-max-reps" value="15">
         </div>
       </div>
@@ -967,7 +944,7 @@
   </div>
 
   <script>
-    let state = {
+    window.state = {
       userName: "Kayden",
       age: 20,
       weight: 140,
@@ -979,8 +956,6 @@
       enemiesDefeated: 0,
       bossesSlain: 0,
       currentReps: 0,
-      strictness: "standard",
-      audioFeedback: "all",
       routineFormat: "cycle",
       selectedTypes: ["standard", "diamond"],
       storyStage: 1,
@@ -991,59 +966,8 @@
     let currentSlide = 1;
     const totalSlides = 4;
 
-    function initApp() {
-      // Listen to Firebase Auth state
-      window.onAuthStateChanged(window.firebaseAuth, (user) => {
-        if (user) {
-          state.signedIn = true;
-          state.userName = user.displayName || state.userName;
-          state.photoURL = user.photoURL || "";
-          
-          // Check if this account already has saved profile data in localStorage
-          const saved = localStorage.getItem('pushup_arena_state_' + user.uid);
-          if (saved) {
-            // Existing account: bypass questions and enter app directly
-            try { state = { ...state, ...JSON.parse(saved) }; } catch(e){}
-            document.getElementById('onboarding-modal').classList.remove('active');
-            postLoginInit();
-          } else {
-            // New account: require user to go through starting questions
-            document.getElementById('onboarding-modal').classList.add('active');
-            document.getElementById('slide-auth').style.display = 'none';
-            document.getElementById('onboarding-progress-bar').style.display = 'flex';
-            document.getElementById('onboarding-slides-container').style.display = 'flex';
-            document.getElementById('onboarding-nav-btns').style.display = 'flex';
-            document.getElementById('signup-name').value = state.userName;
-            updateSlideUI();
-          }
-        } else {
-          // Not logged in: Show Google Sign In screen first
-          state.signedIn = false;
-          document.getElementById('onboarding-modal').classList.add('active');
-          document.getElementById('slide-auth').style.display = 'flex';
-          document.getElementById('onboarding-progress-bar').style.display = 'none';
-          document.getElementById('onboarding-slides-container').style.display = 'none';
-          document.getElementById('onboarding-nav-btns').style.display = 'none';
-        }
-      });
-
-      let progress = 0;
-      const interval = setInterval(() => {
-        progress += 25;
-        document.getElementById('loading-progress').style.width = progress + '%';
-        if (progress >= 100) {
-          clearInterval(interval);
-          document.getElementById('loading-screen').style.opacity = '0';
-          setTimeout(() => { document.getElementById('loading-screen').style.display = 'none'; }, 300);
-        }
-      }, 80);
-    }
-
     function loginWithGoogle() {
-      window.signInWithPopup(window.firebaseAuth, window.firebaseProvider)
-        .then((result) => {
-          // onAuthStateChanged handles the rest automatically
-        })
+      window.signInWithPopup(window.fbAuth, window.fbGoogleProvider)
         .catch((error) => {
           alert("Google Sign-In Error: " + error.message);
         });
@@ -1051,66 +975,61 @@
 
     function postLoginInit() {
       runAiTargetCalculation();
-      updateThemeColor(state.themeColor);
-      document.getElementById('theme-color-picker').value = state.themeColor;
-      document.getElementById('strictness-select').value = state.strictness;
-      document.getElementById('audio-feedback-select').value = state.audioFeedback;
-      document.getElementById('routine-format-select').value = state.routineFormat;
-      document.getElementById('header-gold-val').innerText = state.gold;
-      document.getElementById('header-user-name').innerText = state.userName;
-      
+      updateThemeColor(window.state.themeColor);
+      document.getElementById('header-gold-val').innerText = window.state.gold;
+      document.getElementById('header-user-name').innerText = window.state.userName;
+
       const avatarEl = document.getElementById('avatar');
-      if (state.photoURL) {
-        avatarEl.innerHTML = `<img src="${state.photoURL}" alt="Avatar">`;
+      if (window.state.photoURL) {
+        avatarEl.innerHTML = `<img src="${window.state.photoURL}" alt="Avatar">`;
       } else {
-        avatarEl.innerText = state.userName.charAt(0).toUpperCase();
+        avatarEl.innerText = window.state.userName.charAt(0).toUpperCase();
       }
 
-      document.getElementById('account-name-input').value = state.userName;
-      document.getElementById('account-age-input').value = state.age;
-      document.getElementById('account-weight-input').value = state.weight;
-      document.getElementById('account-max-reps-input').value = state.maxReps;
-      document.getElementById('ai-target-reps-input').value = state.aiTargetReps;
+      document.getElementById('account-name-input').value = window.state.userName;
+      document.getElementById('account-age-input').value = window.state.age;
+      document.getElementById('account-weight-input').value = window.state.weight;
+      document.getElementById('account-max-reps-input').value = window.state.maxReps;
+      document.getElementById('ai-target-reps-input').value = window.state.aiTargetReps;
 
-      syncTypePillsUI();
       updateStatsDisplay();
       drawPixelHelmet();
     }
 
     function runAiTargetCalculation() {
-      let base = parseInt(state.maxReps) || 15;
-      let ageFactor = state.age < 25 ? 1.2 : (state.age > 40 ? 0.9 : 1.1);
-      let weightFactor = state.weight > 180 ? 0.95 : 1.05;
-      
-      let calculated = Math.round(base * 1.2 * ageFactor * weightFactor);
-      state.aiTargetReps = Math.max(5, calculated);
+      let base = parseInt(window.state.maxReps) || 15;
+      let ageFactor = window.state.age < 25 ? 1.2 : (window.state.age > 40 ? 0.9 : 1.1);
+      let weightFactor = window.state.weight > 180 ? 0.95 : 1.05;
 
-      document.getElementById('header-user-level').innerText = `AI Goal: ${state.aiTargetReps} Reps`;
-      document.getElementById('hero-goal-title').innerText = `Target: ${state.aiTargetReps} Reps / Wave`;
-      document.getElementById('hero-goal-desc').innerText = `AI calibrated for ${state.userName} (Max baseline: ${base}). Form precision active.`;
+      let calculated = Math.round(base * 1.2 * ageFactor * weightFactor);
+      window.state.aiTargetReps = Math.max(5, calculated);
+
+      document.getElementById('header-user-level').innerText = `AI Goal: ${window.state.aiTargetReps} Reps`;
+      document.getElementById('hero-goal-title').innerText = `Target: ${window.state.aiTargetReps} Reps / Wave`;
+      document.getElementById('hero-goal-desc').innerText = `AI calibrated for ${window.state.userName} (Max baseline: ${base}).`;
     }
 
     function recalculateAiGoals() {
-      state.age = parseInt(document.getElementById('account-age-input').value) || 20;
-      state.weight = parseInt(document.getElementById('account-weight-input').value) || 140;
-      state.maxReps = parseInt(document.getElementById('account-max-reps-input').value) || 15;
+      window.state.age = parseInt(document.getElementById('account-age-input').value) || 20;
+      window.state.weight = parseInt(document.getElementById('account-weight-input').value) || 140;
+      window.state.maxReps = parseInt(document.getElementById('account-max-reps-input').value) || 15;
       runAiTargetCalculation();
       saveState();
     }
 
     function updateAiTargetReps(val) {
-      state.aiTargetReps = parseInt(val) || 18;
-      document.getElementById('header-user-level').innerText = `AI Goal: ${state.aiTargetReps} Reps`;
-      document.getElementById('hero-goal-title').innerText = `Target: ${state.aiTargetReps} Reps / Wave`;
+      window.state.aiTargetReps = parseInt(val) || 18;
+      document.getElementById('header-user-level').innerText = `AI Goal: ${window.state.aiTargetReps} Reps`;
+      document.getElementById('hero-goal-title').innerText = `Target: ${window.state.aiTargetReps} Reps / Wave`;
       saveState();
     }
 
     function togglePushupType(typeKey) {
-      const idx = state.selectedTypes.indexOf(typeKey);
+      const idx = window.state.selectedTypes.indexOf(typeKey);
       if (idx > -1) {
-        if (state.selectedTypes.length > 1) state.selectedTypes.splice(idx, 1);
+        if (window.state.selectedTypes.length > 1) window.state.selectedTypes.splice(idx, 1);
       } else {
-        state.selectedTypes.push(typeKey);
+        window.state.selectedTypes.push(typeKey);
       }
       syncTypePillsUI();
       saveState();
@@ -1119,15 +1038,12 @@
     function syncTypePillsUI() {
       ['standard', 'diamond', 'wide', 'decline'].forEach(t => {
         const el = document.getElementById(`type-${t}`);
-        if (el) {
-          el.classList.toggle('selected', state.selectedTypes.includes(t));
-        }
+        if (el) el.classList.toggle('selected', window.state.selectedTypes.includes(t));
       });
     }
 
     function saveRoutineSettings() {
-      state.routineFormat = document.getElementById('routine-format-select').value;
-      syncTypePillsUI();
+      window.state.routineFormat = document.getElementById('routine-format-select').value;
       saveState();
     }
 
@@ -1160,23 +1076,17 @@
     }
 
     function updateStatsDisplay() {
-      document.getElementById('stats-total-reps').innerText = state.totalReps;
-      document.getElementById('stats-enemies-killed').innerText = state.enemiesDefeated;
-      document.getElementById('stats-bosses-slain').innerText = state.bossesSlain;
-      document.getElementById('header-gold-val').innerText = state.gold;
+      document.getElementById('stats-total-reps').innerText = window.state.totalReps;
+      document.getElementById('stats-enemies-killed').innerText = window.state.enemiesDefeated;
+      document.getElementById('stats-bosses-slain').innerText = window.state.bossesSlain;
+      document.getElementById('header-gold-val').innerText = window.state.gold;
     }
 
     function updateAccountName(val) {
-      state.userName = val || "Kayden";
-      document.getElementById('header-user-name').innerText = state.userName;
-      document.getElementById('avatar').innerText = state.userName.charAt(0).toUpperCase();
+      window.state.userName = val || "Kayden";
+      document.getElementById('header-user-name').innerText = window.state.userName;
+      document.getElementById('avatar').innerText = window.state.userName.charAt(0).toUpperCase();
       runAiTargetCalculation();
-      saveState();
-    }
-
-    function saveAppSettings() {
-      state.strictness = document.getElementById('strictness-select').value;
-      state.audioFeedback = document.getElementById('audio-feedback-select').value;
       saveState();
     }
 
@@ -1206,18 +1116,18 @@
     }
 
     function completeOnboarding() {
-      state.userName = document.getElementById('signup-name').value || "Kayden";
-      state.age = parseInt(document.getElementById('signup-age').value) || 20;
-      state.weight = parseInt(document.getElementById('signup-weight').value) || 140;
-      state.maxReps = parseInt(document.getElementById('signup-max-reps').value) || 15;
-      
+      window.state.userName = document.getElementById('signup-name').value || "Kayden";
+      window.state.age = parseInt(document.getElementById('signup-age').value) || 20;
+      window.state.weight = parseInt(document.getElementById('signup-weight').value) || 140;
+      window.state.maxReps = parseInt(document.getElementById('signup-max-reps').value) || 15;
+
       document.getElementById('onboarding-modal').classList.remove('active');
       saveState();
       postLoginInit();
     }
 
     function triggerSignOut() {
-      window.signOut(window.firebaseAuth).then(() => {
+      window.signOut(window.fbAuth).then(() => {
         location.reload();
       });
     }
@@ -1225,15 +1135,15 @@
     function drawPixelHelmet() {
       const cvs = document.getElementById('helmet-canvas');
       const ctx = cvs.getContext('2d');
-      ctx.fillStyle = state.themeColor;
+      ctx.fillStyle = window.state.themeColor || "#38bdf8";
       ctx.fillRect(16, 8, 32, 12);
       ctx.fillRect(12, 20, 40, 32);
-      ctx.fillStyle = "#0d1117";
+      ctx.fillStyle = "#0a0b0e";
       ctx.fillRect(20, 28, 24, 8);
     }
 
     function updateThemeColor(hex) {
-      state.themeColor = hex;
+      window.state.themeColor = hex;
       document.documentElement.style.setProperty('--primary', hex);
       document.documentElement.style.setProperty('--primary-glow', hex + '55');
       saveState();
@@ -1241,99 +1151,50 @@
     }
 
     function saveState() {
-      const user = window.firebaseAuth.currentUser;
+      const user = window.fbAuth.currentUser;
       const key = user ? 'pushup_arena_state_' + user.uid : 'pushup_arena_state_guest';
-      localStorage.setItem(key, JSON.stringify(state));
+      localStorage.setItem(key, JSON.stringify(window.state));
     }
 
     function resetAllData() {
       if (confirm("Are you sure you want to reset all app stats and progress?")) {
-        const user = window.firebaseAuth.currentUser;
+        const user = window.fbAuth.currentUser;
         const key = user ? 'pushup_arena_state_' + user.uid : 'pushup_arena_state_guest';
         localStorage.removeItem(key);
         location.reload();
       }
     }
 
-    /* Game Modes Logic */
     function openStoryCampaign() {
-      const stages = 50;
-      let stageName = "";
-      if (state.storyStage <= 10) stageName = `Stage ${state.storyStage}: Goblin Caves`;
-      else if (state.storyStage <= 20) stageName = `Stage ${state.storyStage}: Orc Fortress`;
-      else if (state.storyStage <= 30) stageName = `Stage ${state.storyStage}: Undead Crypts`;
-      else if (state.storyStage <= 40) stageName = `Stage ${state.storyStage}: Volcanic Lair`;
-      else stageName = `Stage ${state.storyStage}: Dragon Spire`;
-
-      if (confirm(`📜 HUGE STORY CAMPAIGN\nCurrent Progression: ${stageName} (Stage ${state.storyStage} of ${stages})\n\nDo you want to enter this battle?`)) {
+      if (confirm(`📜 STORY CAMPAIGN\nCurrent Stage: ${window.state.storyStage}\n\nEnter battle?`)) {
         startArena('story');
       }
     }
 
-    function openEndlessSurvival() {
-      if (confirm("💀 ENDLESS SURVIVAL MODE\nWaves of monsters will spawn continuously until failure. Ready your stamina?")) {
-        startArena('endless');
-      }
-    }
-
     function openArmory() {
-      let choice = prompt(`🛡️ HERO ARMORY & SHOP\nYour Gold: 🪙 ${state.gold}\n\n1. Equip Legendary Knight Armor (Free)\n2. Buy Glowing Aura (100 Gold)\n3. Buy Golden Crown (250 Gold)\n\nEnter choice (1-3):`, "1");
-      if (choice === "2") {
-        if (state.gold >= 100) {
-          state.gold -= 100;
-          alert("Success! Glowing Aura equipped!");
-          updateStatsDisplay();
-          saveState();
-        } else {
-          alert("Not enough gold!");
-        }
-      } else if (choice === "3") {
-        if (state.gold >= 250) {
-          state.gold -= 250;
-          alert("Success! Golden Crown equipped!");
-          updateStatsDisplay();
-          saveState();
-        } else {
-          alert("Not enough gold!");
-        }
-      } else if (choice === "1") {
-        alert("Legendary Knight Armor equipped!");
-      }
+      alert(`🛡️ HERO ARMORY\nYour Gold: 🪙 ${window.state.gold}`);
     }
 
     let camera = null;
     let pose = null;
     let repPhase = "TOP";
     let smoothedAngle = 170;
-    let currentPushupTypeIdx = 0;
-    let activeGameMode = "quick";
 
     function startArena(mode) {
-      activeGameMode = mode;
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.querySelectorAll('.sub-screen').forEach(s => s.classList.remove('active'));
       document.querySelector('.bottom-nav').style.display = 'none';
       document.getElementById('arena-screen').classList.add('active');
 
-      state.currentReps = 0;
-      currentPushupTypeIdx = 0;
-      updateActivePushupTypeDisplay();
+      window.state.currentReps = 0;
       updateArenaHpDisplay();
 
       const videoElement = document.getElementById('webcam');
       const canvasElement = document.getElementById('output-canvas');
       const canvasCtx = canvasElement.getContext('2d');
 
-      pose = new Pose({
-        locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`
-      });
-
-      pose.setOptions({
-        modelComplexity: 1,
-        smoothLandmarks: true,
-        minDetectionConfidence: 0.7,
-        minTrackingConfidence: 0.7
-      });
+      pose = new Pose({ locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}` });
+      pose.setOptions({ modelComplexity: 1, smoothLandmarks: true, minDetectionConfidence: 0.7, minTrackingConfidence: 0.7 });
 
       pose.onResults((results) => {
         canvasElement.width = videoElement.videoWidth;
@@ -1343,7 +1204,6 @@
         canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
 
         if (results.poseLandmarks) {
-          drawSkeleton(canvasCtx, results.poseLandmarks);
           process100xSensor(results.poseLandmarks);
         }
         canvasCtx.restore();
@@ -1357,88 +1217,35 @@
       camera.start();
     }
 
-    function updateActivePushupTypeDisplay() {
-      const activeTypeKey = state.selectedTypes[currentPushupTypeIdx] || "standard";
-      const typeLabels = { standard: "STANDARD PUSH-UP", diamond: "DIAMOND PUSH-UP", wide: "WIDE GRIP PUSH-UP", decline: "DECLINE PUSH-UP" };
-      document.getElementById('arena-type-lbl').innerText = typeLabels[activeTypeKey];
-    }
-
     function process100xSensor(landmarks) {
       const lShoulder = landmarks[11], lElbow = landmarks[13], lWrist = landmarks[15];
-      const rShoulder = landmarks[12], rElbow = landmarks[14], rWrist = landmarks[16];
-
       if (!lShoulder || !lElbow || !lWrist) return;
 
-      const leftAngle = calculateAngle(lShoulder, lElbow, lWrist);
-      const rightAngle = (rShoulder && rElbow && rWrist) ? calculateAngle(rShoulder, rElbow, rWrist) : leftAngle;
-      
-      const rawAngle = (leftAngle + rightAngle) / 2;
+      const rawAngle = calculateAngle(lShoulder, lElbow, lWrist);
       smoothedAngle = (smoothedAngle * 0.5) + (rawAngle * 0.5);
       document.getElementById('elbow-angle-val').innerText = Math.round(smoothedAngle) + '°';
 
-      let bottomThreshold = 85;
-      if (state.strictness === "casual") bottomThreshold = 100;
-      if (state.strictness === "strict") bottomThreshold = 70;
-      const topThreshold = 145;
+      if (repPhase === "TOP" && smoothedAngle < 130) {
+        repPhase = "DESCENDING";
+      } else if (repPhase === "DESCENDING" && smoothedAngle <= 85) {
+        repPhase = "BOTTOM";
+      } else if (repPhase === "BOTTOM" && smoothedAngle > 100) {
+        repPhase = "ASCENDING";
+      } else if (repPhase === "ASCENDING" && smoothedAngle >= 145) {
+        repPhase = "TOP";
+        window.state.currentReps++;
+        window.state.totalReps++;
+        window.state.gold += 5;
+        document.getElementById('rep-circle-val').innerText = window.state.currentReps;
+        document.getElementById('total-reps-val').innerText = window.state.currentReps;
+        document.getElementById('header-gold-val').innerText = window.state.gold;
+        updateArenaHpDisplay();
 
-      const banner = document.getElementById('sensor-banner');
-
-      if (repPhase === "TOP") {
-        if (smoothedAngle < topThreshold - 12) {
-          repPhase = "DESCENDING";
-          banner.innerText = "Lowering chest... Good form.";
+        if (window.state.currentReps >= window.state.aiTargetReps) {
+          alert("VICTORY! Target Reached!");
+          exitArena();
         }
-      } else if (repPhase === "DESCENDING") {
-        if (smoothedAngle <= bottomThreshold) {
-          repPhase = "BOTTOM";
-          banner.innerText = "Depth reached! Push up smoothly!";
-          if (state.audioFeedback !== "off" && navigator.vibrate) navigator.vibrate(30);
-        }
-      } else if (repPhase === "BOTTOM") {
-        if (smoothedAngle > bottomThreshold + 12) {
-          repPhase = "ASCENDING";
-          banner.innerText = "Extension in progress...";
-        }
-      } else if (repPhase === "ASCENDING") {
-        if (smoothedAngle >= topThreshold) {
-          repPhase = "TOP";
-          state.currentReps++;
-          state.totalReps++;
-          state.enemiesDefeated++;
-          state.gold += 5;
-
-          if (state.routineFormat === "cycle" && state.selectedTypes.length > 1) {
-            if (state.currentReps % 5 === 0) {
-              currentPushupTypeIdx = (currentPushupTypeIdx + 1) % state.selectedTypes.length;
-              updateActivePushupTypeDisplay();
-            }
-          }
-
-          document.getElementById('rep-circle-val').innerText = state.currentReps;
-          document.getElementById('total-reps-val').innerText = state.currentReps;
-          document.getElementById('header-gold-val').innerText = state.gold;
-          updateArenaHpDisplay();
-          banner.innerText = "PERFECT REP! (+5 Gold)";
-
-          if (state.audioFeedback !== "off" && navigator.vibrate) navigator.vibrate(80);
-
-          if (state.currentReps >= state.aiTargetReps) {
-            if (activeGameMode === 'story') {
-              state.storyStage = Math.min(50, state.storyStage + 1);
-              state.bossesSlain++;
-              alert(`VICTORY! Story Stage Completed! Advanced to Stage ${state.storyStage}! +50 Bonus Gold!`);
-            } else if (activeGameMode === 'endless') {
-              alert(`WAVE CLEARED! Endless Survival continues... +50 Bonus Gold!`);
-              state.aiTargetReps += 5;
-            } else {
-              state.bossesSlain++;
-              alert(`VICTORY! Boss Defeated! +50 Bonus Gold!`);
-            }
-            state.gold += 50;
-            exitArena();
-          }
-          saveState();
-        }
+        saveState();
       }
     }
 
@@ -1449,40 +1256,10 @@
       return Math.acos((Math.pow(AB, 2) + Math.pow(BC, 2) - Math.pow(AC, 2)) / (2 * AB * BC)) * (180 / Math.PI);
     }
 
-    function drawSkeleton(ctx, landmarks) {
-      const connections = [
-        [11, 12], [11, 13], [13, 15], [12, 14], [14, 16],
-        [11, 23], [12, 24], [23, 24],
-        [23, 25], [24, 26], [25, 27], [26, 28]
-      ];
-
-      ctx.lineWidth = 5;
-      ctx.strokeStyle = state.themeColor;
-
-      connections.forEach(([i, j]) => {
-        const p1 = landmarks[i], p2 = landmarks[j];
-        if (p1 && p2) {
-          ctx.beginPath();
-          ctx.moveTo(p1.x * ctx.canvas.width, p1.y * ctx.canvas.height);
-          ctx.lineTo(p2.x * ctx.canvas.width, p2.y * ctx.canvas.height);
-          ctx.stroke();
-        }
-      });
-
-      landmarks.forEach((lm) => {
-        if (lm.visibility > 0.6) {
-          ctx.beginPath();
-          ctx.arc(lm.x * ctx.canvas.width, lm.y * ctx.canvas.height, 7, 0, 2 * Math.PI);
-          ctx.fillStyle = "#fff";
-          ctx.fill();
-        }
-      });
-    }
-
     function updateArenaHpDisplay() {
-      const pct = Math.min(100, (state.currentReps / state.aiTargetReps) * 100);
+      const pct = Math.min(100, (window.state.currentReps / window.state.aiTargetReps) * 100);
       document.getElementById('hp-bar').style.width = pct + '%';
-      document.getElementById('hp-txt').innerText = `${state.currentReps} / ${state.aiTargetReps} Reps`;
+      document.getElementById('hp-txt').innerText = `${window.state.currentReps} / ${window.state.aiTargetReps} Reps`;
     }
 
     function exitArena() {
@@ -1493,59 +1270,29 @@
       saveState();
     }
 
-    const mockUsers = [
-      { name: "Sir Arthur", reps: 340, enemies: 68, bosses: 14, stage: 32 },
-      { name: "Valeria", reps: 290, enemies: 58, bosses: 11, stage: 27 },
-      { name: "Gideon", reps: 210, enemies: 42, bosses: 8, stage: 19 },
-      { name: "Lyra", reps: 185, enemies: 37, bosses: 7, stage: 16 },
-      { name: "Thorin", reps: 140, enemies: 28, bosses: 5, stage: 12 }
-    ];
-
     function renderLeaderboard() {
       const container = document.getElementById('leaderboard-list-container');
-      let allUsers = [...mockUsers, { name: state.userName + " (You)", reps: state.totalReps, enemies: state.enemiesDefeated, bosses: state.bossesSlain, stage: state.storyStage }];
-      allUsers.sort((a, b) => b.reps - a.reps);
-
-      let html = '';
-      allUsers.forEach((u, idx) => {
-        let rankBadge = `#${idx + 1}`;
-        if (idx === 0) rankBadge = "🥇 1";
-        else if (idx === 1) rankBadge = "🥈 2";
-        else if (idx === 2) rankBadge = "🥉 3";
-
-        html += `
-          <div class="setting-item" style="cursor: pointer; flex-direction: row; justify-content: space-between; align-items: center;" onclick="inspectHero('${u.name}', ${u.reps}, ${u.enemies}, ${u.bosses}, ${u.stage})">
-            <div style="display: flex; align-items: center; gap: 14px;">
-              <div style="font-weight: 800; font-size: 1.1rem; color: var(--primary); min-width: 40px;">${rankBadge}</div>
-              <div>
-                <div style="font-weight: 800; font-size: 1.05rem; color: #fff;">${u.name}</div>
-                <div style="font-size: 0.72rem; color: var(--subtext);">Stage ${u.stage} • ${u.bosses} Bosses Slain</div>
-              </div>
-            </div>
-            <div style="text-align: right;">
-              <div style="font-weight: 800; font-size: 1.1rem; color: #fff;">💪 ${u.reps}</div>
-              <div style="font-size: 0.65rem; color: var(--subtext); text-transform: uppercase;">Total Reps</div>
-            </div>
-          </div>
-        `;
-      });
-      container.innerHTML = html;
+      container.innerHTML = `
+        <div class="setting-item" style="flex-direction: row; justify-content: space-between;">
+          <div><strong>${window.state.userName} (You)</strong></div>
+          <div>💪 ${window.state.totalReps} Reps</div>
+        </div>
+      `;
     }
 
-    function inspectHero(name, reps, enemies, bosses, stage) {
-      document.getElementById('modal-hero-title').innerText = name + "'s Stats";
-      document.getElementById('modal-hero-reps').innerText = reps;
-      document.getElementById('modal-hero-enemies').innerText = enemies;
-      document.getElementById('modal-hero-bosses').innerText = bosses;
-      document.getElementById('modal-hero-stage').innerText = "Stage " + stage;
-      document.getElementById('user-stats-modal').classList.add('active');
-    }
-
-    function closeUserStatsModal() {
-      document.getElementById('user-stats-modal').classList.remove('active');
-    }
-
-    window.onload = initApp;
+    window.onload = () => {
+      drawPixelHelmet();
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += 25;
+        document.getElementById('loading-progress').style.width = progress + '%';
+        if (progress >= 100) {
+          clearInterval(interval);
+          document.getElementById('loading-screen').style.opacity = '0';
+          setTimeout(() => { document.getElementById('loading-screen').style.display = 'none'; }, 300);
+        }
+      }, 80);
+    };
   </script>
 </body>
 </html>
