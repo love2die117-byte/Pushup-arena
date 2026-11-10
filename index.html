@@ -6,7 +6,7 @@
   <title>Push Up Arena: Knight's Quest</title>
 
   <!-- AUTO-UPDATE CACHE BUSTER -->
-  <meta name="app-version" content="v6.0-grey-obsidian-pro">
+  <meta name="app-version" content="v7.0-pro-settings-hub">
 
   <!-- PWA & Mobile Optimization -->
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -20,17 +20,13 @@
 
   <style>
     :root {
-      --primary: #e2e8f0;
-      --primary-dark: #cbd5e1;
-      --primary-glow: rgba(226, 232, 240, 0.25);
-      --accent-gold: #fbbf24;
-      --accent-glow: rgba(251, 191, 36, 0.2);
       --bg: #0d0e12;
       --card-bg: #16181d;
       --card-border: rgba(255, 255, 255, 0.08);
-      --card-border-active: rgba(255, 255, 255, 0.25);
+      --card-border-active: rgba(255, 255, 255, 0.3);
       --text: #f1f5f9;
       --subtext: #94a3b8;
+      --accent-gold: #fbbf24;
       --danger: #ef4444;
       --success: #10b981;
     }
@@ -54,7 +50,7 @@
       flex-direction: column;
     }
 
-    /* Screen Management with Smooth Scrolling */
+    /* Scrollable Screens */
     .screen {
       display: none;
       position: absolute;
@@ -63,7 +59,7 @@
       z-index: 10;
       background: var(--bg);
       flex-direction: column;
-      padding-bottom: 75px;
+      padding-bottom: 90px;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
     }
@@ -122,7 +118,7 @@
       transition: width 0.15s ease;
     }
 
-    /* Grey Obsidian Header Bar */
+    /* Header Bar */
     .app-header {
       padding: 44px 20px 14px 20px;
       display: flex;
@@ -132,6 +128,7 @@
       backdrop-filter: blur(20px);
       border-bottom: 1px solid var(--card-border);
       z-index: 15;
+      flex-shrink: 0;
     }
     .user-pill {
       display: flex;
@@ -164,11 +161,11 @@
       color: var(--accent-gold);
     }
 
-    /* Bottom Navigation Bar with Tiny Scale Up on Click */
+    /* Bottom Navigation Bar */
     .bottom-nav {
       position: absolute;
       bottom: 0; left: 0; right: 0;
-      height: 72px;
+      height: 76px;
       background: #0f1015;
       backdrop-filter: blur(20px);
       border-top: 1px solid var(--card-border);
@@ -191,44 +188,39 @@
       letter-spacing: 0.8px;
       transition: transform 0.15s ease, color 0.15s ease;
       flex: 1;
+      padding: 8px 0;
     }
     .nav-item span:first-child {
-      font-size: 1.25rem;
+      font-size: 1.3rem;
       transition: transform 0.15s ease;
     }
-    .nav-item.active {
-      color: #fff;
-    }
-    .nav-item.active span:first-child {
-      transform: scale(1.18);
-    }
-    .nav-item:active span:first-child {
-      transform: scale(1.25);
-    }
+    .nav-item.active { color: #fff; }
+    .nav-item.active span:first-child { transform: scale(1.18); }
+    .nav-item:active span:first-child { transform: scale(1.25); }
 
     /* Scrollable Menu Content */
     .menu-content {
-      padding: 20px;
+      padding: 24px 20px 40px 20px;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
       flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 18px;
     }
 
     /* Hero Banner Card */
     .hero-banner {
       background: linear-gradient(135deg, #181a22 0%, #121318 100%);
       border: 1px solid var(--card-border);
-      border-radius: 20px;
-      padding: 22px;
+      border-radius: 22px;
+      padding: 24px;
       position: relative;
       overflow: hidden;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
     }
     .hero-tag {
-      font-size: 0.7rem;
+      font-size: 0.72rem;
       font-weight: 900;
       color: var(--subtext);
       text-transform: uppercase;
@@ -236,91 +228,92 @@
       margin-bottom: 6px;
     }
     .hero-title {
-      font-size: 1.45rem;
+      font-size: 1.5rem;
       font-weight: 900;
       color: #fff;
       margin-bottom: 6px;
     }
     .hero-sub {
-      font-size: 0.82rem;
+      font-size: 0.85rem;
       color: var(--subtext);
-      margin-bottom: 18px;
-      line-height: 1.4;
+      margin-bottom: 20px;
+      line-height: 1.45;
     }
 
     /* Game Mode Cards Grid */
     .modes-grid {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 14px;
     }
     .mode-card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 16px;
-      padding: 18px;
+      border-radius: 18px;
+      padding: 20px;
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 18px;
       cursor: pointer;
       transition: all 0.2s ease;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.25);
     }
     .mode-card:active {
-      transform: scale(0.98);
-      border-color: rgba(255,255,255,0.3);
+      transform: scale(0.97);
+      border-color: rgba(255,255,255,0.4);
     }
     .mode-icon-box {
-      width: 52px;
-      height: 52px;
-      border-radius: 14px;
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
       background: #1f222d;
       border: 1px solid var(--card-border);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.5rem;
+      font-size: 1.7rem;
       flex-shrink: 0;
     }
     .mode-info { flex: 1; }
     .mode-title {
-      font-size: 1.1rem;
+      font-size: 1.15rem;
       font-weight: 900;
       color: var(--text);
-      margin-bottom: 3px;
+      margin-bottom: 4px;
     }
     .mode-desc {
-      font-size: 0.78rem;
+      font-size: 0.8rem;
       color: var(--subtext);
-      line-height: 1.35;
+      line-height: 1.4;
     }
     .mode-action-pill {
       background: #f1f5f9;
       color: #0d0e12;
       font-weight: 900;
-      font-size: 0.75rem;
-      padding: 8px 16px;
-      border-radius: 10px;
+      font-size: 0.78rem;
+      padding: 10px 18px;
+      border-radius: 12px;
+      flex-shrink: 0;
     }
 
     /* Sub Screens & Scrollable Lists */
     .sub-screen {
       display: none;
       position: absolute;
-      top: 0; left: 0; right: 0; bottom: 72px;
+      top: 0; left: 0; right: 0; bottom: 76px;
       background: var(--bg);
       z-index: 20;
       flex-direction: column;
-      padding: 20px;
+      padding: 24px 20px;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
     }
     .sub-screen.active { display: flex; }
 
     .screen-header-title {
-      font-size: 1.4rem;
+      font-size: 1.5rem;
       font-weight: 900;
-      margin-bottom: 16px;
+      margin-bottom: 18px;
       color: #fff;
     }
 
@@ -339,27 +332,33 @@
       flex-direction: column;
       gap: 8px;
     }
-    .stat-card-icon { font-size: 1.5rem; }
-    .stat-card-num { font-size: 1.5rem; font-weight: 900; color: #fff; }
-    .stat-card-label { font-size: 0.72rem; color: var(--subtext); text-transform: uppercase; font-weight: 800; }
+    .stat-card-icon { font-size: 1.6rem; }
+    .stat-card-num { font-size: 1.6rem; font-weight: 900; color: #fff; }
+    .stat-card-label { font-size: 0.75rem; color: var(--subtext); text-transform: uppercase; font-weight: 800; }
 
     .settings-list {
       display: flex;
       flex-direction: column;
-      gap: 14px;
-      padding-bottom: 30px;
+      gap: 16px;
+      padding-bottom: 50px;
     }
     .setting-item {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 18px;
-      padding: 18px;
+      padding: 20px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
+    }
+    .setting-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
     }
     label {
-      font-size: 0.82rem;
+      font-size: 0.85rem;
       color: var(--subtext);
       font-weight: 800;
       text-transform: uppercase;
@@ -377,6 +376,38 @@
       font-weight: 700;
     }
     input:focus, select:focus { border-color: rgba(255,255,255,0.4); }
+
+    /* Custom Switch Toggle */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 52px;
+      height: 28px;
+      flex-shrink: 0;
+    }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #22252e;
+      transition: 0.2s;
+      border-radius: 28px;
+      border: 1px solid var(--card-border);
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.2s;
+      border-radius: 50%;
+    }
+    input:checked + .slider { background-color: #f1f5f9; }
+    input:checked + .slider:before { transform: translateX(24px); background-color: #0d0e12; }
 
     .type-pill-grid {
       display: grid;
@@ -769,16 +800,12 @@
     </div>
   </div>
 
-  <!-- SCREEN 5: SETTINGS -->
+  <!-- SCREEN 5: MASSIVE PRO SETTINGS HUB -->
   <div id="settings-screen" class="sub-screen">
-    <div class="screen-header-title">⚙️ App Settings</div>
+    <div class="screen-header-title">⚙️ Pro Settings Hub</div>
 
     <div class="settings-list">
-      <div class="setting-item">
-        <label>🎨 Theme Accent Color</label>
-        <input type="color" id="theme-color-picker" value="#f1f5f9" onchange="updateThemeColor(this.value)">
-      </div>
-
+      <!-- AI & Sensor Options -->
       <div class="setting-item">
         <label>🎯 Form Strictness</label>
         <select id="strictness-select" onchange="saveAppSettings()">
@@ -789,6 +816,16 @@
       </div>
 
       <div class="setting-item">
+        <label>📐 Camera Tracking Sensitivity</label>
+        <select id="camera-sensitivity-select" onchange="saveAppSettings()">
+          <option value="balanced" selected>Balanced AI Tracking</option>
+          <option value="high">High Precision (Strict Lighting)</option>
+          <option value="relaxed">Relaxed (Low Light Support)</option>
+        </select>
+      </div>
+
+      <!-- Audio & Haptics Options -->
+      <div class="setting-item">
         <label>🔊 Audio & Haptic Feedback</label>
         <select id="audio-feedback-select" onchange="saveAppSettings()">
           <option value="all" selected>Vibration & Audio Cues Enabled</option>
@@ -798,8 +835,66 @@
       </div>
 
       <div class="setting-item">
-        <label>🛠️ Data Management</label>
-        <button class="btn btn-secondary" style="color: var(--danger);" onclick="resetAllData()">Factory Reset Profile</button>
+        <div class="setting-row">
+          <div>
+            <label style="display:block; margin-bottom:2px;">Rep Completion Beep</label>
+            <span style="font-size:0.75rem; color:var(--subtext);">Play sound chime on every rep</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="setting-rep-sound" checked onchange="saveAppSettings()">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-row">
+          <div>
+            <label style="display:block; margin-bottom:2px;">Haptic Vibration Pulses</label>
+            <span style="font-size:0.75rem; color:var(--subtext);">Vibrate phone on depth confirmation</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="setting-haptic-pulse" checked onchange="saveAppSettings()">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Display Options -->
+      <div class="setting-item">
+        <div class="setting-row">
+          <div>
+            <label style="display:block; margin-bottom:2px;">Show Live Skeleton Overlay</label>
+            <span style="font-size:0.75rem; color:var(--subtext);">Render AI skeletal tracking lines on camera</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="setting-skeleton-overlay" checked onchange="saveAppSettings()">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-row">
+          <div>
+            <label style="display:block; margin-bottom:2px;">Keep Screen Awake</label>
+            <span style="font-size:0.75rem; color:var(--subtext);">Prevent screen dimming during workouts</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="setting-wake-lock" checked onchange="saveAppSettings()">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Data & Backup -->
+      <div class="setting-item">
+        <label>💾 Save Data Management</label>
+        <div style="display:flex; gap:10px; margin-top:4px;">
+          <button class="btn btn-secondary" onclick="exportSaveBackup()">Export Backup</button>
+          <button class="btn btn-secondary" onclick="importSaveBackup()">Import Backup</button>
+        </div>
+        <button class="btn btn-secondary" style="color: var(--danger); margin-top:8px;" onclick="resetAllData()">Factory Reset Profile</button>
       </div>
     </div>
   </div>
@@ -837,7 +932,7 @@
     <button class="btn" style="margin-top: 20px;" onclick="closeUserStatsModal()">Close Inspection</button>
   </div>
 
-  <!-- BOTTOM NAVIGATION BAR (Scales icons slightly bigger on click) -->
+  <!-- BOTTOM NAVIGATION BAR -->
   <div class="bottom-nav">
     <div class="nav-item active" id="nav-home" onclick="switchTab('home')">
       <span>⚔️</span>
@@ -996,13 +1091,17 @@
       maxReps: 15,
       aiTargetReps: 18,
       gold: 100,
-      themeColor: "#f1f5f9",
       totalReps: 0,
       enemiesDefeated: 0,
       bossesSlain: 0,
       currentReps: 0,
       strictness: "standard",
+      cameraSensitivity: "balanced",
       audioFeedback: "all",
+      repSound: true,
+      hapticPulse: true,
+      skeletonOverlay: true,
+      wakeLock: true,
       routineFormat: "cycle",
       selectedTypes: ["standard", "diamond"],
       storyStage: 1
@@ -1024,11 +1123,17 @@
 
       document.getElementById('device-id-display').value = deviceSaveKey;
       runAiTargetCalculation();
-      updateThemeColor(state.themeColor);
-      document.getElementById('theme-color-picker').value = state.themeColor;
+
+      // Populate Settings UI
       document.getElementById('strictness-select').value = state.strictness;
+      document.getElementById('camera-sensitivity-select').value = state.cameraSensitivity || "balanced";
       document.getElementById('audio-feedback-select').value = state.audioFeedback;
       document.getElementById('routine-format-select').value = state.routineFormat;
+      document.getElementById('setting-rep-sound').checked = state.repSound !== false;
+      document.getElementById('setting-haptic-pulse').checked = state.hapticPulse !== false;
+      document.getElementById('setting-skeleton-overlay').checked = state.skeletonOverlay !== false;
+      document.getElementById('setting-wake-lock').checked = state.wakeLock !== false;
+
       document.getElementById('header-gold-val').innerText = state.gold;
       document.getElementById('header-user-name').innerText = state.userName;
       document.getElementById('avatar').innerText = state.userName.charAt(0).toUpperCase();
@@ -1052,7 +1157,7 @@
           document.getElementById('loading-screen').style.opacity = '0';
           setTimeout(() => { document.getElementById('loading-screen').style.display = 'none'; }, 300);
         }
-      }, 60);
+      }, 50);
     }
 
     function createNewDeviceProfile() {
@@ -1124,6 +1229,48 @@
       saveState();
     }
 
+    function saveAppSettings() {
+      state.strictness = document.getElementById('strictness-select').value;
+      state.cameraSensitivity = document.getElementById('camera-sensitivity-select').value;
+      state.audioFeedback = document.getElementById('audio-feedback-select').value;
+      state.repSound = document.getElementById('setting-rep-sound').checked;
+      state.hapticPulse = document.getElementById('setting-haptic-pulse').checked;
+      state.skeletonOverlay = document.getElementById('setting-skeleton-overlay').checked;
+      state.wakeLock = document.getElementById('setting-wake-lock').checked;
+      saveState();
+    }
+
+    function exportSaveBackup() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
+      const dlAnchorElem = document.createElement('a');
+      dlAnchorElem.setAttribute("href", dataStr);
+      dlAnchorElem.setAttribute("download", `pushup_arena_${state.userName}_backup.json`);
+      dlAnchorElem.click();
+    }
+
+    function importSaveBackup() {
+      let input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.json';
+      input.onchange = e => {
+        let file = e.target.files[0];
+        let reader = new FileReader();
+        reader.readAsText(file, 'UTF-8');
+        reader.onload = readerEvent => {
+          try {
+            let parsed = JSON.parse(readerEvent.target.result);
+            state = { ...state, ...parsed };
+            saveState();
+            alert("Backup imported successfully! Reloading...");
+            location.reload();
+          } catch(err) {
+            alert("Invalid backup file format.");
+          }
+        }
+      }
+      input.click();
+    }
+
     function switchTab(tabName) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.querySelectorAll('.sub-screen').forEach(s => s.classList.remove('active'));
@@ -1164,12 +1311,6 @@
       document.getElementById('header-user-name').innerText = state.userName;
       document.getElementById('avatar').innerText = state.userName.charAt(0).toUpperCase();
       runAiTargetCalculation();
-      saveState();
-    }
-
-    function saveAppSettings() {
-      state.strictness = document.getElementById('strictness-select').value;
-      state.audioFeedback = document.getElementById('audio-feedback-select').value;
       saveState();
     }
 
@@ -1239,12 +1380,6 @@
       ctx.fillRect(12, 20, 40, 32);
       ctx.fillStyle = "#0d0e12";
       ctx.fillRect(20, 28, 24, 8);
-    }
-
-    function updateThemeColor(hex) {
-      state.themeColor = hex;
-      saveState();
-      drawPixelHelmet();
     }
 
     function saveState() {
@@ -1354,11 +1489,12 @@
         locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`
       });
 
+      let conf = state.cameraSensitivity === 'high' ? 0.8 : (state.cameraSensitivity === 'relaxed' ? 0.6 : 0.7);
       pose.setOptions({
         modelComplexity: 1,
         smoothLandmarks: true,
-        minDetectionConfidence: 0.7,
-        minTrackingConfidence: 0.7
+        minDetectionConfidence: conf,
+        minTrackingConfidence: conf
       });
 
       pose.onResults((results) => {
@@ -1369,7 +1505,9 @@
         canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
 
         if (results.poseLandmarks) {
-          drawSkeleton(canvasCtx, results.poseLandmarks);
+          if (state.skeletonOverlay !== false) {
+            drawSkeleton(canvasCtx, results.poseLandmarks);
+          }
           processHighPrecisionSensor(results.poseLandmarks);
         } else {
           document.getElementById('sensor-banner-text').innerText = "⚠️ Position camera to see your full body";
@@ -1427,7 +1565,7 @@
         if (smoothedAngle <= bottomThreshold) {
           repPhase = "BOTTOM";
           bannerText.innerText = "✅ DEPTH REACHED! PUSH UP NOW!";
-          if (state.audioFeedback !== "off" && navigator.vibrate) navigator.vibrate(35);
+          if (state.audioFeedback !== "off" && state.hapticPulse !== false && navigator.vibrate) navigator.vibrate(35);
         }
       } else if (repPhase === "BOTTOM") {
         bannerText.innerText = "⬆️ Pushing back up...";
@@ -1458,7 +1596,7 @@
             updateArenaHpDisplay();
             
             bannerText.innerText = "🔥 PERFECT REP! (+5 Gold)";
-            if (state.audioFeedback !== "off" && navigator.vibrate) navigator.vibrate([40, 30, 60]);
+            if (state.audioFeedback !== "off" && state.hapticPulse !== false && navigator.vibrate) navigator.vibrate([40, 30, 60]);
 
             if (state.currentReps >= state.aiTargetReps) {
               if (activeGameMode === 'story') {
