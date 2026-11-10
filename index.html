@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Push Up Arena: Knight's Quest S-RANK MASTERY</title>
-  <meta name="app-version" content="v17.0-flawless-ranks">
+  <meta name="app-version" content="v20.0-full-skeleton-revamp">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="PushUpArena">
@@ -667,7 +667,7 @@
   <div id="loading-screen">
     <canvas id="helmet-canvas" width="64" height="64" class="helmet-logo"></canvas>
     <div class="loading-title">Push Up Arena</div>
-    <div class="loading-sub">[FULL RANKING SYSTEM ONLINE]</div>
+    <div class="loading-sub">[POSE SKELETON ENGINE ACTIVE]</div>
     <div class="progress-bar-bg">
       <div id="loading-progress" class="progress-bar-fill"></div>
     </div>
@@ -682,14 +682,14 @@
         <div id="header-user-level" style="font-size: 0.75rem; color: var(--subtext); font-weight: 800;">Mastery Rank: [ D ]</div>
       </div>
     </div>
-    <div class="version-badge">v17.0-RANKS</div>
+    <div class="version-badge">v20.0-REVAMP</div>
   </div>
 
   <!-- SCREEN 1: HOME / ARENA MODES -->
   <div id="home-screen" class="screen active">
     <div class="menu-content">
       <div class="hero-banner">
-        <div class="hero-tag">[RANK MASTERY progression]</div>
+        <div class="hero-tag">[RANK MASTERY PROGRESSION]</div>
         <div class="hero-title" id="hero-goal-title">Target: 15 Reps / Wave</div>
         <div class="hero-sub" id="hero-goal-desc">Conquer tiered bosses to rank up from D to EX Rank!</div>
         <button class="btn" onclick="startArena('quick')">[ &gt; ] QUICK BOSS RAID</button>
@@ -941,6 +941,13 @@
 
     const RANK_TIERS = ["D", "C", "B", "A", "S", "S2", "SS", "SSS", "EX"];
 
+    // MediaPipe Pose Skeleton Connections Array
+    const POSE_CONNECTIONS = [
+      [11, 12], [11, 13], [13, 15], [12, 14], [14, 16],
+      [11, 23], [12, 24], [23, 24], [23, 25], [24, 26],
+      [25, 27], [26, 28]
+    ];
+
     function getRankColor(rank) {
       switch(rank) {
         case "D": return "var(--rank-d)";
@@ -1174,7 +1181,7 @@
       ctx.fillRect(20, 28, 24, 8);
     }
 
-    /* Camera Sensor & Arena Engine */
+    /* Camera Sensor & Pose Skeleton Engine */
     let camera = null;
     let pose = null;
     let repPhase = "TOP";
@@ -1207,6 +1214,7 @@
         canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
 
         if (results.poseLandmarks) {
+          drawSkeleton(canvasCtx, results.poseLandmarks, canvasElement.width, canvasElement.height);
           processHighPrecisionSensor(results.poseLandmarks);
         }
         canvasCtx.restore();
@@ -1214,6 +1222,39 @@
 
       camera = new Camera(videoElement, { onFrame: async () => { await pose.send({ image: videoElement }); }, width: 640, height: 480 });
       camera.start();
+    }
+
+    function drawSkeleton(ctx, landmarks, width, height) {
+      // Draw Skeleton Connection Lines
+      ctx.strokeStyle = "#34d399";
+      ctx.lineWidth = 4;
+
+      POSE_CONNECTIONS.forEach(([i, j]) => {
+        const p1 = landmarks[i];
+        const p2 = landmarks[j];
+        if (p1 && p2 && p1.visibility > 0.5 && p2.visibility > 0.5) {
+          ctx.beginPath();
+          ctx.moveTo(p1.x * width, p1.y * height);
+          ctx.lineTo(p2.x * width, p2.y * height);
+          ctx.stroke();
+        }
+      });
+
+      // Draw Key Tracking Joints
+      const keyJoints = [11, 12, 13, 14, 15, 16, 23, 24, 25, 26];
+      keyJoints.forEach(index => {
+        const lm = landmarks[index];
+        if (lm && lm.visibility > 0.5) {
+          ctx.fillStyle = "#f43f5e";
+          ctx.beginPath();
+          ctx.arc(lm.x * width, lm.y * height, 6, 0, 2 * Math.PI);
+          ctx.fill();
+
+          ctx.strokeStyle = "#ffffff";
+          ctx.lineWidth = 2;
+          ctx.stroke();
+        }
+      });
     }
 
     function processHighPrecisionSensor(landmarks) {
