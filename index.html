@@ -727,6 +727,10 @@
         <label>Baseline Max Push-ups</label>
         <input type="number" id="account-max-reps-input" value="15" onchange="recalculateAiGoals()">
       </div>
+      <div class="setting-item">
+        <label>Account Management</label>
+        <button class="btn btn-secondary" onclick="triggerSignOut()">Sign Out / Switch Account</button>
+      </div>
     </div>
   </div>
 
@@ -775,7 +779,7 @@
   </div>
 
   <!-- User Stats Inspection Modal -->
-  <div id="user-stats-modal" class="modal" style="padding: 30px 20px;">
+  <div id="user-stats-modal" class="modal" style="padding: 30px 20px; z-index: 110;">
     <div class="screen-header-title" id="modal-hero-title">Hero Stats</div>
     <div class="settings-list" style="margin-top: 10px;">
       <div class="setting-item">
@@ -862,14 +866,14 @@
     </div>
   </div>
 
-  <!-- Onboarding Modal -->
-  <div id="onboarding-modal" class="modal active">
+  <!-- Onboarding Modal (Sign-in / Starting Questions Flow) -->
+  <div id="onboarding-modal" class="modal">
     <!-- Welcome Intro Slide (Slide 0) -->
     <div class="onboarding-slide active" id="slide-welcome" style="display: flex; align-items: center; text-align: center; justify-content: center; height: 100%;">
       <div style="font-size: 3rem; margin-bottom: 15px;">⚔️</div>
-      <h1 style="font-size: 1.8rem; font-weight: 800; color: #fff; margin-bottom: 10px;">Welcome to Kaydens Push up App</h1>
+      <h1 style="font-size: 1.8rem; font-weight: 800; color: #fff; margin-bottom: 10px;">Welcome to Push Up Arena</h1>
       <p style="color: var(--subtext); font-size: 0.95rem; margin-bottom: 30px; line-height: 1.4;">Transform your fitness with AI pose tracking, campaign battles, and epic quests.</p>
-      <button class="btn" onclick="startOnboardingFlow()">Get started</button>
+      <button class="btn" onclick="startOnboardingFlow()">Sign In / Create Account</button>
     </div>
 
     <div class="slide-progress" id="onboarding-progress-bar" style="display: none;">
@@ -882,7 +886,7 @@
     <div class="slide-container" id="onboarding-slides-container" style="display: none;">
       <div class="onboarding-slide" id="slide-1">
         <h2>What's your hero name?</h2>
-        <p style="color: var(--subtext); font-size: 0.85rem;">Personalizes your AI training profile.</p>
+        <p style="color: var(--subtext); font-size: 0.85rem;">Personalizes your AI training profile and leaderboard standing.</p>
         <div class="form-group" style="margin-top: 10px;">
           <input type="text" id="signup-name" value="Kayden" placeholder="Enter name">
         </div>
@@ -936,7 +940,8 @@
       audioFeedback: "all",
       routineFormat: "cycle",
       selectedTypes: ["standard", "diamond"],
-      storyStage: 1
+      storyStage: 1,
+      signedIn: false
     };
 
     let currentSlide = 1;
@@ -946,9 +951,18 @@
       const saved = localStorage.getItem('pushup_arena_state');
       if (saved) {
         try { state = { ...state, ...JSON.parse(saved) }; } catch(e){}
-        document.getElementById('onboarding-modal').classList.remove('active');
-      } else {
+      }
+
+      // Check if user is signed in / completed onboarding
+      if (!state.signedIn) {
         document.getElementById('onboarding-modal').classList.add('active');
+        // Reset slide UI to welcome screen
+        document.getElementById('slide-welcome').style.display = 'flex';
+        document.getElementById('onboarding-progress-bar').style.display = 'none';
+        document.getElementById('onboarding-slides-container').style.display = 'none';
+        document.getElementById('onboarding-nav-btns').style.display = 'none';
+      } else {
+        document.getElementById('onboarding-modal').classList.remove('active');
       }
 
       runAiTargetCalculation();
@@ -1090,7 +1104,8 @@
       document.getElementById('onboarding-progress-bar').style.display = 'flex';
       document.getElementById('onboarding-slides-container').style.display = 'flex';
       document.getElementById('onboarding-nav-btns').style.display = 'flex';
-      document.getElementById('slide-1').classList.add('active');
+      currentSlide = 1;
+      updateSlideUI();
     }
 
     function updateSlideUI() {
@@ -1099,7 +1114,7 @@
         document.getElementById(`p-step-${i}`).classList.toggle('active', i <= currentSlide);
       }
       document.getElementById('back-btn').style.display = currentSlide === 1 ? 'none' : 'block';
-      document.getElementById('next-btn').innerText = currentSlide === totalSlides ? 'Finish' : 'Next';
+      document.getElementById('next-btn').innerText = currentSlide === totalSlides ? 'Finish & Start' : 'Next';
     }
 
     function nextSlide() {
@@ -1123,6 +1138,7 @@
       state.age = parseInt(document.getElementById('signup-age').value) || 20;
       state.weight = parseInt(document.getElementById('signup-weight').value) || 140;
       state.maxReps = parseInt(document.getElementById('signup-max-reps').value) || 15;
+      state.signedIn = true;
       
       runAiTargetCalculation();
       document.getElementById('header-user-name').innerText = state.userName;
@@ -1130,6 +1146,14 @@
       document.getElementById('avatar').innerText = state.userName.charAt(0).toUpperCase();
       document.getElementById('onboarding-modal').classList.remove('active');
       saveState();
+    }
+
+    function triggerSignOut() {
+      if (confirm("Are you sure you want to sign out? You can sign back in or create a new account profile.")) {
+        state.signedIn = false;
+        saveState();
+        location.reload();
+      }
     }
 
     function drawPixelHelmet() {
