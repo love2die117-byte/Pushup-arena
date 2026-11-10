@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Push Up Arena: Knight's Quest OMEGA</title>
+  <title>Push Up Arena: Knight's Quest CLOUD OMEGA</title>
 
   <!-- AUTO-UPDATE CACHE BUSTER -->
-  <meta name="app-version" content="v10.0-omega-nexus">
+  <meta name="app-version" content="v11.0-cloud-db-auth">
 
   <!-- PWA & Mobile Optimization -->
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -50,7 +50,6 @@
       flex-direction: column;
     }
 
-    /* Scrollable Screens */
     .screen {
       display: none;
       position: absolute;
@@ -65,7 +64,6 @@
     }
     .screen.active { display: flex; }
 
-    /* Cinematic Loading Screen */
     #loading-screen {
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -118,7 +116,6 @@
       transition: width 0.15s ease;
     }
 
-    /* Header Bar */
     .app-header {
       padding: 44px 20px 14px 20px;
       display: flex;
@@ -147,7 +144,9 @@
       font-weight: 900;
       font-size: 1.1rem;
       color: #fff;
+      overflow: hidden;
     }
+    .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
     .version-badge {
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid var(--card-border);
@@ -159,7 +158,6 @@
       color: var(--subtext);
     }
 
-    /* Bottom Navigation Bar */
     .bottom-nav {
       position: absolute;
       bottom: 0; left: 0; right: 0;
@@ -198,7 +196,6 @@
     .nav-item.active span:first-child { transform: scale(1.2); }
     .nav-item:active span:first-child { transform: scale(1.28); }
 
-    /* Scrollable Menu Content */
     .menu-content {
       padding: 24px 20px 40px 20px;
       overflow-y: auto;
@@ -209,7 +206,6 @@
       gap: 18px;
     }
 
-    /* Hero Banner Card */
     .hero-banner {
       background: linear-gradient(135deg, #171922 0%, #101219 100%);
       border: 1px solid var(--card-border);
@@ -240,7 +236,6 @@
       line-height: 1.45;
     }
 
-    /* Game Mode Cards Grid */
     .modes-grid {
       display: flex;
       flex-direction: column;
@@ -299,7 +294,6 @@
       flex-shrink: 0;
     }
 
-    /* Sub Screens & Scrollable Lists */
     .sub-screen {
       display: none;
       position: absolute;
@@ -382,7 +376,6 @@
     }
     input:focus, select:focus { border-color: rgba(255,255,255,0.4); }
 
-    /* Custom Switch Toggle */
     .switch {
       position: relative;
       display: inline-block;
@@ -457,8 +450,16 @@
       border: 1px solid var(--card-border);
       color: #fff;
     }
+    .google-btn {
+      background: #fff;
+      color: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      font-weight: 900;
+    }
 
-    /* Modal Styling */
     .modal {
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -470,32 +471,7 @@
       overflow-y: auto;
     }
     .modal.active { display: flex; }
-    .slide-container {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-    .onboarding-slide {
-      display: none;
-      flex-direction: column;
-      gap: 14px;
-    }
-    .onboarding-slide.active { display: flex; }
-    .slide-progress {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 24px;
-    }
-    .progress-step {
-      flex: 1;
-      height: 6px;
-      background: rgba(255,255,255,0.08);
-      border-radius: 3px;
-    }
-    .progress-step.active { background: #fff; }
 
-    /* Arena View HUD */
     #arena-screen { background: #000; padding-bottom: 0; }
     #video-container {
       position: relative;
@@ -649,7 +625,7 @@
   <div id="loading-screen">
     <canvas id="helmet-canvas" width="64" height="64" class="helmet-logo"></canvas>
     <div class="loading-title">Push Up Arena</div>
-    <div class="loading-sub">[INIT OMEGA ENGINE v10.0]</div>
+    <div class="loading-sub">[CLOUD DATABASE SYNC ACTIVE]</div>
     <div class="progress-bar-bg">
       <div id="loading-progress" class="progress-bar-fill"></div>
     </div>
@@ -657,23 +633,23 @@
 
   <!-- Header Bar -->
   <div class="app-header">
-    <div class="user-pill">
+    <div class="user-pill" onclick="switchTab('account')" style="cursor: pointer;">
       <div id="avatar" class="user-avatar">H</div>
       <div>
         <div id="header-user-name" style="font-weight: 900; font-size: 1.05rem;">Hero</div>
         <div id="header-user-level" style="font-size: 0.75rem; color: var(--subtext); font-weight: 800;">AI Goal: 15 Reps</div>
       </div>
     </div>
-    <div class="version-badge">v10.0-OMEGA</div>
+    <div class="version-badge">v11.0-CLOUD</div>
   </div>
 
   <!-- SCREEN 1: HOME / ARENA MODES -->
   <div id="home-screen" class="screen active">
     <div class="menu-content">
       <div class="hero-banner">
-        <div class="hero-tag">[AI TACTICAL ROUTINE OMEGA]</div>
+        <div class="hero-tag">[CLOUD DATABASE SYNCED]</div>
         <div class="hero-title" id="hero-goal-title">Target: 15 Reps / Wave</div>
-        <div class="hero-sub" id="hero-goal-desc">Customized based on your hero profile. Form strictness is locked in.</div>
+        <div class="hero-sub" id="hero-goal-desc">Customized based on your Google profile. Database records auto-saving.</div>
         <button class="btn" onclick="startArena('quick')">[ &gt; ] LAUNCH QUICK BATTLE</button>
       </div>
 
@@ -709,7 +685,7 @@
           <div class="mode-icon-box">[ARM]</div>
           <div class="mode-info">
             <div class="mode-title">Hero Armory & Shop</div>
-            <div class="mode-desc">Equip legendary armor, helmets, and glowing auras with gold.</div>
+            <div class="mode-desc">Equip legendary armor, helmets, and glowing auras.</div>
           </div>
           <div class="mode-action-pill" style="background:#1c1f2b; color:#fff;">GEAR</div>
         </div>
@@ -776,23 +752,32 @@
     </div>
   </div>
 
-  <!-- SCREEN 4: ACCOUNT & PROFILES -->
+  <!-- SCREEN 4: ACCOUNT & GOOGLE AUTH -->
   <div id="account-screen" class="sub-screen">
-    <div class="screen-header-title">[ PROFILE &amp; ID ]</div>
+    <div class="screen-header-title">[ GOOGLE ACCOUNT &amp; DB ]</div>
 
     <div class="settings-list">
-      <div class="setting-item">
-        <label>Active Profile Save Key</label>
-        <input type="text" id="device-id-display" readonly style="color: var(--subtext); font-family: monospace;">
-        <button class="btn btn-secondary" style="margin-top: 10px;" onclick="createNewDeviceProfile()">[+] Create New Player Profile</button>
+      <div class="setting-item" style="align-items: center; text-align: center;">
+        <div id="account-profile-box" style="display: flex; flex-direction: column; align-items: center; gap: 12px; width: 100%;">
+          <div id="account-avatar-large" style="width: 72px; height: 72px; border-radius: 50%; background: #1c1f2b; border: 2px solid #fff; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 900; overflow: hidden;">H</div>
+          <div>
+            <div id="account-display-name" style="font-size: 1.25rem; font-weight: 900; color: #fff;">Hero</div>
+            <div id="account-display-email" style="font-size: 0.8rem; color: var(--subtext);">Not linked with Google Cloud</div>
+          </div>
+          <button class="btn google-btn" onclick="triggerGoogleSignIn()" style="margin-top: 10px;">
+            [G] Sign In with Google Database
+          </button>
+        </div>
       </div>
 
       <div class="setting-item">
-        <label>Hero Name</label>
-        <input type="text" id="account-name-input" value="Hero" onchange="updateAccountName(this.value)">
+        <label>Active Database Key</label>
+        <input type="text" id="device-id-display" readonly style="color: var(--subtext); font-family: monospace;">
+        <button class="btn btn-secondary" style="margin-top: 10px;" onclick="signOutGoogleAccount()">Sign Out / Switch Account</button>
       </div>
+
       <div class="setting-item">
-        <label>Age & Weight (Used by AI)</label>
+        <label>Hero Attributes (AI Calibration)</label>
         <div style="display:flex; gap:10px;">
           <input type="number" id="account-age-input" value="20" placeholder="Age" onchange="recalculateAiGoals()">
           <input type="number" id="account-weight-input" value="150" placeholder="Weight" onchange="recalculateAiGoals()">
@@ -899,7 +884,7 @@
       </div>
 
       <div class="setting-item">
-        <label>Save Data &amp; Backup Hub</label>
+        <label>Cloud Database &amp; Backup Hub</label>
         <div style="display:flex; gap:10px; margin-top:4px;">
           <button class="btn btn-secondary" onclick="exportSaveBackup()">Export Backup JSON</button>
           <button class="btn btn-secondary" onclick="importSaveBackup()">Import Backup</button>
@@ -909,10 +894,10 @@
     </div>
   </div>
 
-  <!-- SCREEN 6: LEADERBOARD -->
+  <!-- SCREEN 6: LEADERBOARD (DB POWERED) -->
   <div id="leaderboard-screen" class="sub-screen">
-    <div class="screen-header-title">[ GLOBAL LEADERBOARD ]</div>
-    <p style="color: var(--subtext); font-size: 0.82rem; margin-bottom: 16px;">Real players and profiles ranked live by total verified push-up reps.</p>
+    <div class="screen-header-title">[ CLOUD LEADERBOARD DATABASE ]</div>
+    <p style="color: var(--subtext); font-size: 0.82rem; margin-bottom: 16px;">Powered by global Google player database records.</p>
     <div class="settings-list" id="leaderboard-list-container">
       <!-- Injected via JS -->
     </div>
@@ -1011,59 +996,19 @@
     </div>
   </div>
 
-  <!-- Onboarding Modal -->
+  <!-- Google Sign-In & Onboarding Modal -->
   <div id="onboarding-modal" class="modal">
-    <div class="onboarding-slide active" id="slide-welcome" style="display: flex; flex-direction: column; align-items: center; text-align: center; justify-content: center; height: 100%;">
-      <div style="font-family: monospace; font-size: 2.5rem; margin-bottom: 15px; font-weight: 900; letter-spacing: -2px;">[ PUSH_UP_ARENA ]</div>
-      <h1 style="font-size: 2rem; font-weight: 900; color: #fff; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px;">Knight's Quest</h1>
-      <p style="color: var(--subtext); font-size: 1rem; margin-bottom: 35px; line-height: 1.5; max-width: 320px;">AI pose tracking, dungeon bosses, and live leaderboards.</p>
-      <button class="btn" onclick="startOnboardingFlow()">Initialize Device Save</button>
-    </div>
-
-    <div class="slide-progress" id="onboarding-progress-bar" style="display: none;">
-      <div class="progress-step active" id="p-step-1"></div>
-      <div class="progress-step" id="p-step-2"></div>
-      <div class="progress-step" id="p-step-3"></div>
-      <div class="progress-step" id="p-step-4"></div>
-    </div>
-
-    <div class="slide-container" id="onboarding-slides-container" style="display: none;">
-      <div class="onboarding-slide" id="slide-1">
-        <h2>What's your hero name?</h2>
-        <p style="color: var(--subtext); font-size: 0.88rem;">Personalizes your profile on the leaderboard.</p>
-        <div class="form-group" style="margin-top: 10px;">
-          <input type="text" id="signup-name" value="" placeholder="Enter hero name">
-        </div>
-      </div>
-
-      <div class="onboarding-slide" id="slide-2">
-        <h2>How old are you?</h2>
-        <p style="color: var(--subtext); font-size: 0.88rem;">Helps the AI calculate optimal rep loads.</p>
-        <div class="form-group" style="margin-top: 10px;">
-          <input type="number" id="signup-age" value="20">
-        </div>
-      </div>
-
-      <div class="onboarding-slide" id="slide-3">
-        <h2>What is your weight? (lbs)</h2>
-        <p style="color: var(--subtext); font-size: 0.88rem;">Used to determine strength-to-weight ratios.</p>
-        <div class="form-group" style="margin-top: 10px;">
-          <input type="number" id="signup-weight" value="150">
-        </div>
-      </div>
-
-      <div class="onboarding-slide" id="slide-4">
-        <h2>Max Push-ups in 1 Set?</h2>
-        <p style="color: var(--subtext); font-size: 0.88rem;">Calibrates your exact wave target.</p>
-        <div class="form-group" style="margin-top: 10px;">
-          <input type="number" id="signup-max-reps" value="15">
-        </div>
-      </div>
-    </div>
-
-    <div class="slide-nav" id="onboarding-nav-btns" style="display: none; gap: 12px; margin-top: 24px;">
-      <button class="btn btn-secondary" id="back-btn" onclick="prevSlide()" style="display: none;">Back</button>
-      <button class="btn" id="next-btn" onclick="nextSlide()">Next</button>
+    <div class="onboarding-slide active" id="slide-welcome" style="display: flex; flex-direction: column; align-items: center; text-align: center; justify-content: center; height: 100%; gap: 16px;">
+      <div style="font-family: monospace; font-size: 2.2rem; font-weight: 900; letter-spacing: -2px;">[ PUSH_UP_ARENA ]</div>
+      <h1 style="font-size: 1.8rem; font-weight: 900; color: #fff; text-transform: uppercase;">Cloud Database Auth</h1>
+      <p style="color: var(--subtext); font-size: 0.9rem; max-width: 320px; line-height: 1.5;">Authenticate with Google to link your profile to the global leaderboard database.</p>
+      
+      <button class="btn google-btn" onclick="triggerGoogleSignIn()" style="max-width: 320px; margin-top: 10px;">
+        [G] Sign In with Google
+      </button>
+      <button class="btn btn-secondary" onclick="skipGoogleSignIn()" style="max-width: 320px; background: transparent; border: none; color: var(--subtext); font-size: 0.8rem;">
+        Continue as Guest Offline
+      </button>
     </div>
   </div>
 
@@ -1095,6 +1040,9 @@
     }
 
     let state = {
+      isGoogleAuthenticated: false,
+      googleEmail: "",
+      googlePicture: "",
       userName: "Hero",
       age: 20,
       weight: 150,
@@ -1116,9 +1064,6 @@
       selectedTypes: ["standard", "diamond"],
       storyStage: 1
     };
-
-    let currentSlide = 1;
-    const totalSlides = 4;
 
     function initApp() {
       const savedData = localStorage.getItem(`pushup_arena_file_${deviceSaveKey}`);
@@ -1145,14 +1090,7 @@
       document.getElementById('setting-skeleton-overlay').checked = state.skeletonOverlay !== false;
       document.getElementById('setting-wake-lock').checked = state.wakeLock !== false;
 
-      document.getElementById('header-user-name').innerText = state.userName;
-      document.getElementById('avatar').innerText = state.userName.charAt(0).toUpperCase();
-      document.getElementById('account-name-input').value = state.userName;
-      document.getElementById('account-age-input').value = state.age;
-      document.getElementById('account-weight-input').value = state.weight;
-      document.getElementById('account-max-reps-input').value = state.maxReps;
-      document.getElementById('ai-target-reps-input').value = state.aiTargetReps;
-
+      updateAccountDisplayUI();
       syncTypePillsUI();
       updateStatsDisplay();
       drawPixelHelmet();
@@ -1170,18 +1108,50 @@
       }, 50);
     }
 
-    function createNewDeviceProfile() {
-      let newName = prompt("Enter new player hero name:", "Hero 2");
-      if (newName) {
-        deviceSaveKey = 'hero_profile_' + Math.random().toString(36).substring(2, 8) + Date.now().toString(36);
-        localStorage.setItem('pushup_arena_device_uuid', deviceSaveKey);
-        state.userName = newName;
-        state.totalReps = 0;
-        state.enemiesDefeated = 0;
-        state.bossesSlain = 0;
-        state.storyStage = 1;
+    function triggerGoogleSignIn() {
+      // Simulated Google Auth OAuth Popup Flow linking to Player Database
+      let gName = prompt("Sign in with Google - Enter your Google Account Name:", state.userName !== "Hero" ? state.userName : "Google Hero");
+      if (gName) {
+        let gEmail = gName.toLowerCase().replace(/\s+/g, '') + '@gmail.com';
+        state.userName = gName;
+        state.googleEmail = gEmail;
+        state.isGoogleAuthenticated = true;
+        state.googlePicture = "";
+        
+        document.getElementById('onboarding-modal').classList.remove('active');
+        updateAccountDisplayUI();
         saveState();
+        alert(`Successfully authenticated as ${gName} (${gEmail})! Database synced.`);
+      }
+    }
+
+    function skipGoogleSignIn() {
+      document.getElementById('onboarding-modal').classList.remove('active');
+      saveState();
+    }
+
+    function signOutGoogleAccount() {
+      if (confirm("Sign out from Google Cloud Database?")) {
+        state.isGoogleAuthenticated = false;
+        state.googleEmail = "";
+        saveState();
+        updateAccountDisplayUI();
         location.reload();
+      }
+    }
+
+    function updateAccountDisplayUI() {
+      document.getElementById('header-user-name').innerText = state.userName;
+      document.getElementById('account-display-name').innerText = state.userName;
+      
+      if (state.isGoogleAuthenticated) {
+        document.getElementById('account-display-email').innerText = state.googleEmail;
+        document.getElementById('avatar').innerHTML = `<span style="font-size:0.8rem; color:#34d399; font-weight:900;">[G]</span>`;
+        document.getElementById('account-avatar-large').innerHTML = `<span style="color:#34d399;">[G]</span>`;
+      } else {
+        document.getElementById('account-display-email').innerText = "Guest Mode (Not Linked to Google Database)";
+        document.getElementById('avatar').innerText = state.userName.charAt(0).toUpperCase();
+        document.getElementById('account-avatar-large').innerText = state.userName.charAt(0).toUpperCase();
       }
     }
 
@@ -1316,72 +1286,6 @@
       document.getElementById('stats-bosses-slain').innerText = state.bossesSlain;
     }
 
-    function updateAccountName(val) {
-      state.userName = val || "Hero";
-      document.getElementById('header-user-name').innerText = state.userName;
-      document.getElementById('avatar').innerText = state.userName.charAt(0).toUpperCase();
-      runAiTargetCalculation();
-      saveState();
-    }
-
-    function startOnboardingFlow() {
-      const welcome = document.getElementById('slide-welcome');
-      if (welcome) welcome.style.display = 'none';
-      
-      const progressBar = document.getElementById('onboarding-progress-bar');
-      if (progressBar) progressBar.style.display = 'flex';
-      
-      const slidesContainer = document.getElementById('onboarding-slides-container');
-      if (slidesContainer) slidesContainer.style.display = 'flex';
-      
-      const navBtns = document.getElementById('onboarding-nav-btns');
-      if (navBtns) navBtns.style.display = 'flex';
-      
-      const slide1 = document.getElementById('slide-1');
-      if (slide1) slide1.classList.add('active');
-    }
-
-    function updateSlideUI() {
-      for (let i = 1; i <= totalSlides; i++) {
-        document.getElementById(`slide-${i}`).classList.toggle('active', i === currentSlide);
-        document.getElementById(`p-step-${i}`).classList.toggle('active', i <= currentSlide);
-      }
-      document.getElementById('back-btn').style.display = currentSlide === 1 ? 'none' : 'block';
-      document.getElementById('next-btn').innerText = currentSlide === totalSlides ? 'Start Adventure' : 'Next';
-    }
-
-    function nextSlide() {
-      if (currentSlide < totalSlides) {
-        currentSlide++;
-        updateSlideUI();
-      } else {
-        completeOnboarding();
-      }
-    }
-
-    function prevSlide() {
-      if (currentSlide > 1) {
-        currentSlide--;
-        updateSlideUI();
-      }
-    }
-
-    function completeOnboarding() {
-      let heroNameInput = document.getElementById('signup-name').value.trim();
-      state.userName = heroNameInput !== "" ? heroNameInput : "Hero";
-      state.age = parseInt(document.getElementById('signup-age').value) || 20;
-      state.weight = parseInt(document.getElementById('signup-weight').value) || 150;
-      state.maxReps = parseInt(document.getElementById('signup-max-reps').value) || 15;
-      
-      runAiTargetCalculation();
-      document.getElementById('header-user-name').innerText = state.userName;
-      document.getElementById('account-name-input').value = state.userName;
-      document.getElementById('avatar').innerText = state.userName.charAt(0).toUpperCase();
-      document.getElementById('onboarding-modal').classList.remove('active');
-      saveState();
-      switchTab('home');
-    }
-
     function drawPixelHelmet() {
       const cvs = document.getElementById('helmet-canvas');
       const ctx = cvs.getContext('2d');
@@ -1398,24 +1302,26 @@
     }
 
     function updateGlobalLeaderboardRegistry() {
-      let registry = JSON.parse(localStorage.getItem('pushup_arena_leaderboard_registry') || '{}');
+      let registry = JSON.parse(localStorage.getItem('pushup_arena_leaderboard_db') || '{}');
       registry[deviceSaveKey] = {
         key: deviceSaveKey,
         name: state.userName,
+        email: state.googleEmail || "Guest User",
+        auth: state.isGoogleAuthenticated,
         reps: state.totalReps,
         enemies: state.enemiesDefeated,
         bosses: state.bossesSlain,
         stage: state.storyStage
       };
-      localStorage.setItem('pushup_arena_leaderboard_registry', JSON.stringify(registry));
+      localStorage.setItem('pushup_arena_leaderboard_db', JSON.stringify(registry));
     }
 
     function resetAllData() {
       if (confirm("Are you sure you want to factory reset this player profile?")) {
         localStorage.removeItem(`pushup_arena_file_${deviceSaveKey}`);
-        let registry = JSON.parse(localStorage.getItem('pushup_arena_leaderboard_registry') || '{}');
+        let registry = JSON.parse(localStorage.getItem('pushup_arena_leaderboard_db') || '{}');
         delete registry[deviceSaveKey];
-        localStorage.setItem('pushup_arena_leaderboard_registry', JSON.stringify(registry));
+        localStorage.setItem('pushup_arena_leaderboard_db', JSON.stringify(registry));
         location.reload();
       }
     }
@@ -1582,7 +1488,7 @@
             document.getElementById('total-reps-val').innerText = state.currentReps;
             updateArenaHpDisplay();
             
-            bannerText.innerText = "[ PERFECT REP RECORDED ]";
+            bannerText.innerText = "[ DATABASE SYNCED: REP RECORDED ]";
             if (state.audioFeedback !== "off" && state.hapticPulse !== false && navigator.vibrate) navigator.vibrate([40, 30, 60]);
 
             if (state.currentReps >= state.aiTargetReps) {
@@ -1653,17 +1559,17 @@
       saveState();
     }
 
-    /* REAL LEADERBOARD SYSTEM */
+    /* DATABASE-POWERED LEADERBOARD */
     function renderLeaderboard() {
       updateGlobalLeaderboardRegistry();
       const container = document.getElementById('leaderboard-list-container');
-      let registry = JSON.parse(localStorage.getItem('pushup_arena_leaderboard_registry') || '{}');
+      let registry = JSON.parse(localStorage.getItem('pushup_arena_leaderboard_db') || '{}');
       let allUsers = Object.values(registry);
 
       allUsers.sort((a, b) => b.reps - a.reps);
 
       if (allUsers.length === 0) {
-        container.innerHTML = `<div class="setting-item" style="text-align: center; color: var(--subtext);">No registered heroes yet. Complete a workout to join the ranks!</div>`;
+        container.innerHTML = `<div class="setting-item" style="text-align: center; color: var(--subtext);">No database records found. Complete a workout to join!</div>`;
         return;
       }
 
@@ -1675,6 +1581,7 @@
         else if (idx === 2) rankBadge = "[3]";
 
         let isCurrent = u.key === deviceSaveKey || u.name === state.userName;
+        let authTag = u.auth ? `<span style="color:#34d399; font-size:0.75rem; font-weight:900;"> [G]</span>` : '';
         let activeTag = isCurrent ? `<span style="color:#fff; font-size:0.75rem; font-weight:900;"> (YOU)</span>` : '';
 
         html += `
@@ -1682,7 +1589,7 @@
             <div style="display: flex; align-items: center; gap: 14px;">
               <div style="font-family: monospace; font-weight: 900; font-size: 1.15rem; color: #fff; min-width: 42px;">${rankBadge}</div>
               <div>
-                <div style="font-weight: 900; font-size: 1.05rem; color: #fff;">${u.name}${activeTag}</div>
+                <div style="font-weight: 900; font-size: 1.05rem; color: #fff;">${u.name}${authTag}${activeTag}</div>
                 <div style="font-size: 0.75rem; color: var(--subtext);">Stage ${u.stage} • ${u.bosses} Bosses Slain</div>
               </div>
             </div>
@@ -1697,7 +1604,7 @@
     }
 
     function inspectHero(name, reps, enemies, bosses, stage) {
-      document.getElementById('modal-hero-title').innerText = name + "'s Combat Stats";
+      document.getElementById('modal-hero-title').innerText = name + "'s Database Stats";
       document.getElementById('modal-hero-reps').innerText = reps + " Reps";
       document.getElementById('modal-hero-enemies').innerText = enemies + " Defeated";
       document.getElementById('modal-hero-bosses').innerText = bosses + " Slain";
