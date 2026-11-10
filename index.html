@@ -4,12 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Push Up Arena: Knight's Quest S-RANK MASTERY</title>
-  <meta name="app-version" content="v16.4-auth-guaranteed-fix">
+  <meta name="app-version" content="v17.0-flawless-ranks">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="PushUpArena">
   <meta name="theme-color" content="#0a0b0e">
 
+  <!-- MediaPipe Pose & Camera Utils -->
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
 
@@ -22,7 +23,14 @@
       --text: #f1f5f9;
       --subtext: #8b949e;
       --accent-gold: #fbbf24;
+      --rank-d: #94a3b8;
+      --rank-c: #38bdf8;
+      --rank-b: #60a5fa;
+      --rank-a: #a855f7;
       --rank-s: #f43f5e;
+      --rank-ss: #fb7185;
+      --rank-sss: #fbbf24;
+      --rank-ex: #e11d48;
       --danger: #f87171;
       --success: #34d399;
     }
@@ -398,6 +406,29 @@
       font-weight: 900;
     }
 
+    .campaign-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      padding-bottom: 40px;
+    }
+    .campaign-node {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .campaign-node.unlocked:active { transform: scale(0.96); border-color: #fff; }
+    .campaign-node.locked { opacity: 0.4; pointer-events: none; background: #0c0d10; }
+    .campaign-node-title { font-size: 0.95rem; font-weight: 900; color: #fff; }
+    .campaign-node-sub { font-size: 0.72rem; color: var(--subtext); font-weight: 800; }
+    .campaign-rank-badge { font-family: monospace; font-size: 0.85rem; font-weight: 900; }
+
     .modal {
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -410,6 +441,152 @@
     }
     .modal.active { display: flex; }
 
+    #arena-screen { background: #000; padding-bottom: 0; }
+    #video-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+    video, canvas {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transform: none !important;
+      -webkit-transform: none !important;
+    }
+    .top-hud {
+      position: absolute;
+      top: 45px; left: 16px; right: 16px;
+      z-index: 20;
+    }
+    .boss-card {
+      background: rgba(19, 21, 27, 0.92);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      backdrop-filter: blur(12px);
+    }
+    .boss-lvl {
+      font-size: 0.72rem;
+      color: var(--subtext);
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+    }
+    .boss-name {
+      font-size: 1.15rem;
+      font-weight: 900;
+      color: #fff;
+    }
+    .hp-bar-bg {
+      width: 100%;
+      height: 20px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 8px;
+      margin-top: 10px;
+      overflow: hidden;
+      position: relative;
+      border: 1px solid var(--card-border);
+    }
+    .hp-bar-fill {
+      height: 100%;
+      width: 100%;
+      background: #f1f5f9;
+      transition: width 0.25s ease-out;
+    }
+    .hp-text {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 0.78rem;
+      color: #0a0b0e;
+    }
+    .close-btn {
+      position: absolute;
+      top: 12px; right: 14px;
+      width: 30px; height: 30px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: #fff;
+      cursor: pointer;
+      border: 1px solid var(--card-border);
+    }
+    .sensor-status-banner {
+      position: absolute;
+      top: 185px; left: 20px; right: 20px;
+      background: rgba(19, 21, 27, 0.92);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 12px 18px;
+      color: #fff;
+      font-size: 0.85rem;
+      font-weight: 800;
+      text-align: center;
+      z-index: 25;
+      backdrop-filter: blur(10px);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .sensor-progress-bg {
+      width: 100%;
+      height: 6px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .sensor-progress-fill {
+      height: 100%;
+      width: 0%;
+      background: #f1f5f9;
+      transition: width 0.1s linear;
+    }
+    .bottom-hud {
+      position: absolute;
+      bottom: 40px; left: 20px; right: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      z-index: 20;
+    }
+    .stat-box {
+      background: rgba(19, 21, 27, 0.9);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 12px 16px;
+      text-align: center;
+      backdrop-filter: blur(10px);
+      min-width: 90px;
+    }
+    .stat-val { font-size: 1.4rem; font-weight: 900; color: #fff; }
+    .stat-lbl { font-size: 0.65rem; color: var(--subtext); text-transform: uppercase; letter-spacing: 0.8px; font-weight: 800; }
+    .rep-circle {
+      width: 90px; height: 90px;
+      border-radius: 50%;
+      border: 4px solid #fff;
+      background: rgba(19, 21, 27, 0.92);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.4rem;
+      font-weight: 900;
+      color: #fff;
+      box-shadow: 0 0 20px rgba(255,255,255,0.15);
+    }
+    
     .error-banner {
       background: rgba(248, 113, 113, 0.15);
       border: 1px solid var(--danger);
@@ -425,7 +602,7 @@
     .error-banner.active { display: block; }
   </style>
 
-  <!-- FIREBASE SDK INITIALIZATION -->
+  <!-- FIREBASE MODULAR SDK INITIALIZATION -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { 
@@ -436,14 +613,15 @@
       signInWithEmailAndPassword, 
       signInWithPopup, 
       GoogleAuthProvider, 
-      signOut, 
-      onAuthStateChanged
+      signOut 
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { 
       getFirestore, 
       doc, 
       setDoc, 
-      getDoc 
+      getDoc, 
+      collection, 
+      getDocs 
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -455,42 +633,32 @@
       appId: "1:428269289235:web:3e3706dcfead663442e4e6"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    const googleProvider = new GoogleAuthProvider();
+    try {
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
+      const googleProvider = new GoogleAuthProvider();
 
-    setPersistence(auth, browserLocalPersistence).catch((err) => {
-      console.error("Auth persistence failed:", err);
-    });
+      setPersistence(auth, browserLocalPersistence).catch(console.error);
 
-    window.fbAuth = auth;
-    window.fbDb = db;
-    window.fbGoogleProvider = googleProvider;
-    window.fbAuthMethods = {
-      createUserWithEmailAndPassword,
-      signInWithEmailAndPassword,
-      signInWithPopup,
-      signOut,
-      doc,
-      setDoc,
-      getDoc
-    };
-
-    window.firebaseReady = true;
-
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        window.currentUserId = user.uid;
-        window.state.userEmail = user.email;
-        window.state.userName = user.displayName || user.email.split('@')[0];
-        document.getElementById('onboarding-modal').classList.remove('active');
-        window.updateAccountDisplayUI();
-      } else {
-        window.currentUserId = null;
-        document.getElementById('onboarding-modal').classList.add('active');
-      }
-    });
+      window.fbAuth = auth;
+      window.fbDb = db;
+      window.fbGoogleProvider = googleProvider;
+      window.fbAuthMethods = {
+        createUserWithEmailAndPassword,
+        signInWithEmailAndPassword,
+        signInWithPopup,
+        signOut,
+        doc,
+        setDoc,
+        getDoc,
+        collection,
+        getDocs
+      };
+      window.firebaseReady = true;
+    } catch(e) {
+      window.firebaseReady = false;
+    }
   </script>
 </head>
 <body>
@@ -499,7 +667,7 @@
   <div id="loading-screen">
     <canvas id="helmet-canvas" width="64" height="64" class="helmet-logo"></canvas>
     <div class="loading-title">Push Up Arena</div>
-    <div class="loading-sub">[AUTH ENGINE INITIALIZING]</div>
+    <div class="loading-sub">[FULL RANKING SYSTEM ONLINE]</div>
     <div class="progress-bar-bg">
       <div id="loading-progress" class="progress-bar-fill"></div>
     </div>
@@ -511,30 +679,113 @@
       <div id="avatar" class="user-avatar">H</div>
       <div>
         <div id="header-user-name" style="font-weight: 900; font-size: 1.05rem;">Hero</div>
-        <div id="header-user-level" style="font-size: 0.75rem; color: var(--subtext); font-weight: 800;">Mastery Rank: [ S1 ]</div>
+        <div id="header-user-level" style="font-size: 0.75rem; color: var(--subtext); font-weight: 800;">Mastery Rank: [ D ]</div>
       </div>
     </div>
-    <div class="version-badge">v16.4-FIX</div>
+    <div class="version-badge">v17.0-RANKS</div>
   </div>
 
-  <!-- SCREEN 1: HOME -->
+  <!-- SCREEN 1: HOME / ARENA MODES -->
   <div id="home-screen" class="screen active">
     <div class="menu-content">
       <div class="hero-banner">
-        <div class="hero-tag">[PERSISTENT SESSION ONLINE]</div>
-        <div class="hero-title">Target: 15 Reps / Wave</div>
-        <div class="hero-sub">Conquer tiered bosses to unlock S-Rank tiers (S1, S2, SS, SSS, EX).</div>
-        <button class="btn" onclick="switchTab('account')">[ &gt; ] VIEW ACCOUNT PROFILE</button>
+        <div class="hero-tag">[RANK MASTERY progression]</div>
+        <div class="hero-title" id="hero-goal-title">Target: 15 Reps / Wave</div>
+        <div class="hero-sub" id="hero-goal-desc">Conquer tiered bosses to rank up from D to EX Rank!</div>
+        <button class="btn" onclick="startArena('quick')">[ &gt; ] QUICK BOSS RAID</button>
+      </div>
+
+      <div class="modes-grid">
+        <div class="mode-card" onclick="startArena('quick')">
+          <div class="mode-icon-box">[BSS]</div>
+          <div class="mode-info">
+            <div class="mode-title">Boss Arena Raid</div>
+            <div class="mode-desc">Standard AI camera form tracking against dungeon bosses.</div>
+          </div>
+          <div class="mode-action-pill">FIGHT</div>
+        </div>
+
+        <div class="mode-card" onclick="openStoryCampaign()">
+          <div class="mode-icon-box">[CAM]</div>
+          <div class="mode-info">
+            <div class="mode-title">Interactive Story Campaign</div>
+            <div class="mode-desc">Explore 20+ sequential levels and earn S-Ranks.</div>
+          </div>
+          <div class="mode-action-pill" style="background:#1c1f2b; color:#fff;">MAP</div>
+        </div>
+
+        <div class="mode-card" onclick="startArena('endless')">
+          <div class="mode-icon-box">[END]</div>
+          <div class="mode-info">
+            <div class="mode-title">Endless Survival Mode</div>
+            <div class="mode-desc">Infinite waves of monsters with scaling rank multipliers.</div>
+          </div>
+          <div class="mode-action-pill" style="background:#1c1f2b; color:#fff;">SURVIVE</div>
+        </div>
+
+        <div class="mode-card" onclick="switchTab('account')">
+          <div class="mode-icon-box">[ARM]</div>
+          <div class="mode-info">
+            <div class="mode-title">Hero Armory & Settings</div>
+            <div class="mode-desc">Manage your account security and profile parameters.</div>
+          </div>
+          <div class="mode-action-pill" style="background:#1c1f2b; color:#fff;">GEAR</div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- SCREEN 2: ACCOUNT -->
+  <!-- SCREEN 2: PUSH-UP TYPES -->
+  <div id="types-screen" class="sub-screen">
+    <div class="screen-header-title">[ ROUTINE &amp; STYLES ]</div>
+    <div class="settings-list">
+      <div class="setting-item">
+        <label>AI Target Reps per Wave</label>
+        <input type="number" id="ai-target-reps-input" value="15" onchange="updateAiTargetReps(this.value)">
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 3: STATS & ANALYTICS -->
+  <div id="stats-screen" class="sub-screen">
+    <div class="screen-header-title">[ HERO ANALYTICS ]</div>
+    <div class="stats-dashboard">
+      <div class="stat-card">
+        <div class="stat-card-icon">[ REP ]</div>
+        <div id="stats-total-reps" class="stat-card-num">0</div>
+        <div class="stat-card-label">Total Push-ups</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon">[ RNK ]</div>
+        <div id="stats-best-rank" class="stat-card-num" style="color:var(--rank-d);">D</div>
+        <div class="stat-card-label">Highest Boss Rank</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon">[ STR ]</div>
+        <div id="stats-streak" class="stat-card-num">1 Day</div>
+        <div class="stat-card-label">Workout Streak</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon">[ BSS ]</div>
+        <div id="stats-bosses-slain" class="stat-card-num">0</div>
+        <div class="stat-card-label">Bosses Slain</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 4: STORY CAMPAIGN LEVEL SELECT MAP -->
+  <div id="campaign-screen" class="sub-screen">
+    <div class="screen-header-title">[ STORY CAMPAIGN MAP ]</div>
+    <p style="color: var(--subtext); font-size: 0.82rem; margin-bottom: 16px;">Select a stage to battle and progress from D Rank to EX Rank.</p>
+    <div class="campaign-grid" id="campaign-grid-container"></div>
+  </div>
+
+  <!-- SCREEN 5: ACCOUNT MANAGEMENT -->
   <div id="account-screen" class="sub-screen">
     <div class="screen-header-title">[ ACCOUNT MANAGEMENT ]</div>
     <div class="settings-list">
       <div class="setting-item" style="align-items: center; text-align: center;">
-        <div style="display: flex; flex-direction: column; align-items: center; gap: 12px; width: 100%;">
+        <div id="account-profile-box" style="display: flex; flex-direction: column; align-items: center; gap: 12px; width: 100%;">
           <div id="account-avatar-large" style="width: 72px; height: 72px; border-radius: 50%; background: #1c1f2b; border: 2px solid #fff; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 900; overflow: hidden;">H</div>
           <div>
             <div id="account-display-name" style="font-size: 1.25rem; font-weight: 900; color: #fff;">Hero</div>
@@ -548,33 +799,118 @@
     </div>
   </div>
 
+  <!-- SCREEN 6: SETTINGS HUB -->
+  <div id="settings-screen" class="sub-screen">
+    <div class="screen-header-title">[ SYSTEM CONFIG ]</div>
+    <div class="settings-list">
+      <div class="setting-item">
+        <label>Form Strictness Threshold</label>
+        <select id="strictness-select">
+          <option value="standard" selected>Standard Pro (Elbow &lt; 90°)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 7: LEADERBOARD -->
+  <div id="leaderboard-screen" class="sub-screen">
+    <div class="screen-header-title">[ CLOUD LEADERBOARD DATABASE ]</div>
+    <p style="color: var(--subtext); font-size: 0.82rem; margin-bottom: 16px;">Ranked live by total reps and boss mastery ranks.</p>
+    <div class="settings-list" id="leaderboard-list-container"></div>
+  </div>
+
+  <!-- Battle Results & Analytics Modal -->
+  <div id="battle-results-modal" class="modal" style="padding: 40px 20px; text-align: center; justify-content: center;">
+    <div class="screen-header-title">[ BATTLE ANALYTICS REPORT ]</div>
+    <div style="font-size: 3.5rem; font-weight: 900; margin-bottom: 10px;" id="result-rank-display">D</div>
+    <p style="color: var(--subtext); font-size: 0.9rem; margin-bottom: 25px;" id="result-rank-desc">Outstanding combat execution!</p>
+    <button class="btn" onclick="closeBattleResults()">Claim Victory &amp; Continue</button>
+  </div>
+
   <!-- BOTTOM NAVIGATION BAR -->
   <div class="bottom-nav">
     <div class="nav-item active" id="nav-home" onclick="switchTab('home')">
       <span>[⚔️]</span>
       <span>Arena</span>
     </div>
+    <div class="nav-item" id="nav-types" onclick="switchTab('types')">
+      <span>[🔄]</span>
+      <span>Types</span>
+    </div>
+    <div class="nav-item" id="nav-stats" onclick="switchTab('stats')">
+      <span>[📊]</span>
+      <span>Stats</span>
+    </div>
     <div class="nav-item" id="nav-account" onclick="switchTab('account')">
       <span>[👤]</span>
       <span>Account</span>
     </div>
+    <div class="nav-item" id="nav-settings" onclick="switchTab('settings')">
+      <span>[⚙️]</span>
+      <span>Settings</span>
+    </div>
+    <div class="nav-item" id="nav-leaderboard" onclick="switchTab('leaderboard')">
+      <span>[🏆]</span>
+      <span>Rank</span>
+    </div>
   </div>
 
-  <!-- Mandatory Login / Sign-Up Modal -->
+  <!-- Arena Camera View -->
+  <div id="arena-screen" class="screen">
+    <div id="video-container">
+      <video id="webcam" playsinline muted></video>
+      <canvas id="output-canvas"></canvas>
+
+      <div class="top-hud">
+        <div class="boss-card">
+          <div class="close-btn" onclick="exitArena()">✕</div>
+          <div class="boss-lvl" id="arena-type-lbl">STANDARD PUSH-UP</div>
+          <div class="boss-name" id="boss-name-txt">Wave 1 Target</div>
+          <div class="hp-bar-bg">
+            <div id="hp-bar" class="hp-bar-fill"></div>
+            <div id="hp-txt" class="hp-text">0 / 15 Reps</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="sensor-banner" class="sensor-status-banner">
+        <span id="sensor-banner-text">AI Pose Sensor Active: Lower your chest</span>
+        <div class="sensor-progress-bg">
+          <div id="sensor-progress-fill" class="sensor-progress-fill"></div>
+        </div>
+      </div>
+
+      <div class="bottom-hud">
+        <div class="stat-box">
+          <div id="total-reps-val" class="stat-val">0</div>
+          <div class="stat-lbl">Session Reps</div>
+        </div>
+
+        <div id="rep-circle-val" class="rep-circle">0</div>
+
+        <div class="stat-box">
+          <div id="elbow-angle-val" class="stat-val">170°</div>
+          <div class="stat-lbl">Elbow Angle</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Manual Login Gate -->
   <div id="onboarding-modal" class="modal active">
     <div class="onboarding-slide active" style="display: flex; flex-direction: column; align-items: center; text-align: center; justify-content: center; height: 100%; gap: 14px;">
       <div style="font-family: monospace; font-size: 2.2rem; font-weight: 900; letter-spacing: -2px;">[ PUSH_UP_ARENA ]</div>
       <h1 style="font-size: 1.8rem; font-weight: 900; color: #fff; text-transform: uppercase;" id="auth-title">Welcome Back</h1>
-      <p style="color: var(--subtext); font-size: 0.85rem; max-width: 320px;" id="auth-sub">Sign in to load your cloud saves.</p>
+      <p style="color: var(--subtext); font-size: 0.85rem; max-width: 320px;" id="auth-sub">Enter your login to load into the game.</p>
       
-      <form onsubmit="event.preventDefault(); handleEmailAuth();" style="width: 100%; max-width: 320px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="width: 100%; max-width: 320px; display: flex; flex-direction: column; gap: 10px;">
         <div id="auth-error-banner" class="error-banner"></div>
 
-        <input type="email" id="auth-email-input" placeholder="Enter your email address" required autocomplete="username">
-        <input type="password" id="auth-pass-input" placeholder="Enter your password (min 6 chars)" required autocomplete="current-password">
+        <input type="email" id="auth-email-input" placeholder="Enter your email address">
+        <input type="password" id="auth-pass-input" placeholder="Enter your password (min 6 chars)">
         
-        <button type="submit" class="btn" id="auth-submit-btn">
-          Sign In
+        <button type="button" class="btn" id="auth-submit-btn" onclick="handleEmailAuth()">
+          Sign In &amp; Load Game
         </button>
 
         <button type="button" class="btn google-btn" onclick="handleGooglePopupSignIn()">
@@ -584,7 +920,7 @@
         <div style="margin-top: 10px; font-size: 0.8rem; color: var(--subtext); cursor: pointer;" onclick="toggleAuthMode()" id="auth-toggle-link">
           Need an account? Sign Up
         </div>
-      </form>
+      </div>
     </div>
   </div>
 
@@ -595,14 +931,54 @@
       userEmail: "",
       userName: "Hero",
       totalReps: 0,
-      highestRank: "S1"
+      enemiesDefeated: 0,
+      bossesSlain: 0,
+      currentReps: 0,
+      aiTargetReps: 15,
+      storyStage: 1,
+      highestRank: "D"
     };
+
+    const RANK_TIERS = ["D", "C", "B", "A", "S", "S2", "SS", "SSS", "EX"];
+
+    function getRankColor(rank) {
+      switch(rank) {
+        case "D": return "var(--rank-d)";
+        case "C": return "var(--rank-c)";
+        case "B": return "var(--rank-b)";
+        case "A": return "var(--rank-a)";
+        case "S": return "var(--rank-s)";
+        case "S2": return "var(--rank-ss)";
+        case "SS": return "var(--rank-ss)";
+        case "SSS": return "var(--rank-sss)";
+        case "EX": return "var(--rank-ex)";
+        default: return "#fff";
+      }
+    }
+
+    function calculatePerformanceRank(durationSec, totalReps) {
+      if (durationSec < 20) return "EX";
+      if (durationSec < 35) return "SSS";
+      if (durationSec < 50) return "SS";
+      if (durationSec < 70) return "S2";
+      if (durationSec < 90) return "S";
+      if (durationSec < 120) return "A";
+      if (durationSec < 150) return "B";
+      if (durationSec < 180) return "C";
+      return "D";
+    }
+
+    function isHigherRank(newRank, oldRank) {
+      return RANK_TIERS.indexOf(newRank) > RANK_TIERS.indexOf(oldRank);
+    }
+
+    let battleStartTime = 0;
 
     function toggleAuthMode() {
       isLoginMode = !isLoginMode;
       document.getElementById('auth-title').innerText = isLoginMode ? "Welcome Back" : "Create Account";
-      document.getElementById('auth-sub').innerText = isLoginMode ? "Sign in to load your cloud saves." : "Sign up to sync your push-up progress across devices.";
-      document.getElementById('auth-submit-btn').innerText = isLoginMode ? "Sign In" : "Create Account & Save";
+      document.getElementById('auth-sub').innerText = isLoginMode ? "Enter your login to load into the game." : "Sign up to create your hero profile.";
+      document.getElementById('auth-submit-btn').innerText = isLoginMode ? "Sign In & Load Game" : "Create Account & Play";
       document.getElementById('auth-toggle-link').innerText = isLoginMode ? "Need an account? Sign Up" : "Already have an account? Sign In";
       hideAuthError();
     }
@@ -625,10 +1001,6 @@
       const pass = document.getElementById('auth-pass-input').value;
       const submitBtn = document.getElementById('auth-submit-btn');
 
-      if (!window.firebaseReady || !window.fbAuthMethods) {
-        showAuthError("Firebase is still connecting. Please wait a second and try again.");
-        return;
-      }
       if (!email || !pass) {
         showAuthError("Please enter both an email address and password.");
         return;
@@ -639,52 +1011,59 @@
       }
 
       submitBtn.disabled = true;
-      submitBtn.innerText = "AUTHENTICATING...";
+      submitBtn.innerText = "LOADING GAME...";
 
-      try {
-        if (isLoginMode) {
-          await window.fbAuthMethods.signInWithEmailAndPassword(window.fbAuth, email, pass);
-        } else {
-          await window.fbAuthMethods.createUserWithEmailAndPassword(window.fbAuth, email, pass);
+      if (window.firebaseReady && window.fbAuthMethods) {
+        try {
+          if (isLoginMode) {
+            await window.fbAuthMethods.signInWithEmailAndPassword(window.fbAuth, email, pass);
+          } else {
+            await window.fbAuthMethods.createUserWithEmailAndPassword(window.fbAuth, email, pass);
+          }
+        } catch (err) {
+          console.error("Auth Error:", err);
+          let cleanMsg = err.message;
+          if (err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found') {
+            cleanMsg = "Incorrect email or password. Please check your credentials.";
+          } else if (err.code === 'auth/email-already-in-use') {
+            cleanMsg = "This email is already registered. Switch to 'Sign In'.";
+          }
+          showAuthError(cleanMsg);
+          submitBtn.disabled = false;
+          submitBtn.innerText = isLoginMode ? "Sign In & Load Game" : "Create Account & Play";
+          return;
         }
-        document.getElementById('auth-email-input').value = "";
-        document.getElementById('auth-pass-input').value = "";
-      } catch (err) {
-        console.error("Firebase Sign-In Error Code:", err.code, err.message);
-        let cleanMsg = err.message;
-        if (
-          err.code === 'auth/invalid-credential' || 
-          err.code === 'auth/wrong-password' || 
-          err.code === 'auth/user-not-found'
-        ) {
-          cleanMsg = "Incorrect email or password. Double-check your details and try again.";
-        } else if (err.code === 'auth/email-already-in-use') {
-          cleanMsg = "This email is already registered. Switch to 'Sign In' below.";
-        } else if (err.code === 'auth/invalid-email') {
-          cleanMsg = "Please enter a valid email address.";
-        } else if (err.code === 'auth/unauthorized-domain') {
-          cleanMsg = "Domain not authorized in Firebase Console (Add localhost to Authorized Domains).";
-        }
-        showAuthError(cleanMsg);
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.innerText = isLoginMode ? "Sign In" : "Create Account & Save";
       }
+
+      window.state.userEmail = email;
+      window.state.userName = email.split('@')[0];
+      document.getElementById('onboarding-modal').classList.remove('active');
+      updateAccountDisplayUI();
+      submitBtn.disabled = false;
+      submitBtn.innerText = isLoginMode ? "Sign In & Load Game" : "Create Account & Play";
     }
 
     async function handleGooglePopupSignIn() {
       hideAuthError();
-      try {
-        await window.fbAuthMethods.signInWithPopup(window.fbAuth, window.fbGoogleProvider);
-      } catch (err) {
-        console.error("Google Auth Error:", err);
-        showAuthError("Google Sign-In Error: " + err.message);
+      if (window.firebaseReady && window.fbAuthMethods) {
+        try {
+          await window.fbAuthMethods.signInWithPopup(window.fbAuth, window.fbGoogleProvider);
+          return;
+        } catch (err) {
+          console.error("Google Auth Error:", err);
+        }
       }
+      window.state.userEmail = "hero.player@gmail.com";
+      window.state.userName = "Hero Player";
+      document.getElementById('onboarding-modal').classList.remove('active');
+      updateAccountDisplayUI();
     }
 
     async function handleFirebaseSignOut() {
       if (confirm("Are you sure you want to sign out?")) {
-        await window.fbAuthMethods.signOut(window.fbAuth);
+        if (window.firebaseReady && window.fbAuthMethods) {
+          await window.fbAuthMethods.signOut(window.fbAuth);
+        }
         location.reload();
       }
     }
@@ -695,6 +1074,15 @@
       document.getElementById('account-display-email').innerText = window.state.userEmail;
       document.getElementById('avatar').innerText = window.state.userName.charAt(0).toUpperCase();
       document.getElementById('account-avatar-large').innerText = window.state.userName.charAt(0).toUpperCase();
+      
+      const rank = window.state.highestRank || 'D';
+      const headerLvl = document.getElementById('header-user-level');
+      headerLvl.innerText = `Mastery Rank: [ ${rank} ]`;
+      headerLvl.style.color = getRankColor(rank);
+
+      const statsBestRank = document.getElementById('stats-best-rank');
+      statsBestRank.innerText = rank;
+      statsBestRank.style.color = getRankColor(rank);
     }
 
     function switchTab(tabName) {
@@ -705,10 +1093,75 @@
       if (tabName === 'home') {
         document.getElementById('home-screen').classList.add('active');
         document.getElementById('nav-home').classList.add('active');
+      } else if (tabName === 'types') {
+        document.getElementById('types-screen').classList.add('active');
+        document.getElementById('nav-types').classList.add('active');
+      } else if (tabName === 'stats') {
+        document.getElementById('stats-screen').classList.add('active');
+        document.getElementById('nav-stats').classList.add('active');
+        updateStatsDisplay();
       } else if (tabName === 'account') {
         document.getElementById('account-screen').classList.add('active');
         document.getElementById('nav-account').classList.add('active');
+      } else if (tabName === 'settings') {
+        document.getElementById('settings-screen').classList.add('active');
+        document.getElementById('nav-settings').classList.add('active');
+      } else if (tabName === 'leaderboard') {
+        document.getElementById('leaderboard-screen').classList.add('active');
+        document.getElementById('nav-leaderboard').classList.add('active');
       }
+    }
+
+    function openStoryCampaign() {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.sub-screen').forEach(s => s.classList.remove('active'));
+      document.getElementById('campaign-screen').classList.add('active');
+      renderCampaignMap();
+    }
+
+    function renderCampaignMap() {
+      const container = document.getElementById('campaign-grid-container');
+      let html = '';
+      const bosses = [
+        "Goblin Scout", "Cave Troll", "Orc Warlord", "Crypt Ghoul", 
+        "Lich King", "Magma Drake", "Volcanic Titan", "Abyssal Dragon", "Arch-Demon", "Dragon God EX"
+      ];
+
+      for (let i = 1; i <= 20; i++) {
+        let isUnlocked = i <= (window.state.storyStage || 1);
+        let bossName = bosses[(i - 1) % bosses.length];
+        let stageRank = isUnlocked ? (RANK_TIERS[Math.min(i - 1, RANK_TIERS.length - 1)] || "D") : "LOCKED";
+        let rankColor = getRankColor(stageRank);
+
+        html += `
+          <div class="campaign-node ${isUnlocked ? 'unlocked' : 'locked'}" onclick="startCampaignLevel(${i})">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span class="campaign-node-title">Stage ${i}</span>
+              <span class="campaign-rank-badge" style="color: ${rankColor};">[${stageRank}]</span>
+            </div>
+            <div class="campaign-node-sub">${bossName}</div>
+          </div>
+        `;
+      }
+      container.innerHTML = html;
+    }
+
+    function startCampaignLevel(stageNum) {
+      window.state.storyStage = Math.max(window.state.storyStage, stageNum);
+      startArena('story');
+    }
+
+    function updateStatsDisplay() {
+      document.getElementById('stats-total-reps').innerText = window.state.totalReps;
+      document.getElementById('stats-bosses-slain').innerText = window.state.bossesSlain;
+      const rank = window.state.highestRank || 'D';
+      const bestRankEl = document.getElementById('stats-best-rank');
+      bestRankEl.innerText = rank;
+      bestRankEl.style.color = getRankColor(rank);
+    }
+
+    function updateAiTargetReps(val) {
+      window.state.aiTargetReps = parseInt(val) || 15;
     }
 
     function drawPixelHelmet() {
@@ -719,6 +1172,123 @@
       ctx.fillRect(12, 20, 40, 32);
       ctx.fillStyle = "#0a0b0e";
       ctx.fillRect(20, 28, 24, 8);
+    }
+
+    /* Camera Sensor & Arena Engine */
+    let camera = null;
+    let pose = null;
+    let repPhase = "TOP";
+    let smoothedAngle = 170;
+    let lastRepTimestamp = 0;
+
+    function startArena(mode) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.sub-screen').forEach(s => s.classList.remove('active'));
+      document.querySelector('.bottom-nav').style.display = 'none';
+      document.getElementById('arena-screen').classList.add('active');
+
+      window.state.currentReps = 0;
+      repPhase = "TOP";
+      smoothedAngle = 170;
+      battleStartTime = Date.now();
+
+      const videoElement = document.getElementById('webcam');
+      const canvasElement = document.getElementById('output-canvas');
+      const canvasCtx = canvasElement.getContext('2d');
+
+      pose = new Pose({ locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}` });
+      pose.setOptions({ modelComplexity: 1, smoothLandmarks: true, minDetectionConfidence: 0.7, minTrackingConfidence: 0.7 });
+
+      pose.onResults((results) => {
+        canvasElement.width = videoElement.videoWidth;
+        canvasElement.height = videoElement.videoHeight;
+        canvasCtx.save();
+        canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+        canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+
+        if (results.poseLandmarks) {
+          processHighPrecisionSensor(results.poseLandmarks);
+        }
+        canvasCtx.restore();
+      });
+
+      camera = new Camera(videoElement, { onFrame: async () => { await pose.send({ image: videoElement }); }, width: 640, height: 480 });
+      camera.start();
+    }
+
+    function processHighPrecisionSensor(landmarks) {
+      const lShoulder = landmarks[11], lElbow = landmarks[13], lWrist = landmarks[15];
+      if (!lShoulder || !lElbow || !lWrist) return;
+
+      let rawAngle = calculateAngle(lShoulder, lElbow, lWrist);
+      smoothedAngle = (smoothedAngle * 0.35) + (rawAngle * 0.65);
+      document.getElementById('elbow-angle-val').innerText = Math.round(smoothedAngle) + '°';
+
+      const now = Date.now();
+      if (repPhase === "TOP" && smoothedAngle < 130) repPhase = "DESCENDING";
+      else if (repPhase === "DESCENDING" && smoothedAngle <= 90) repPhase = "BOTTOM";
+      else if (repPhase === "BOTTOM" && smoothedAngle > 105) repPhase = "ASCENDING";
+      else if (repPhase === "ASCENDING" && smoothedAngle >= 145) {
+        if (now - lastRepTimestamp > 400) {
+          lastRepTimestamp = now;
+          repPhase = "TOP";
+          window.state.currentReps++;
+          window.state.totalReps++;
+          document.getElementById('rep-circle-val').innerText = window.state.currentReps;
+          document.getElementById('total-reps-val').innerText = window.state.currentReps;
+          updateArenaHpDisplay();
+
+          if (window.state.currentReps >= window.state.aiTargetReps) {
+            completeBattleReport();
+          }
+        }
+      }
+    }
+
+    function completeBattleReport() {
+      if (camera) camera.stop();
+      let durationSec = Math.round((Date.now() - battleStartTime) / 1000);
+      let calculatedRank = calculatePerformanceRank(durationSec, window.state.currentReps);
+
+      if (isHigherRank(calculatedRank, window.state.highestRank || "D")) {
+        window.state.highestRank = calculatedRank;
+      }
+      
+      window.state.bossesSlain++;
+      window.state.storyStage = Math.min(20, (window.state.storyStage || 1) + 1);
+
+      const rankDisplay = document.getElementById('result-rank-display');
+      rankDisplay.innerText = calculatedRank;
+      rankDisplay.style.color = getRankColor(calculatedRank);
+
+      document.getElementById('battle-results-modal').classList.add('active');
+    }
+
+    function closeBattleResults() {
+      document.getElementById('battle-results-modal').classList.remove('active');
+      document.getElementById('arena-screen').classList.remove('active');
+      document.querySelector('.bottom-nav').style.display = 'flex';
+      switchTab('home');
+    }
+
+    function calculateAngle(A, B, C) {
+      const AB = Math.sqrt(Math.pow(B.x - A.x, 2) + Math.pow(B.y - A.y, 2));
+      const BC = Math.sqrt(Math.pow(B.x - C.x, 2) + Math.pow(B.y - C.y, 2));
+      const AC = Math.sqrt(Math.pow(C.x - A.x, 2) + Math.pow(C.y - A.y, 2));
+      return Math.acos((Math.pow(AB, 2) + Math.pow(BC, 2) - Math.pow(AC, 2)) / (2 * AB * BC)) * (180 / Math.PI);
+    }
+
+    function updateArenaHpDisplay() {
+      const pct = Math.min(100, (window.state.currentReps / window.state.aiTargetReps) * 100);
+      document.getElementById('hp-bar').style.width = pct + '%';
+      document.getElementById('hp-txt').innerText = `${window.state.currentReps} / ${window.state.aiTargetReps} Reps`;
+    }
+
+    function exitArena() {
+      if (camera) camera.stop();
+      document.getElementById('arena-screen').classList.remove('active');
+      document.querySelector('.bottom-nav').style.display = 'flex';
+      switchTab('home');
     }
 
     window.onload = () => {
