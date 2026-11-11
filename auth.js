@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAT1A-Em7JMMi-v4eZLEHxSZc7afJs9mpg",
@@ -23,10 +23,28 @@ window.signInWithPopup = signInWithPopup;
 window.signOut = signOut;
 window.onAuthStateChanged = onAuthStateChanged;
 
+window.handleEmailSignIn = function() {
+  const email = document.getElementById('auth-email-input').value;
+  const pass = document.getElementById('auth-password-input').value;
+  if (!email || !pass) { alert("Please enter both email and password."); return; }
+  
+  signInWithEmailAndPassword(auth, email, pass)
+    .catch(err => alert("Sign In Error: " + err.message));
+};
+
+window.handleEmailSignUp = function() {
+  const email = document.getElementById('auth-email-input').value;
+  const pass = document.getElementById('auth-password-input').value;
+  if (!email || !pass) { alert("Please enter both email and password."); return; }
+  
+  createUserWithEmailAndPassword(auth, email, pass)
+    .catch(err => alert("Registration Error: " + err.message));
+};
+
 onAuthStateChanged(auth, (user) => {
   if (user) {
     window.state.signedIn = true;
-    window.state.userName = user.displayName || "Kayden";
+    window.state.userName = user.displayName || user.email.split('@')[0] || "Kayden";
     window.state.photoURL = user.photoURL || "";
 
     const saved = localStorage.getItem('pushup_realm_state_' + user.uid);
