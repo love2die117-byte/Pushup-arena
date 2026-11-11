@@ -1,5 +1,6 @@
 window.state = {
   userName: "Kayden",
+  heroClass: "Vanguard",
   age: 20,
   weight: 140,
   maxReps: 15,
@@ -61,7 +62,7 @@ window.storyChapters = [
 ];
 
 let currentSlide = 1;
-const totalSlides = 4;
+const totalSlides = 5;
 
 function loginWithGoogle() {
   window.signInWithPopup(window.firebaseAuth, window.firebaseProvider)
@@ -70,11 +71,28 @@ function loginWithGoogle() {
     });
 }
 
+function selectHeroClass(className, colorHex) {
+  window.state.heroClass = className;
+  window.state.themeColor = colorHex;
+  document.querySelectorAll('.class-card').forEach(c => c.classList.remove('selected'));
+  if (className === 'Vanguard') {
+    const el = document.getElementById('class-vanguard');
+    if (el) el.classList.add('selected');
+  } else {
+    const el = document.getElementById('class-berserker');
+    if (el) el.classList.add('selected');
+  }
+  updateThemeColor(colorHex);
+}
+
 function postLoginInit() {
   runAiTargetCalculation();
   document.getElementById('header-gold-val').innerText = window.state.gold;
   document.getElementById('header-gems-val').innerText = window.state.gems;
   document.getElementById('header-user-name').innerText = window.state.userName;
+
+  const lvlEl = document.getElementById('header-user-level');
+  if (lvlEl) lvlEl.innerText = `${window.state.heroClass || "Vanguard"} Knight`;
 
   const avatarEl = document.getElementById('avatar');
   if (window.state.photoURL) {
@@ -95,6 +113,7 @@ function postLoginInit() {
 
 function renderStoryCampaignMap() {
   const container = document.getElementById('campaign-map-container');
+  if(!container) return;
   container.innerHTML = "";
 
   window.storyChapters.forEach((chap) => {
@@ -127,8 +146,10 @@ function renderStoryCampaignMap() {
 function runAiTargetCalculation() {
   let base = parseInt(window.state.maxReps) || 15;
   window.state.aiTargetReps = Math.max(10, Math.round(base * 1.2));
-  document.getElementById('hero-goal-title').innerText = `Chapter ${window.state.unlockedChapter} Raid`;
-  document.getElementById('hero-goal-desc').innerText = `AI tailored target: ${window.state.aiTargetReps} Reps per wave.`;
+  const goalTitle = document.getElementById('hero-goal-title');
+  const goalDesc = document.getElementById('hero-goal-desc');
+  if(goalTitle) goalTitle.innerText = `Chapter ${window.state.unlockedChapter} Raid`;
+  if(goalDesc) goalDesc.innerText = `AI tailored target: ${window.state.aiTargetReps} Reps per wave.`;
 }
 
 function recalculateAiGoals() {
@@ -213,11 +234,15 @@ function updateAccountName(val) {
 
 function updateSlideUI() {
   for (let i = 1; i <= totalSlides; i++) {
-    document.getElementById(`slide-${i}`).classList.toggle('active', i === currentSlide);
-    document.getElementById(`p-step-${i}`).classList.toggle('active', i <= currentSlide);
+    const sEl = document.getElementById(`slide-${i}`);
+    const pEl = document.getElementById(`p-step-${i}`);
+    if (sEl) sEl.classList.toggle('active', i === currentSlide);
+    if (pEl) pEl.classList.toggle('active', i <= currentSlide);
   }
-  document.getElementById('back-btn').style.display = currentSlide === 1 ? 'none' : 'block';
-  document.getElementById('next-btn').innerText = currentSlide === totalSlides ? 'Enter Realm' : 'Next';
+  const backBtn = document.getElementById('back-btn');
+  const nextBtn = document.getElementById('next-btn');
+  if (backBtn) backBtn.style.display = currentSlide === 1 ? 'none' : 'block';
+  if (nextBtn) nextBtn.innerText = currentSlide === totalSlides ? 'Enter Realm' : 'Next';
 }
 
 function nextSlide() {
@@ -242,6 +267,9 @@ function completeOnboarding() {
   window.state.weight = parseInt(document.getElementById('signup-weight').value) || 140;
   window.state.maxReps = parseInt(document.getElementById('signup-max-reps').value) || 15;
 
+  const strictEl = document.getElementById('signup-strictness');
+  if (strictEl) window.state.formStrictness = strictEl.value;
+
   document.getElementById('onboarding-modal').classList.remove('active');
   saveState();
   postLoginInit();
@@ -251,6 +279,14 @@ function triggerSignOut() {
   window.signOut(window.firebaseAuth).then(() => {
     location.reload();
   });
+}
+
+function updateThemeColor(hex) {
+  window.state.themeColor = hex;
+  document.documentElement.style.setProperty('--primary', hex);
+  document.documentElement.style.setProperty('--primary-glow', hex + '55');
+  saveState();
+  drawPixelHelmet();
 }
 
 function drawPixelHelmet() {
@@ -276,6 +312,7 @@ function openArmory() {
 
 function renderLeaderboard() {
   const container = document.getElementById('leaderboard-list-container');
+  if(!container) return;
   container.innerHTML = `
     <div class="setting-item" style="flex-direction: row; justify-content: space-between;">
       <div><strong>1. ${window.state.userName} (You)</strong></div>
@@ -303,6 +340,7 @@ window.onload = () => {
 };
 
 window.loginWithGoogle = loginWithGoogle;
+window.selectHeroClass = selectHeroClass;
 window.postLoginInit = postLoginInit;
 window.recalculateAiGoals = recalculateAiGoals;
 window.togglePushupType = togglePushupType;
@@ -314,5 +352,6 @@ window.updateSlideUI = updateSlideUI;
 window.nextSlide = nextSlide;
 window.prevSlide = prevSlide;
 window.triggerSignOut = triggerSignOut;
+window.updateThemeColor = updateThemeColor;
 window.openArmory = openArmory;
 window.saveState = saveState;
