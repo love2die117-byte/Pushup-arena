@@ -112,7 +112,6 @@ function triggerVictoryCondition() {
     }
     window.state.campaignProgress[window.currentChapter][window.currentLevel] = "SSS";
     
-    // Unlock next level
     if (window.currentLevel < 5) {
       window.state.unlockedLevel = Math.max(window.state.unlockedLevel, window.currentLevel + 1);
     } else if (window.currentChapter < 5) {
