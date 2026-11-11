@@ -4,15 +4,748 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Push Up Arena: The Iron Oath (S-RANK MASTERY)</title>
-  <meta name="app-version" content="v21.0-advanced-auth">
+  <meta name="app-version" content="v22.0-advanced-skeleton-auth">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#0a0b0e">
-  <link rel="stylesheet" href="style.css">
 
   <!-- MediaPipe Pose & Camera Utils -->
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
+
+  <style>
+    :root {
+      --bg: #0a0b0e;
+      --card-bg: #13151b;
+      --card-border: rgba(255, 255, 255, 0.08);
+      --card-border-active: rgba(255, 255, 255, 0.35);
+      --primary: #38bdf8;
+      --primary-dark: #0284c7;
+      --primary-glow: rgba(56, 189, 248, 0.35);
+      --text: #f1f5f9;
+      --subtext: #8b949e;
+      --accent-gold: #fbbf24;
+      --rank-s: #f43f5e;
+      --danger: #f87171;
+      --success: #34d399;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .screen {
+      display: none;
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      width: 100%; height: 100%;
+      z-index: 10;
+      background: var(--bg);
+      flex-direction: column;
+      padding-bottom: 90px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .screen.active { display: flex; }
+
+    #loading-screen {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      padding-bottom: 0;
+      justify-content: center;
+      align-items: center;
+      z-index: 200;
+      background: radial-gradient(circle at center, #181b24 0%, #0a0b0e 100%);
+      display: flex;
+      flex-direction: column;
+    }
+    .helmet-logo {
+      width: 110px;
+      height: 110px;
+      image-rendering: pixelated;
+      margin-bottom: 20px;
+      animation: chillFloat 3s infinite ease-in-out;
+      filter: drop-shadow(0 0 25px rgba(255,255,255,0.2));
+    }
+    @keyframes chillFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    .loading-title {
+      font-size: 1.6rem;
+      font-weight: 900;
+      letter-spacing: 3px;
+      color: #fff;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+    .loading-sub {
+      font-size: 0.75rem;
+      color: var(--subtext);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 24px;
+      font-weight: 800;
+    }
+    .progress-bar-bg {
+      width: 250px;
+      height: 6px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 3px;
+      overflow: hidden;
+      border: 1px solid var(--card-border);
+    }
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: #f1f5f9;
+      transition: width 0.15s ease;
+    }
+
+    .app-header {
+      padding: 44px 20px 14px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(19, 21, 27, 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--card-border);
+      z-index: 15;
+      flex-shrink: 0;
+    }
+    .user-pill {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .user-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: #1c1f2b;
+      border: 2px solid rgba(255,255,255,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 1.1rem;
+      color: #fff;
+      overflow: hidden;
+    }
+    .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .currency-badge {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      padding: 6px 12px;
+      border-radius: 10px;
+      font-family: monospace;
+      font-size: 0.8rem;
+      font-weight: 900;
+      color: #fff;
+    }
+
+    .bottom-nav {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 76px;
+      background: #0d0f14;
+      backdrop-filter: blur(20px);
+      border-top: 1px solid var(--card-border);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 30;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: var(--subtext);
+      cursor: pointer;
+      font-size: 0.65rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      transition: transform 0.15s ease, color 0.15s ease;
+      flex: 1;
+      padding: 8px 0;
+    }
+    .nav-item span:first-child {
+      font-size: 1.2rem;
+      font-family: monospace;
+      font-weight: 900;
+      transition: transform 0.15s ease;
+    }
+    .nav-item.active { color: #fff; }
+    .nav-item.active span:first-child { transform: scale(1.2); }
+
+    .menu-content {
+      padding: 24px 20px 40px 20px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .hero-banner {
+      background: linear-gradient(135deg, #171922 0%, #101219 100%);
+      border: 1px solid var(--card-border);
+      border-radius: 22px;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+    .hero-tag {
+      font-size: 0.72rem;
+      font-weight: 900;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 6px;
+    }
+    .hero-title {
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+    .hero-sub {
+      font-size: 0.85rem;
+      color: var(--subtext);
+      margin-bottom: 20px;
+      line-height: 1.45;
+    }
+
+    .modes-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .mode-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+    }
+    .mode-card:active {
+      transform: scale(0.97);
+      border-color: rgba(255,255,255,0.4);
+    }
+    .mode-icon-box {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      background: #1c1f2b;
+      border: 1px solid var(--card-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: monospace;
+      font-size: 1.25rem;
+      font-weight: 900;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .mode-info { flex: 1; }
+    .mode-title {
+      font-size: 1.15rem;
+      font-weight: 900;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .mode-desc {
+      font-size: 0.8rem;
+      color: var(--subtext);
+      line-height: 1.4;
+    }
+    .mode-action-pill {
+      background: #f1f5f9;
+      color: #0a0b0e;
+      font-weight: 900;
+      font-size: 0.78rem;
+      padding: 10px 18px;
+      border-radius: 12px;
+      flex-shrink: 0;
+    }
+
+    .sub-screen {
+      display: none;
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 76px;
+      background: var(--bg);
+      z-index: 20;
+      flex-direction: column;
+      padding: 24px 20px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .sub-screen.active { display: flex; }
+
+    .screen-header-title {
+      font-size: 1.5rem;
+      font-weight: 900;
+      margin-bottom: 18px;
+      color: #fff;
+      font-family: monospace;
+      letter-spacing: -0.5px;
+    }
+
+    .campaign-chapters-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      padding-bottom: 50px;
+    }
+    .chapter-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .chapter-title {
+      font-size: 1.1rem;
+      font-weight: 900;
+      color: #fff;
+    }
+    .levels-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+    }
+    .level-node {
+      background: #1c1f2b;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 12px 6px;
+      text-align: center;
+      cursor: pointer;
+    }
+    .level-node.unlocked {
+      background: rgba(56, 189, 248, 0.1);
+      border-color: var(--primary);
+    }
+    .level-node.completed {
+      background: rgba(52, 211, 153, 0.1);
+      border-color: var(--success);
+    }
+    .level-node-num { font-weight: 900; font-size: 0.9rem; color: #fff; }
+    .level-node-rank { font-size: 0.65rem; font-family: monospace; color: var(--rank-s); font-weight: 900; margin-top: 4px; }
+
+    .stats-dashboard {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .stat-card-icon { font-family: monospace; font-size: 1.3rem; font-weight: 900; color: var(--subtext); }
+    .stat-card-num { font-size: 1.6rem; font-weight: 900; color: #fff; }
+    .stat-card-label { font-size: 0.75rem; color: var(--subtext); text-transform: uppercase; font-weight: 800; }
+
+    .settings-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding-bottom: 50px;
+    }
+    .setting-item {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    label {
+      font-size: 0.85rem;
+      color: var(--subtext);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    input, select {
+      width: 100%;
+      padding: 14px;
+      background: #0f1117;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      color: #fff;
+      font-size: 1rem;
+      outline: none;
+      font-weight: 700;
+      -webkit-user-select: text;
+      user-select: text;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 16px;
+      border-radius: 14px;
+      border: none;
+      background: #f1f5f9;
+      color: #0a0b0e;
+      font-weight: 900;
+      font-size: 1.05rem;
+      cursor: pointer;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .btn:active { transform: scale(0.98); opacity: 0.9; }
+    .btn-secondary {
+      background: #1c1f2b;
+      border: 1px solid var(--card-border);
+      color: #fff;
+    }
+    .btn-google {
+      background: #fff;
+      color: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      font-weight: 900;
+    }
+
+    .type-pill-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 6px;
+    }
+    .type-pill {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--card-border);
+      padding: 12px;
+      border-radius: 12px;
+      text-align: center;
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--subtext);
+      cursor: pointer;
+    }
+    .type-pill.selected {
+      background: rgba(56, 189, 248, 0.12);
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    /* Auth & Onboarding Styling */
+    .modal {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(10, 11, 14, 0.98);
+      z-index: 150;
+      display: none;
+      flex-direction: column;
+      padding: 40px 24px;
+      overflow-y: auto;
+    }
+    .modal.active { display: flex; }
+
+    .auth-view-container { display: none; flex-direction: column; width: 100%; }
+    .auth-view-container.active { display: flex; }
+
+    .auth-card-wrapper {
+      max-width: 440px;
+      width: 100%;
+      margin: auto;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border-active);
+      border-radius: 26px;
+      padding: 36px 28px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.8);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .auth-emblem {
+      font-size: 3.5rem;
+      margin-bottom: 8px;
+      text-align: center;
+      filter: drop-shadow(0 0 15px var(--primary-glow));
+    }
+
+    .auth-title {
+      font-size: 1.85rem;
+      font-weight: 900;
+      color: #fff;
+      text-align: center;
+      margin-bottom: 6px;
+      font-family: monospace;
+      letter-spacing: -0.5px;
+    }
+
+    .auth-subtitle {
+      color: var(--subtext);
+      font-size: 0.85rem;
+      text-align: center;
+      margin-bottom: 22px;
+      line-height: 1.45;
+    }
+
+    .auth-tab-header {
+      display: flex;
+      background: #0f1117;
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 4px;
+      margin-bottom: 20px;
+    }
+
+    .auth-tab-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      padding: 12px;
+      border-radius: 10px;
+      color: var(--subtext);
+      font-weight: 900;
+      font-size: 0.8rem;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.2s ease;
+    }
+
+    .auth-tab-btn.active {
+      background: #1c1f2b;
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    .auth-form-panel { display: none; flex-direction: column; gap: 12px; }
+    .auth-form-panel.active { display: flex; }
+
+    .input-group { display: flex; flex-direction: column; gap: 6px; text-align: left; }
+
+    .auth-divider {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      margin: 18px 0;
+      color: var(--subtext);
+      font-size: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+    }
+    .auth-divider::before, .auth-divider::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .auth-divider::before { margin-right: .75em; }
+    .auth-divider::after { margin-left: .75em; }
+
+    .step-badge {
+      font-size: 0.72rem;
+      font-weight: 900;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 6px;
+      font-family: monospace;
+    }
+
+    .class-card {
+      background: #0f1117;
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .class-card.selected {
+      background: rgba(56, 189, 248, 0.1);
+      border-color: var(--primary);
+    }
+
+    .slide-progress {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+    .progress-step {
+      flex: 1;
+      height: 5px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 3px;
+    }
+    .progress-step.active { background: var(--primary); }
+
+    .onboarding-slide { display: none; flex-direction: column; gap: 14px; }
+    .onboarding-slide.active { display: flex; }
+
+    /* Arena & Neon Skeleton HUD Styles */
+    #arena-screen { background: #000; padding-bottom: 0; }
+    #video-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+    video, canvas {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+    }
+    .top-hud {
+      position: absolute;
+      top: 45px; left: 16px; right: 16px;
+      z-index: 20;
+    }
+    .boss-card {
+      background: rgba(19, 21, 27, 0.92);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      backdrop-filter: blur(12px);
+    }
+    .boss-lvl {
+      font-size: 0.72rem;
+      color: var(--primary);
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+    }
+    .boss-name {
+      font-size: 1.15rem;
+      font-weight: 900;
+      color: #fff;
+    }
+    .hp-bar-bg {
+      width: 100%;
+      height: 20px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 8px;
+      margin-top: 10px;
+      overflow: hidden;
+      position: relative;
+      border: 1px solid var(--card-border);
+    }
+    .hp-bar-fill {
+      height: 100%;
+      width: 100%;
+      background: var(--primary);
+      transition: width 0.25s ease-out;
+    }
+    .hp-text {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 0.78rem;
+      color: #0a0b0e;
+    }
+    .close-btn {
+      position: absolute;
+      top: 12px; right: 14px;
+      width: 30px; height: 30px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: #fff;
+      cursor: pointer;
+      border: 1px solid var(--card-border);
+    }
+    .sensor-status-banner {
+      position: absolute;
+      top: 185px; left: 20px; right: 20px;
+      background: rgba(19, 21, 27, 0.92);
+      border: 2px solid var(--primary);
+      border-radius: 14px;
+      padding: 12px 18px;
+      color: #fff;
+      font-size: 0.88rem;
+      font-weight: 900;
+      text-align: center;
+      z-index: 25;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+      transition: border-color 0.3s ease;
+    }
+    .bottom-hud {
+      position: absolute;
+      bottom: 40px; left: 20px; right: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      z-index: 20;
+    }
+    .stat-box {
+      background: rgba(19, 21, 27, 0.9);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 12px 16px;
+      text-align: center;
+      backdrop-filter: blur(10px);
+      min-width: 90px;
+    }
+    .stat-val { font-size: 1.4rem; font-weight: 900; color: #fff; }
+    .stat-lbl { font-size: 0.65rem; color: var(--subtext); text-transform: uppercase; letter-spacing: 0.8px; font-weight: 800; }
+    .rep-circle {
+      width: 90px; height: 90px;
+      border-radius: 50%;
+      border: 4px solid var(--primary);
+      background: rgba(19, 21, 27, 0.92);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.4rem;
+      font-weight: 900;
+      color: var(--primary);
+    }
+  </style>
 </head>
 <body>
 
@@ -253,80 +986,101 @@
     </div>
   </div>
 
-  <!-- ADVANCED ONBOARDING & AUTH MODAL -->
-  <div id="onboarding-modal" class="modal">
+  <!-- ADVANCED AUTHENTICATION & ONBOARDING MODAL -->
+  <div id="onboarding-modal" class="modal active">
     <div class="auth-card-wrapper">
       
-      <!-- STEP 0: INITIAL LOGIN / SIGNUP GATE -->
-      <div class="onboarding-slide active" id="slide-auth">
+      <!-- AUTHENTICATION GATE (SIGN IN / REGISTER TABS) -->
+      <div class="auth-view-container active" id="auth-gate-view">
         <div class="auth-emblem">🛡️</div>
         <h1 class="auth-title">The Iron Oath</h1>
-        <p class="auth-subtitle">Enter the realm of biometric ARPG fitness. Sync your training logs to the cloud.</p>
+        <p class="auth-subtitle">Enter the biometric ARPG fitness realm. Sync your training logs, cloud gear, and S-Rank scores.</p>
         
-        <div class="auth-action-stack">
-          <button class="btn btn-google" onclick="loginWithGoogle()">
-            <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.18v3.15C3.16 21.32 7.23 24 12 24z"/><path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.6H1.18C.43 8.12 0 9.82 0 12s.43 3.88 1.18 5.4l4.09-3.16z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.23 0 3.16 2.68 1.18 6.6l4.09 3.15c.95-2.85 3.6-4.96 6.73-4.96z"/></svg>
-            Continue with Google
-          </button>
-          
-          <div class="auth-divider"><span>OR EMAIL REGISTRATION</span></div>
-          
-          <input type="email" id="auth-email-input" placeholder="knight@ironrealm.com" style="margin-bottom: 10px;">
-          <input type="password" id="auth-password-input" placeholder="Secret Password" style="margin-bottom: 14px;">
-          
-          <div style="display: flex; gap: 10px;">
-            <button class="btn btn-secondary" onclick="handleEmailSignIn()">Sign In</button>
-            <button class="btn" onclick="handleEmailSignUp()">Register Account</button>
-          </div>
+        <!-- Tab Switcher Header -->
+        <div class="auth-tab-header">
+          <button class="auth-tab-btn active" id="tab-signin-btn" onclick="switchAuthTab('signin')">Sign In</button>
+          <button class="auth-tab-btn" id="tab-signup-btn" onclick="switchAuthTab('signup')">Register Account</button>
         </div>
+
+        <!-- SIGN IN FORM -->
+        <div class="auth-form-panel active" id="panel-signin">
+          <div class="input-group">
+            <label>Email Address</label>
+            <input type="email" id="signin-email" placeholder="knight@ironrealm.com">
+          </div>
+          <div class="input-group">
+            <label>Password</label>
+            <input type="password" id="signin-password" placeholder="••••••••••••">
+          </div>
+          <button class="btn" style="margin-top: 10px;" onclick="submitEmailSignIn()">Enter Realm (Sign In)</button>
+        </div>
+
+        <!-- SIGN UP FORM -->
+        <div class="auth-form-panel" id="panel-signup">
+          <div class="input-group">
+            <label>Email Address</label>
+            <input type="email" id="signup-email-input" placeholder="knight@ironrealm.com">
+          </div>
+          <div class="input-group">
+            <label>Create Password (6+ characters)</label>
+            <input type="password" id="signup-password-input" placeholder="••••••••••••">
+          </div>
+          <button class="btn" style="margin-top: 10px;" onclick="submitEmailRegistration()">Continue Setup</button>
+        </div>
+
+        <div class="auth-divider"><span>OR CONNECT WITH SOCIAL</span></div>
+
+        <button class="btn btn-google" onclick="loginWithGoogle()">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.18v3.15C3.16 21.32 7.23 24 12 24z"/><path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.6H1.18C.43 8.12 0 9.82 0 12s.43 3.88 1.18 5.4l4.09-3.16z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.23 0 3.16 2.68 1.18 6.6l4.09 3.15c.95-2.85 3.6-4.96 6.73-4.96z"/></svg>
+          Sign In with Google Cloud
+        </button>
       </div>
 
-      <!-- PROGRESS BAR FOR NEW ACCOUNTS -->
+      <!-- PROGRESS BAR FOR NEW ACCOUNTS ONBOARDING -->
       <div class="slide-progress" id="onboarding-progress-bar" style="display: none;">
         <div class="progress-step active" id="p-step-1"></div>
         <div class="progress-step" id="p-step-2"></div>
         <div class="progress-step" id="p-step-3"></div>
         <div class="progress-step" id="p-step-4"></div>
-        <div class="progress-step" id="p-step-5"></div>
       </div>
 
       <!-- ONBOARDING QUESTIONNAIRE SLIDES -->
       <div class="slide-container" id="onboarding-slides-container" style="display: none;">
         
-        <!-- Slide 1: Hero Name -->
+        <!-- Slide 1: Hero Moniker -->
         <div class="onboarding-slide" id="slide-1">
-          <div class="step-badge">Step 1 of 5</div>
-          <h2>What is your Knight Moniker?</h2>
-          <p style="color: var(--subtext); font-size: 0.85rem;">Your identity across realm leaderboards and dungeons.</p>
+          <div class="step-badge">Profile Setup (1 of 4)</div>
+          <h2>Choose Your Knight Moniker</h2>
+          <p style="color: var(--subtext); font-size: 0.85rem;">Your name will echo across realm leaderboards and dungeons.</p>
           <div style="margin-top: 15px;">
-            <input type="text" id="signup-name" value="Kayden" placeholder="Enter Hero Name">
+            <input type="text" id="signup-name" value="Kayden" placeholder="Hero Name">
           </div>
         </div>
 
-        <!-- Slide 2: Class Archetype -->
+        <!-- Slide 2: Combat Class & Theme -->
         <div class="onboarding-slide" id="slide-2">
-          <div class="step-badge">Step 2 of 5</div>
-          <h2>Select Your Combat Class</h2>
-          <p style="color: var(--subtext); font-size: 0.85rem;">Determines your aesthetic aura and stat growth archetype.</p>
+          <div class="step-badge">Profile Setup (2 of 4)</div>
+          <h2>Select Combat Specialization</h2>
+          <p style="color: var(--subtext); font-size: 0.85rem;">Sets your custom interface lighting aura and progression archetype.</p>
           <div class="class-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px;">
             <div class="class-card selected" id="class-vanguard" onclick="selectHeroClass('Vanguard', '#38bdf8')">
-              <div style="font-size: 1.5rem;">🛡️</div>
+              <div style="font-size: 1.6rem;">🛡️</div>
               <div style="font-weight:900; margin-top:4px;">Vanguard</div>
-              <div style="font-size:0.7rem; color:var(--subtext);">Balanced Stamina & Power</div>
+              <div style="font-size:0.7rem; color:var(--subtext);">Balanced Stamina & Defense</div>
             </div>
             <div class="class-card" id="class-berserker" onclick="selectHeroClass('Berserker', '#f43f5e')">
-              <div style="font-size: 1.5rem;">🪓</div>
+              <div style="font-size: 1.6rem;">🪓</div>
               <div style="font-weight:900; margin-top:4px;">Berserker</div>
-              <div style="font-size:0.7rem; color:var(--subtext);">High Speed & Crit Multipliers</div>
+              <div style="font-size:0.7rem; color:var(--subtext);">High Attack & Crit Multipliers</div>
             </div>
           </div>
         </div>
 
-        <!-- Slide 3: Age & Weight -->
+        <!-- Slide 3: Biomass Data -->
         <div class="onboarding-slide" id="slide-3">
-          <div class="step-badge">Step 3 of 5</div>
+          <div class="step-badge">Profile Setup (3 of 4)</div>
           <h2>Biometric Calibration</h2>
-          <p style="color: var(--subtext); font-size: 0.85rem;">Helps the AI algorithm tailor safe workout workloads.</p>
+          <p style="color: var(--subtext); font-size: 0.85rem;">Used by the AI camera engine to evaluate workout workloads safely.</p>
           <div style="display:flex; gap:10px; margin-top: 15px;">
             <input type="number" id="signup-age" value="20" placeholder="Age">
             <input type="number" id="signup-weight" value="140" placeholder="Weight (lbs)">
@@ -335,24 +1089,12 @@
 
         <!-- Slide 4: Baseline Strength -->
         <div class="onboarding-slide" id="slide-4">
-          <div class="step-badge">Step 4 of 5</div>
-          <h2>Baseline Power Test</h2>
-          <p style="color: var(--subtext); font-size: 0.85rem;">Max unbroken push-ups you can perform right now.</p>
+          <div class="step-badge">Profile Setup (4 of 4)</div>
+          <h2>Baseline Power Assessment</h2>
+          <p style="color: var(--subtext); font-size: 0.85rem;">Maximum unbroken push-ups you can complete in one set.</p>
           <div style="margin-top: 15px;">
             <input type="number" id="signup-max-reps" value="15">
           </div>
-        </div>
-
-        <!-- Slide 5: Form Strictness Goal -->
-        <div class="onboarding-slide" id="slide-5">
-          <div class="step-badge">Step 5 of 5</div>
-          <h2>AI Form Discipline</h2>
-          <p style="color: var(--subtext); font-size: 0.85rem;">Choose how strict the camera sensor tracking should be.</p>
-          <select id="signup-strictness" style="margin-top: 15px;">
-            <option value="lenient">Lenient (90° Arm Depth)</option>
-            <option value="standard" selected>Standard Vanguard (85° Depth)</option>
-            <option value="master">S-Rank Elite Master (75° Chest Touch)</option>
-          </select>
         </div>
 
       </div>
@@ -360,7 +1102,7 @@
       <!-- ONBOARDING NAVIGATION -->
       <div class="slide-nav" id="onboarding-nav-btns" style="display: none; gap: 12px; margin-top: 24px;">
         <button class="btn btn-secondary" id="back-btn" onclick="prevSlide()" style="display: none;">Back</button>
-        <button class="btn" id="next-btn" onclick="nextSlide()">Proceed</button>
+        <button class="btn" id="next-btn" onclick="nextSlide()">Complete Oath</button>
       </div>
 
     </div>
@@ -379,9 +1121,679 @@
     <button class="btn" onclick="closeVictoryModal()">Return to Hub</button>
   </div>
 
-  <!-- JavaScript Modules -->
-  <script type="module" src="auth.js"></script>
-  <script src="camera.js"></script>
-  <script src="app.js"></script>
+  <!-- FIREBASE & CORE GAME LOGIC SCRIPTS -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAT1A-Em7JMMi-v4eZLEHxSZc7afJs9mpg",
+      authDomain: "push-up-arena-371b9.firebaseapp.com",
+      projectId: "push-up-arena-371b9",
+      storageBucket: "push-up-arena-371b9.firebasestorage.app",
+      messagingSenderId: "428269289235",
+      appId: "1:428269289235:web:3e3706dcfead663442e4e6",
+      measurementId: "G-87JFFS2B7M"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+
+    window.firebaseAuth = auth;
+    window.firebaseProvider = provider;
+    window.signInWithPopup = signInWithPopup;
+    window.signOut = signOut;
+    window.onAuthStateChanged = onAuthStateChanged;
+
+    window.switchAuthTab = function(mode) {
+      const signinBtn = document.getElementById('tab-signin-btn');
+      const signupBtn = document.getElementById('tab-signup-btn');
+      const signinPanel = document.getElementById('panel-signin');
+      const signupPanel = document.getElementById('panel-signup');
+
+      if (mode === 'signin') {
+        signinBtn.classList.add('active');
+        signupBtn.classList.remove('active');
+        signinPanel.classList.add('active');
+        signupPanel.classList.remove('active');
+      } else {
+        signupBtn.classList.add('active');
+        signinBtn.classList.remove('active');
+        signupPanel.classList.add('active');
+        signinPanel.classList.remove('active');
+      }
+    };
+
+    window.submitEmailSignIn = function() {
+      const email = document.getElementById('signin-email').value.trim();
+      const pass = document.getElementById('signin-password').value;
+      if (!email || !pass) { alert("Please input both your email and password."); return; }
+      signInWithEmailAndPassword(auth, email, pass).catch(err => alert("Sign In Failed: " + err.message));
+    };
+
+    window.submitEmailRegistration = function() {
+      const email = document.getElementById('signup-email-input').value.trim();
+      const pass = document.getElementById('signup-password-input').value;
+      if (!email || !pass) { alert("Please provide a valid email and secure password."); return; }
+      createUserWithEmailAndPassword(auth, email, pass)
+        .then(() => {
+          document.getElementById('auth-gate-view').classList.remove('active');
+          document.getElementById('onboarding-progress-bar').style.display = 'flex';
+          document.getElementById('onboarding-slides-container').style.display = 'flex';
+          document.getElementById('onboarding-nav-btns').style.display = 'flex';
+          const defaultName = email.split('@')[0];
+          document.getElementById('signup-name').value = defaultName.charAt(0).toUpperCase() + defaultName.slice(1);
+          window.updateSlideUI();
+        })
+        .catch(err => alert("Registration Error: " + err.message));
+    };
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        window.state.signedIn = true;
+        window.state.userName = user.displayName || (user.email ? user.email.split('@')[0] : "Kayden");
+        window.state.photoURL = user.photoURL || "";
+        const saved = localStorage.getItem('pushup_realm_state_' + user.uid);
+        if (saved) {
+          try { window.state = { ...window.state, ...JSON.parse(saved) }; } catch(e){}
+          document.getElementById('onboarding-modal').classList.remove('active');
+          window.postLoginInit();
+        } else {
+          document.getElementById('onboarding-modal').classList.add('active');
+          document.getElementById('auth-gate-view').classList.remove('active');
+          document.getElementById('onboarding-progress-bar').style.display = 'flex';
+          document.getElementById('onboarding-slides-container').style.display = 'flex';
+          document.getElementById('onboarding-nav-btns').style.display = 'flex';
+          document.getElementById('signup-name').value = window.state.userName;
+          window.updateSlideUI();
+        }
+      } else {
+        window.state.signedIn = false;
+        document.getElementById('onboarding-modal').classList.add('active');
+        document.getElementById('auth-gate-view').classList.add('active');
+        document.getElementById('onboarding-progress-bar').style.display = 'none';
+        document.getElementById('onboarding-slides-container').style.display = 'none';
+        document.getElementById('onboarding-nav-btns').style.display = 'none';
+      }
+    });
+  </script>
+
+  <!-- GAME APP & SKELETAL SENSOR ENGINE SCRIPT -->
+  <script>
+    window.state = {
+      userName: "Kayden",
+      heroClass: "Vanguard",
+      age: 20,
+      weight: 140,
+      maxReps: 15,
+      aiTargetReps: 18,
+      gold: 250,
+      gems: 25,
+      themeColor: "#38bdf8",
+      totalReps: 0,
+      enemiesDefeated: 0,
+      sRanksAchieved: 0,
+      currentReps: 0,
+      routineFormat: "cycle",
+      selectedTypes: ["standard", "diamond"],
+      formStrictness: "standard",
+      unlockedChapter: 1,
+      unlockedLevel: 1,
+      campaignProgress: {},
+      signedIn: false,
+      photoURL: ""
+    };
+
+    window.storyChapters = [
+      {
+        id: 1,
+        name: "Whispering Crypts",
+        desc: "Awaken your core strength amidst decaying catacombs.",
+        bosses: [
+          { name: "Undead Warden", reps: 15 },
+          { name: "Skeletal Vanguard", reps: 18 },
+          { name: "Crypt Ghoul Lord", reps: 20 },
+          { name: "Banshee of Sorrows", reps: 22 },
+          { name: "Lich King Malakor", reps: 25 }
+        ]
+      },
+      {
+        id: 2,
+        name: "Sunken Obsidian Citadel",
+        desc: "Molten chambers testing lower-body and core endurance.",
+        bosses: [
+          { name: "Magma Golem", reps: 25 },
+          { name: "Obsidian Knight", reps: 28 },
+          { name: "Flame Pyromancer", reps: 30 },
+          { name: "Cinder Drake", reps: 35 },
+          { name: "Ignis Titan", reps: 40 }
+        ]
+      },
+      {
+        id: 3,
+        name: "Celestial Spire",
+        desc: "Ascend into the divine clouds where form precision is absolute.",
+        bosses: [
+          { name: "Acolyte of Light", reps: 35 },
+          { name: "Solar Guardian", reps: 40 },
+          { name: "Astral Valkyrie", reps: 45 },
+          { name: "Seraphim Sentinel", reps: 50 },
+          { name: "Archangel Michael", reps: 60 }
+        ]
+      }
+    ];
+
+    let currentSlide = 1;
+    const totalSlides = 4;
+
+    function loginWithGoogle() {
+      window.signInWithPopup(window.firebaseAuth, window.firebaseProvider)
+        .catch(error => alert("Google Sign-In Error: " + error.message));
+    }
+
+    function selectHeroClass(className, colorHex) {
+      window.state.heroClass = className;
+      window.state.themeColor = colorHex;
+      document.querySelectorAll('.class-card').forEach(c => c.classList.remove('selected'));
+      if (className === 'Vanguard') {
+        const el = document.getElementById('class-vanguard');
+        if (el) el.classList.add('selected');
+      } else {
+        const el = document.getElementById('class-berserker');
+        if (el) el.classList.add('selected');
+      }
+      updateThemeColor(colorHex);
+    }
+
+    function postLoginInit() {
+      runAiTargetCalculation();
+      document.getElementById('header-gold-val').innerText = window.state.gold;
+      document.getElementById('header-gems-val').innerText = window.state.gems;
+      document.getElementById('header-user-name').innerText = window.state.userName;
+
+      const lvlEl = document.getElementById('header-user-level');
+      if (lvlEl) lvlEl.innerText = `${window.state.heroClass || "Vanguard"} Knight`;
+
+      const avatarEl = document.getElementById('avatar');
+      if (window.state.photoURL) {
+        avatarEl.innerHTML = `<img src="${window.state.photoURL}" alt="Avatar">`;
+      } else {
+        avatarEl.innerText = window.state.userName.charAt(0).toUpperCase();
+      }
+
+      document.getElementById('account-name-input').value = window.state.userName;
+      document.getElementById('account-age-input').value = window.state.age;
+      document.getElementById('account-weight-input').value = window.state.weight;
+      document.getElementById('account-max-reps-input').value = window.state.maxReps;
+
+      updateStatsDisplay();
+      renderStoryCampaignMap();
+      drawPixelHelmet();
+    }
+
+    function renderStoryCampaignMap() {
+      const container = document.getElementById('campaign-map-container');
+      if(!container) return;
+      container.innerHTML = "";
+
+      window.storyChapters.forEach((chap) => {
+        let html = `
+          <div class="chapter-card">
+            <div class="chapter-title">Chapter ${chap.id}: ${chap.name}</div>
+            <p style="color:var(--subtext); font-size:0.8rem;">${chap.desc}</p>
+            <div class="levels-grid">
+        `;
+
+        chap.bosses.forEach((boss, idx) => {
+          let lvlNum = idx + 1;
+          let isUnlocked = chap.id < window.state.unlockedChapter || (chap.id === window.state.unlockedChapter && lvlNum <= window.state.unlockedLevel);
+          let rank = window.state.campaignProgress[chap.id]?.[lvlNum] || "-";
+          let nodeClass = isUnlocked ? (rank !== "-" ? "level-node completed" : "level-node unlocked") : "level-node";
+
+          html += `
+            <div class="${nodeClass}" ${isUnlocked ? `onclick="startCampaignLevel(${chap.id}, ${lvlNum})"` : ''}>
+              <div class="level-node-num">${chap.id}-${lvlNum}</div>
+              <div class="level-node-rank">${rank}</div>
+            </div>
+          `;
+        });
+
+        html += `</div></div>`;
+        container.innerHTML += html;
+      });
+    }
+
+    function runAiTargetCalculation() {
+      let base = parseInt(window.state.maxReps) || 15;
+      window.state.aiTargetReps = Math.max(10, Math.round(base * 1.2));
+      const goalTitle = document.getElementById('hero-goal-title');
+      const goalDesc = document.getElementById('hero-goal-desc');
+      if(goalTitle) goalTitle.innerText = `Chapter ${window.state.unlockedChapter} Raid`;
+      if(goalDesc) goalDesc.innerText = `AI tailored target: ${window.state.aiTargetReps} Reps per wave.`;
+    }
+
+    function recalculateAiGoals() {
+      window.state.age = parseInt(document.getElementById('account-age-input').value) || 20;
+      window.state.weight = parseInt(document.getElementById('account-weight-input').value) || 140;
+      window.state.maxReps = parseInt(document.getElementById('account-max-reps-input').value) || 15;
+      runAiTargetCalculation();
+      saveState();
+    }
+
+    function togglePushupType(typeKey) {
+      const idx = window.state.selectedTypes.indexOf(typeKey);
+      if (idx > -1) {
+        if (window.state.selectedTypes.length > 1) window.state.selectedTypes.splice(idx, 1);
+      } else {
+        window.state.selectedTypes.push(typeKey);
+      }
+      syncTypePillsUI();
+      saveState();
+    }
+
+    function syncTypePillsUI() {
+      ['standard', 'diamond', 'wide', 'decline'].forEach(t => {
+        const el = document.getElementById(`type-${t}`);
+        if (el) el.classList.toggle('selected', window.state.selectedTypes.includes(t));
+      });
+    }
+
+    function saveStrictnessSetting() {
+      window.state.formStrictness = document.getElementById('form-strictness-select').value;
+      saveState();
+    }
+
+    function saveRoutineSettings() {
+      window.state.routineFormat = document.getElementById('routine-format-select').value;
+      saveState();
+    }
+
+    function switchTab(tabName) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.sub-screen').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+
+      if (tabName === 'home') {
+        document.getElementById('home-screen').classList.add('active');
+        document.getElementById('nav-home').classList.add('active');
+      } else if (tabName === 'story') {
+        document.getElementById('story-screen').classList.add('active');
+        document.getElementById('nav-story').classList.add('active');
+        renderStoryCampaignMap();
+      } else if (tabName === 'types') {
+        document.getElementById('types-screen').classList.add('active');
+        document.getElementById('nav-types').classList.add('active');
+      } else if (tabName === 'stats') {
+        document.getElementById('stats-screen').classList.add('active');
+        document.getElementById('nav-stats').classList.add('active');
+        updateStatsDisplay();
+      } else if (tabName === 'account') {
+        document.getElementById('account-screen').classList.add('active');
+        document.getElementById('nav-account').classList.add('active');
+      } else if (tabName === 'leaderboard') {
+        document.getElementById('leaderboard-screen').classList.add('active');
+        document.getElementById('nav-leaderboard').classList.add('active');
+        renderLeaderboard();
+      }
+    }
+
+    function updateStatsDisplay() {
+      document.getElementById('stats-total-reps').innerText = window.state.totalReps;
+      document.getElementById('stats-enemies-killed').innerText = window.state.enemiesDefeated;
+      document.getElementById('stats-s-ranks').innerText = window.state.sRanksAchieved;
+      document.getElementById('header-gold-val').innerText = window.state.gold;
+      document.getElementById('header-gems-val').innerText = window.state.gems;
+    }
+
+    function updateAccountName(val) {
+      window.state.userName = val || "Kayden";
+      document.getElementById('header-user-name').innerText = window.state.userName;
+      document.getElementById('avatar').innerText = window.state.userName.charAt(0).toUpperCase();
+      saveState();
+    }
+
+    function updateSlideUI() {
+      for (let i = 1; i <= totalSlides; i++) {
+        const sEl = document.getElementById(`slide-${i}`);
+        const pEl = document.getElementById(`p-step-${i}`);
+        if (sEl) sEl.classList.toggle('active', i === currentSlide);
+        if (pEl) pEl.classList.toggle('active', i <= currentSlide);
+      }
+      const backBtn = document.getElementById('back-btn');
+      const nextBtn = document.getElementById('next-btn');
+      if (backBtn) backBtn.style.display = currentSlide === 1 ? 'none' : 'block';
+      if (nextBtn) nextBtn.innerText = currentSlide === totalSlides ? 'Complete Oath' : 'Next';
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides) {
+        currentSlide++;
+        updateSlideUI();
+      } else {
+        completeOnboarding();
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 1) {
+        currentSlide--;
+        updateSlideUI();
+      }
+    }
+
+    function completeOnboarding() {
+      window.state.userName = document.getElementById('signup-name').value || "Kayden";
+      window.state.age = parseInt(document.getElementById('signup-age').value) || 20;
+      window.state.weight = parseInt(document.getElementById('signup-weight').value) || 140;
+      window.state.maxReps = parseInt(document.getElementById('signup-max-reps').value) || 15;
+      document.getElementById('onboarding-modal').classList.remove('active');
+      saveState();
+      postLoginInit();
+    }
+
+    function triggerSignOut() {
+      window.signOut(window.firebaseAuth).then(() => location.reload());
+    }
+
+    function updateThemeColor(hex) {
+      window.state.themeColor = hex;
+      document.documentElement.style.setProperty('--primary', hex);
+      document.documentElement.style.setProperty('--primary-glow', hex + '55');
+      saveState();
+      drawPixelHelmet();
+    }
+
+    function drawPixelHelmet() {
+      const cvs = document.getElementById('helmet-canvas');
+      if(!cvs) return;
+      const ctx = cvs.getContext('2d');
+      ctx.fillStyle = window.state.themeColor || "#38bdf8";
+      ctx.fillRect(16, 8, 32, 12);
+      ctx.fillRect(12, 20, 40, 32);
+      ctx.fillStyle = "#0a0b0e";
+      ctx.fillRect(20, 28, 24, 8);
+    }
+
+    function saveState() {
+      const user = window.firebaseAuth.currentUser;
+      const key = user ? 'pushup_realm_state_' + user.uid : 'pushup_realm_state_guest';
+      localStorage.setItem(key, JSON.stringify(window.state));
+    }
+
+    function openArmory() {
+      alert(`🛡️ ARMORY & ARTIFACT SHOP\nGold: 🪙 ${window.state.gold} | Gems: 💎 ${window.state.gems}\n\nLegendary Gear Unlocked!`);
+    }
+
+    function renderLeaderboard() {
+      const container = document.getElementById('leaderboard-list-container');
+      if(!container) return;
+      container.innerHTML = `
+        <div class="setting-item" style="flex-direction: row; justify-content: space-between;">
+          <div><strong>1. ${window.state.userName} (You)</strong></div>
+          <div style="color:var(--rank-s); font-weight:900;">👑 SSS Ranks: ${window.state.sRanksAchieved}</div>
+        </div>
+      `;
+    }
+
+    /* ========================================================
+       REVAMPED AI SKELETAL TRACKING & CAMERA SENSOR ENGINE
+       ======================================================== */
+    let camera = null;
+    let pose = null;
+    let repPhase = "TOP_LOCKOUT";
+    let smoothedAngle = 170;
+
+    function startArena(mode) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.sub-screen').forEach(s => s.classList.remove('active'));
+      document.querySelector('.bottom-nav').style.display = 'none';
+      document.getElementById('arena-screen').classList.add('active');
+
+      window.state.currentReps = 0;
+      updateArenaHpDisplay();
+
+      const videoElement = document.getElementById('webcam');
+      const canvasElement = document.getElementById('output-canvas');
+      const canvasCtx = canvasElement.getContext('2d');
+
+      pose = new Pose({ locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}` });
+      pose.setOptions({ 
+        modelComplexity: 1, 
+        smoothLandmarks: true, 
+        minDetectionConfidence: 0.75, 
+        minTrackingConfidence: 0.75 
+      });
+
+      pose.onResults((results) => {
+        canvasElement.width = videoElement.videoWidth;
+        canvasElement.height = videoElement.videoHeight;
+        canvasCtx.save();
+        canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+        
+        canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+
+        if (results.poseLandmarks) {
+          drawNeonSkeleton(canvasCtx, results.poseLandmarks, canvasElement.width, canvasElement.height);
+          processAdvancedSensorEngine(results.poseLandmarks);
+        } else {
+          updateSensorBanner("⚠️ Step back so full body is visible!", "#f87171");
+        }
+        canvasCtx.restore();
+      });
+
+      camera = new Camera(videoElement, {
+        onFrame: async () => { await pose.send({ image: videoElement }); },
+        width: 640,
+        height: 480
+      });
+      camera.start();
+    }
+
+    function startCampaignLevel(chapterId, levelId) {
+      window.currentChapter = chapterId;
+      window.currentLevel = levelId;
+      const chapter = window.storyChapters[chapterId - 1];
+      const boss = chapter.bosses[levelId - 1];
+
+      window.state.aiTargetReps = boss.reps;
+      document.getElementById('arena-boss-title').innerText = `CHAPTER ${chapterId}-${levelId}: ${chapter.name}`;
+      document.getElementById('boss-name-txt').innerText = `Boss: ${boss.name} (${boss.reps} Reps)`;
+
+      startArena('story');
+    }
+
+    const BONE_CONNECTIONS = [
+      [11, 12], [11, 13], [13, 15], [12, 14], [14, 16],
+      [11, 23], [12, 24], [23, 24],
+      [23, 25], [25, 27], [24, 26], [26, 28]
+    ];
+
+    function drawNeonSkeleton(ctx, landmarks, width, height) {
+      let glowColor = "#38bdf8";
+      if (repPhase === "BOTTOM_STRIKE") glowColor = "#34d399";
+      if (repPhase === "DESCENDING") glowColor = "#fbbf24";
+
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = glowColor;
+      ctx.shadowColor = glowColor;
+      ctx.shadowBlur = 12;
+
+      BONE_CONNECTIONS.forEach(([i, j]) => {
+        const p1 = landmarks[i];
+        const p2 = landmarks[j];
+        if (p1 && p2 && p1.visibility > 0.6 && p2.visibility > 0.6) {
+          ctx.beginPath();
+          ctx.moveTo(p1.x * width, p1.y * height);
+          ctx.lineTo(p2.x * width, p2.y * height);
+          ctx.stroke();
+        }
+      });
+
+      landmarks.forEach((lm) => {
+        if (lm && lm.visibility > 0.6) {
+          ctx.fillStyle = "#fff";
+          ctx.beginPath();
+          ctx.arc(lm.x * width, lm.y * height, 5, 0, 2 * Math.PI);
+          ctx.fill();
+        }
+      });
+      ctx.shadowBlur = 0;
+    }
+
+    function processAdvancedSensorEngine(landmarks) {
+      const lShoulder = landmarks[11], lElbow = landmarks[13], lWrist = landmarks[15];
+      const rShoulder = landmarks[12], rElbow = landmarks[14], rWrist = landmarks[16];
+
+      if (!lShoulder || !lElbow || !lWrist || !rShoulder || !rElbow || !rWrist) {
+        updateSensorBanner("⚠️ Adjust camera angle to show upper body", "#f87171");
+        return;
+      }
+
+      const leftAngle = calculateAngle(lShoulder, lElbow, lWrist);
+      const rightAngle = calculateAngle(rShoulder, rElbow, rWrist);
+      const rawAngle = (leftAngle + rightAngle) / 2;
+
+      smoothedAngle = (smoothedAngle * 0.4) + (rawAngle * 0.6);
+      document.getElementById('elbow-angle-val').innerText = Math.round(smoothedAngle) + '°';
+
+      let bottomThreshold = window.state.formStrictness === 'master' ? 75 : (window.state.formStrictness === 'lenient' ? 95 : 85);
+      let lockoutThreshold = 145;
+
+      if (repPhase === "TOP_LOCKOUT" && smoothedAngle < 135) {
+        repPhase = "DESCENDING";
+        updateSensorBanner("⬇️ Lowering... Keep core rigid!", "#fbbf24");
+      } 
+      else if (repPhase === "DESCENDING" && smoothedAngle <= bottomThreshold) {
+        repPhase = "BOTTOM_STRIKE";
+        updateSensorBanner("🔥 PERFECT DEPTH! Press up!", "#34d399");
+      } 
+      else if (repPhase === "BOTTOM_STRIKE" && smoothedAngle > 105) {
+        repPhase = "ASCENDING";
+        updateSensorBanner("⬆️ Exploding upward!", "#38bdf8");
+      } 
+      else if (repPhase === "ASCENDING" && smoothedAngle >= lockoutThreshold) {
+        repPhase = "TOP_LOCKOUT";
+        window.state.currentReps++;
+        window.state.totalReps++;
+        window.state.gold += 15;
+        
+        document.getElementById('rep-circle-val').innerText = window.state.currentReps;
+        document.getElementById('total-reps-val').innerText = window.state.currentReps;
+        document.getElementById('header-gold-val').innerText = window.state.gold;
+        updateArenaHpDisplay();
+
+        updateSensorBanner("✅ REP COUNTED! +15 Gold", "#34d399");
+
+        if (window.state.currentReps >= window.state.aiTargetReps) {
+          triggerVictoryCondition();
+        }
+        saveState();
+      }
+    }
+
+    function calculateAngle(A, B, C) {
+      const AB = Math.sqrt(Math.pow(B.x - A.x, 2) + Math.pow(B.y - A.y, 2));
+      const BC = Math.sqrt(Math.pow(B.x - C.x, 2) + Math.pow(B.y - C.y, 2));
+      const AC = Math.sqrt(Math.pow(C.x - A.x, 2) + Math.pow(C.y - A.y, 2));
+      return Math.acos((Math.pow(AB, 2) + Math.pow(BC, 2) - Math.pow(AC, 2)) / (2 * AB * BC)) * (180 / Math.PI);
+    }
+
+    function updateSensorBanner(text, colorHex) {
+      const banner = document.getElementById('sensor-banner');
+      if (banner) {
+        banner.innerText = text;
+        banner.style.borderColor = colorHex;
+      }
+    }
+
+    function updateArenaHpDisplay() {
+      const rem = Math.max(0, window.state.aiTargetReps - window.state.currentReps);
+      const pct = Math.min(100, (window.state.currentReps / window.state.aiTargetReps) * 100);
+      document.getElementById('hp-bar').style.width = pct + '%';
+      document.getElementById('hp-txt').innerText = `${rem} Reps Remaining`;
+    }
+
+    function triggerVictoryCondition() {
+      if (camera) camera.stop();
+      window.state.enemiesDefeated++;
+      window.state.sRanksAchieved++;
+      window.state.gems += 10;
+
+      if (window.currentChapter && window.currentLevel) {
+        if (!window.state.campaignProgress[window.currentChapter]) {
+          window.state.campaignProgress[window.currentChapter] = {};
+        }
+        window.state.campaignProgress[window.currentChapter][window.currentLevel] = "SSS";
+        
+        if (window.currentLevel < 5) {
+          window.state.unlockedLevel = Math.max(window.state.unlockedLevel, window.currentLevel + 1);
+        } else if (window.currentChapter < 5) {
+          window.state.unlockedChapter = Math.max(window.state.unlockedChapter, window.currentChapter + 1);
+          window.state.unlockedLevel = 1;
+        }
+      }
+
+      document.getElementById('arena-screen').classList.remove('active');
+      document.getElementById('victory-modal').classList.add('active');
+      saveState();
+    }
+
+    function closeVictoryModal() {
+      document.getElementById('victory-modal').classList.remove('active');
+      document.querySelector('.bottom-nav').style.display = 'flex';
+      switchTab('story');
+      renderStoryCampaignMap();
+    }
+
+    function exitArena() {
+      if (camera) camera.stop();
+      document.getElementById('arena-screen').classList.remove('active');
+      document.querySelector('.bottom-nav').style.display = 'flex';
+      switchTab('home');
+      saveState();
+    }
+
+    window.onload = () => {
+      drawPixelHelmet();
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += 25;
+        const pBar = document.getElementById('loading-progress');
+        if (pBar) pBar.style.width = progress + '%';
+        if (progress >= 100) {
+          clearInterval(interval);
+          const lScreen = document.getElementById('loading-screen');
+          if (lScreen) {
+            lScreen.style.opacity = '0';
+            setTimeout(() => { lScreen.style.display = 'none'; }, 300);
+          }
+        }
+      }, 80);
+    };
+
+    window.loginWithGoogle = loginWithGoogle;
+    window.selectHeroClass = selectHeroClass;
+    window.postLoginInit = postLoginInit;
+    window.recalculateAiGoals = recalculateAiGoals;
+    window.togglePushupType = togglePushupType;
+    window.saveRoutineSettings = saveRoutineSettings;
+    window.saveStrictnessSetting = saveStrictnessSetting;
+    window.switchTab = switchTab;
+    window.updateAccountName = updateAccountName;
+    window.updateSlideUI = updateSlideUI;
+    window.nextSlide = nextSlide;
+    window.prevSlide = prevSlide;
+    window.triggerSignOut = triggerSignOut;
+    window.updateThemeColor = updateThemeColor;
+    window.openArmory = openArmory;
+    window.saveState = saveState;
+    window.startArena = startArena;
+    window.startCampaignLevel = startCampaignLevel;
+    window.exitArena = exitArena;
+    window.closeVictoryModal = closeVictoryModal;
+  </script>
 </body>
 </html>
