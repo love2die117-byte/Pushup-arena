@@ -8,7 +8,7 @@ files = {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Push Up Arena: The Iron Oath (S-RANK MASTERY)</title>
-  <meta name="app-version" content="v20.0-ultimate-revamp">
+  <meta name="app-version" content="v21.0-advanced-auth">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#0a0b0e">
@@ -36,7 +36,7 @@ files = {
       <div id="avatar" class="user-avatar">K</div>
       <div>
         <div id="header-user-name" style="font-weight: 900; font-size: 1rem;">Kayden</div>
-        <div id="header-user-level" style="font-size: 0.75rem; color: var(--primary); font-weight: 800;">Level 1 Novice</div>
+        <div id="header-user-level" style="font-size: 0.75rem; color: var(--primary); font-weight: 800;">Vanguard Knight</div>
       </div>
     </div>
     <div style="display: flex; gap: 8px; align-items: center;">
@@ -257,62 +257,116 @@ files = {
     </div>
   </div>
 
-  <!-- ONBOARDING MODAL -->
+  <!-- ADVANCED ONBOARDING & AUTH MODAL -->
   <div id="onboarding-modal" class="modal">
-    <div class="onboarding-slide active" id="slide-auth" style="display: flex; flex-direction: column; align-items: center; text-align: center; justify-content: center; height: 100%;">
-      <div style="font-size: 3.5rem; margin-bottom: 15px;">🛡️</div>
-      <h1 style="font-size: 2rem; font-weight: 900; color: #fff; margin-bottom: 10px;">The Iron Oath</h1>
-      <p style="color: var(--subtext); font-size: 0.95rem; margin-bottom: 30px; line-height: 1.5;">Step into the ultimate fitness ARPG. Sign in with Google to record your legendary battles across devices.</p>
-      <button class="btn btn-google" onclick="loginWithGoogle()">
-        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.18v3.15C3.16 21.32 7.23 24 12 24z"/><path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.6H1.18C.43 8.12 0 9.82 0 12s.43 3.88 1.18 5.4l4.09-3.16z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.23 0 3.16 2.68 1.18 6.6l4.09 3.15c.95-2.85 3.6-4.96 6.73-4.96z"/></svg>
-        Sign In with Google Cloud
-      </button>
-    </div>
-
-    <div class="slide-progress" id="onboarding-progress-bar" style="display: none;">
-      <div class="progress-step active" id="p-step-1"></div>
-      <div class="progress-step" id="p-step-2"></div>
-      <div class="progress-step" id="p-step-3"></div>
-      <div class="progress-step" id="p-step-4"></div>
-    </div>
-
-    <div class="slide-container" id="onboarding-slides-container" style="display: none;">
-      <div class="onboarding-slide" id="slide-1">
-        <h2>Choose Your Knight Name</h2>
-        <p style="color: var(--subtext); font-size: 0.85rem;">Your moniker will echo across the Realm leaderboard.</p>
-        <div style="margin-top: 10px;">
-          <input type="text" id="signup-name" value="Kayden" placeholder="Knight Name">
+    <div class="auth-card-wrapper">
+      
+      <!-- STEP 0: INITIAL LOGIN / SIGNUP GATE -->
+      <div class="onboarding-slide active" id="slide-auth">
+        <div class="auth-emblem">🛡️</div>
+        <h1 class="auth-title">The Iron Oath</h1>
+        <p class="auth-subtitle">Enter the realm of biometric ARPG fitness. Sync your training logs to the cloud.</p>
+        
+        <div class="auth-action-stack">
+          <button class="btn btn-google" onclick="loginWithGoogle()">
+            <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.18v3.15C3.16 21.32 7.23 24 12 24z"/><path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.6H1.18C.43 8.12 0 9.82 0 12s.43 3.88 1.18 5.4l4.09-3.16z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.23 0 3.16 2.68 1.18 6.6l4.09 3.15c.95-2.85 3.6-4.96 6.73-4.96z"/></svg>
+            Continue with Google
+          </button>
+          
+          <div class="auth-divider"><span>OR EMAIL REGISTRATION</span></div>
+          
+          <input type="email" id="auth-email-input" placeholder="knight@ironrealm.com" style="margin-bottom: 10px;">
+          <input type="password" id="auth-password-input" placeholder="Secret Password" style="margin-bottom: 14px;">
+          
+          <div style="display: flex; gap: 10px;">
+            <button class="btn btn-secondary" onclick="handleEmailSignIn()">Sign In</button>
+            <button class="btn" onclick="handleEmailSignUp()">Register Account</button>
+          </div>
         </div>
       </div>
 
-      <div class="onboarding-slide" id="slide-2">
-        <h2>What is your Age?</h2>
-        <p style="color: var(--subtext); font-size: 0.85rem;">Calibrates the AI stamina curve.</p>
-        <div style="margin-top: 10px;">
-          <input type="number" id="signup-age" value="20">
-        </div>
+      <!-- PROGRESS BAR FOR NEW ACCOUNTS -->
+      <div class="slide-progress" id="onboarding-progress-bar" style="display: none;">
+        <div class="progress-step active" id="p-step-1"></div>
+        <div class="progress-step" id="p-step-2"></div>
+        <div class="progress-step" id="p-step-3"></div>
+        <div class="progress-step" id="p-step-4"></div>
+        <div class="progress-step" id="p-step-5"></div>
       </div>
 
-      <div class="onboarding-slide" id="slide-3">
-        <h2>Body Weight (lbs)?</h2>
-        <p style="color: var(--subtext); font-size: 0.85rem;">Used to compute workload resistance ratios.</p>
-        <div style="margin-top: 10px;">
-          <input type="number" id="signup-weight" value="140">
+      <!-- ONBOARDING QUESTIONNAIRE SLIDES -->
+      <div class="slide-container" id="onboarding-slides-container" style="display: none;">
+        
+        <!-- Slide 1: Hero Name -->
+        <div class="onboarding-slide" id="slide-1">
+          <div class="step-badge">Step 1 of 5</div>
+          <h2>What is your Knight Moniker?</h2>
+          <p style="color: var(--subtext); font-size: 0.85rem;">Your identity across realm leaderboards and dungeons.</p>
+          <div style="margin-top: 15px;">
+            <input type="text" id="signup-name" value="Kayden" placeholder="Enter Hero Name">
+          </div>
         </div>
+
+        <!-- Slide 2: Class Archetype -->
+        <div class="onboarding-slide" id="slide-2">
+          <div class="step-badge">Step 2 of 5</div>
+          <h2>Select Your Combat Class</h2>
+          <p style="color: var(--subtext); font-size: 0.85rem;">Determines your aesthetic aura and stat growth archetype.</p>
+          <div class="class-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px;">
+            <div class="class-card selected" id="class-vanguard" onclick="selectHeroClass('Vanguard', '#38bdf8')">
+              <div style="font-size: 1.5rem;">🛡️</div>
+              <div style="font-weight:900; margin-top:4px;">Vanguard</div>
+              <div style="font-size:0.7rem; color:var(--subtext);">Balanced Stamina & Power</div>
+            </div>
+            <div class="class-card" id="class-berserker" onclick="selectHeroClass('Berserker', '#f43f5e')">
+              <div style="font-size: 1.5rem;">🪓</div>
+              <div style="font-weight:900; margin-top:4px;">Berserker</div>
+              <div style="font-size:0.7rem; color:var(--subtext);">High Speed & Crit Multipliers</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 3: Age & Weight -->
+        <div class="onboarding-slide" id="slide-3">
+          <div class="step-badge">Step 3 of 5</div>
+          <h2>Biometric Calibration</h2>
+          <p style="color: var(--subtext); font-size: 0.85rem;">Helps the AI algorithm tailor safe workout workloads.</p>
+          <div style="display:flex; gap:10px; margin-top: 15px;">
+            <input type="number" id="signup-age" value="20" placeholder="Age">
+            <input type="number" id="signup-weight" value="140" placeholder="Weight (lbs)">
+          </div>
+        </div>
+
+        <!-- Slide 4: Baseline Strength -->
+        <div class="onboarding-slide" id="slide-4">
+          <div class="step-badge">Step 4 of 5</div>
+          <h2>Baseline Power Test</h2>
+          <p style="color: var(--subtext); font-size: 0.85rem;">Max unbroken push-ups you can perform right now.</p>
+          <div style="margin-top: 15px;">
+            <input type="number" id="signup-max-reps" value="15">
+          </div>
+        </div>
+
+        <!-- Slide 5: Form Strictness Goal -->
+        <div class="onboarding-slide" id="slide-5">
+          <div class="step-badge">Step 5 of 5</div>
+          <h2>AI Form Discipline</h2>
+          <p style="color: var(--subtext); font-size: 0.85rem;">Choose how strict the camera sensor tracking should be.</p>
+          <select id="signup-strictness" style="margin-top: 15px;">
+            <option value="lenient">Lenient (90° Arm Depth)</option>
+            <option value="standard" selected>Standard Vanguard (85° Depth)</option>
+            <option value="master">S-Rank Elite Master (75° Chest Touch)</option>
+          </select>
+        </div>
+
       </div>
 
-      <div class="onboarding-slide" id="slide-4">
-        <h2>Max Baseline Push-ups in 1 Set?</h2>
-        <p style="color: var(--subtext); font-size: 0.85rem;">Determines your starting Chapter difficulty rating.</p>
-        <div style="margin-top: 10px;">
-          <input type="number" id="signup-max-reps" value="15">
-        </div>
+      <!-- ONBOARDING NAVIGATION -->
+      <div class="slide-nav" id="onboarding-nav-btns" style="display: none; gap: 12px; margin-top: 24px;">
+        <button class="btn btn-secondary" id="back-btn" onclick="prevSlide()" style="display: none;">Back</button>
+        <button class="btn" id="next-btn" onclick="nextSlide()">Proceed</button>
       </div>
-    </div>
 
-    <div class="slide-nav" id="onboarding-nav-btns" style="display: none; gap: 12px; margin-top: 24px;">
-      <button class="btn btn-secondary" id="back-btn" onclick="prevSlide()" style="display: none;">Back</button>
-      <button class="btn" id="next-btn" onclick="nextSlide()">Begin Oath</button>
     </div>
   </div>
 
@@ -334,7 +388,8 @@ files = {
   <script src="camera.js"></script>
   <script src="app.js"></script>
 </body>
-</html>""",
+</html>
+""",
 
     "style.css": """:root {
   --bg: #0a0b0e;
@@ -803,6 +858,92 @@ input, select {
 }
 .modal.active { display: flex; }
 
+.auth-card-wrapper {
+  max-width: 420px;
+  width: 100%;
+  margin: auto;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border-active);
+  border-radius: 24px;
+  padding: 32px 24px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+  display: flex;
+  flex-direction: column;
+}
+
+.auth-emblem {
+  font-size: 3.2rem;
+  margin-bottom: 12px;
+  text-align: center;
+  filter: drop-shadow(0 0 15px var(--primary-glow));
+}
+
+.auth-title {
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: #fff;
+  text-align: center;
+  margin-bottom: 6px;
+  font-family: monospace;
+  letter-spacing: -0.5px;
+}
+
+.auth-subtitle {
+  color: var(--subtext);
+  font-size: 0.85rem;
+  text-align: center;
+  margin-bottom: 24px;
+  line-height: 1.4;
+}
+
+.auth-action-stack {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 18px 0;
+  color: var(--subtext);
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+.auth-divider::before, .auth-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid var(--card-border);
+}
+.auth-divider::before { margin-right: .75em; }
+.auth-divider::after { margin-left: .75em; }
+
+.step-badge {
+  font-size: 0.7rem;
+  font-weight: 900;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 6px;
+  font-family: monospace;
+}
+
+.class-card {
+  background: #0f1117;
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  padding: 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.class-card.selected {
+  background: rgba(56, 189, 248, 0.1);
+  border-color: var(--primary);
+}
+
 .slide-progress {
   display: flex;
   gap: 8px;
@@ -948,11 +1089,12 @@ video, canvas {
   font-size: 2.4rem;
   font-weight: 900;
   color: var(--primary);
-}""",
+}
+""",
 
     "auth.js": """import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAT1A-Em7JMMi-v4eZLEHxSZc7afJs9mpg",
@@ -975,10 +1117,28 @@ window.signInWithPopup = signInWithPopup;
 window.signOut = signOut;
 window.onAuthStateChanged = onAuthStateChanged;
 
+window.handleEmailSignIn = function() {
+  const email = document.getElementById('auth-email-input').value;
+  const pass = document.getElementById('auth-password-input').value;
+  if (!email || !pass) { alert("Please enter both email and password."); return; }
+  
+  signInWithEmailAndPassword(auth, email, pass)
+    .catch(err => alert("Sign In Error: " + err.message));
+};
+
+window.handleEmailSignUp = function() {
+  const email = document.getElementById('auth-email-input').value;
+  const pass = document.getElementById('auth-password-input').value;
+  if (!email || !pass) { alert("Please enter both email and password."); return; }
+  
+  createUserWithEmailAndPassword(auth, email, pass)
+    .catch(err => alert("Registration Error: " + err.message));
+};
+
 onAuthStateChanged(auth, (user) => {
   if (user) {
     window.state.signedIn = true;
-    window.state.userName = user.displayName || "Kayden";
+    window.state.userName = user.displayName || user.email.split('@')[0] || "Kayden";
     window.state.photoURL = user.photoURL || "";
 
     const saved = localStorage.getItem('pushup_realm_state_' + user.uid);
@@ -1003,7 +1163,8 @@ onAuthStateChanged(auth, (user) => {
     document.getElementById('onboarding-slides-container').style.display = 'none';
     document.getElementById('onboarding-nav-btns').style.display = 'none';
   }
-});""",
+});
+""",
 
     "camera.js": """let camera = null;
 let pose = null;
@@ -1150,10 +1311,12 @@ function exitArena() {
 window.startArena = startArena;
 window.startCampaignLevel = startCampaignLevel;
 window.exitArena = exitArena;
-window.closeVictoryModal = closeVictoryModal;""",
+window.closeVictoryModal = closeVictoryModal;
+""",
 
     "app.js": """window.state = {
   userName: "Kayden",
+  heroClass: "Vanguard",
   age: 20,
   weight: 140,
   maxReps: 15,
@@ -1215,7 +1378,7 @@ window.storyChapters = [
 ];
 
 let currentSlide = 1;
-const totalSlides = 4;
+const totalSlides = 5;
 
 function loginWithGoogle() {
   window.signInWithPopup(window.firebaseAuth, window.firebaseProvider)
@@ -1224,11 +1387,28 @@ function loginWithGoogle() {
     });
 }
 
+function selectHeroClass(className, colorHex) {
+  window.state.heroClass = className;
+  window.state.themeColor = colorHex;
+  document.querySelectorAll('.class-card').forEach(c => c.classList.remove('selected'));
+  if (className === 'Vanguard') {
+    const el = document.getElementById('class-vanguard');
+    if (el) el.classList.add('selected');
+  } else {
+    const el = document.getElementById('class-berserker');
+    if (el) el.classList.add('selected');
+  }
+  updateThemeColor(colorHex);
+}
+
 function postLoginInit() {
   runAiTargetCalculation();
   document.getElementById('header-gold-val').innerText = window.state.gold;
   document.getElementById('header-gems-val').innerText = window.state.gems;
   document.getElementById('header-user-name').innerText = window.state.userName;
+
+  const lvlEl = document.getElementById('header-user-level');
+  if (lvlEl) lvlEl.innerText = `${window.state.heroClass || "Vanguard"} Knight`;
 
   const avatarEl = document.getElementById('avatar');
   if (window.state.photoURL) {
@@ -1370,11 +1550,15 @@ function updateAccountName(val) {
 
 function updateSlideUI() {
   for (let i = 1; i <= totalSlides; i++) {
-    document.getElementById(`slide-${i}`).classList.toggle('active', i === currentSlide);
-    document.getElementById(`p-step-${i}`).classList.toggle('active', i <= currentSlide);
+    const sEl = document.getElementById(`slide-${i}`);
+    const pEl = document.getElementById(`p-step-${i}`);
+    if (sEl) sEl.classList.toggle('active', i === currentSlide);
+    if (pEl) pEl.classList.toggle('active', i <= currentSlide);
   }
-  document.getElementById('back-btn').style.display = currentSlide === 1 ? 'none' : 'block';
-  document.getElementById('next-btn').innerText = currentSlide === totalSlides ? 'Enter Realm' : 'Next';
+  const backBtn = document.getElementById('back-btn');
+  const nextBtn = document.getElementById('next-btn');
+  if (backBtn) backBtn.style.display = currentSlide === 1 ? 'none' : 'block';
+  if (nextBtn) nextBtn.innerText = currentSlide === totalSlides ? 'Enter Realm' : 'Next';
 }
 
 function nextSlide() {
@@ -1399,6 +1583,9 @@ function completeOnboarding() {
   window.state.weight = parseInt(document.getElementById('signup-weight').value) || 140;
   window.state.maxReps = parseInt(document.getElementById('signup-max-reps').value) || 15;
 
+  const strictEl = document.getElementById('signup-strictness');
+  if (strictEl) window.state.formStrictness = strictEl.value;
+
   document.getElementById('onboarding-modal').classList.remove('active');
   saveState();
   postLoginInit();
@@ -1408,6 +1595,14 @@ function triggerSignOut() {
   window.signOut(window.firebaseAuth).then(() => {
     location.reload();
   });
+}
+
+function updateThemeColor(hex) {
+  window.state.themeColor = hex;
+  document.documentElement.style.setProperty('--primary', hex);
+  document.documentElement.style.setProperty('--primary-glow', hex + '55');
+  saveState();
+  drawPixelHelmet();
 }
 
 function drawPixelHelmet() {
@@ -1428,7 +1623,7 @@ function saveState() {
 }
 
 function openArmory() {
-  alert(`🛡️ ARMORY & ARTIFACT SHOP\nGold: 🪙 ${window.state.gold} | Gems: 💎 ${window.state.gems}\\n\\nLegendary Gear Unlocked!`);
+  alert(`🛡️ ARMORY & ARTIFACT SHOP\nGold: 🪙 ${window.state.gold} | Gems: 💎 ${window.state.gems}\n\nLegendary Gear Unlocked!`);
 }
 
 function renderLeaderboard() {
@@ -1461,6 +1656,7 @@ window.onload = () => {
 };
 
 window.loginWithGoogle = loginWithGoogle;
+window.selectHeroClass = selectHeroClass;
 window.postLoginInit = postLoginInit;
 window.recalculateAiGoals = recalculateAiGoals;
 window.togglePushupType = togglePushupType;
@@ -1472,8 +1668,10 @@ window.updateSlideUI = updateSlideUI;
 window.nextSlide = nextSlide;
 window.prevSlide = prevSlide;
 window.triggerSignOut = triggerSignOut;
+window.updateThemeColor = updateThemeColor;
 window.openArmory = openArmory;
-window.saveState = saveState;"""
+window.saveState = saveState;
+"""
 }
 
 for filename, content in files.items():
@@ -1481,4 +1679,4 @@ for filename, content in files.items():
         f.write(content)
     print(f"Successfully updated: {filename}")
 
-print("\\nAll project files successfully regenerated and synchronized!")
+print("\nAll project files successfully regenerated and synchronized!")
