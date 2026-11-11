@@ -253,7 +253,6 @@ window.onload = () => {
   }, 80);
 };
 
-// Expose functions globally for inline HTML event handlers
 window.loginWithGoogle = loginWithGoogle;
 window.postLoginInit = postLoginInit;
 window.recalculateAiGoals = recalculateAiGoals;
