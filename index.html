@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Push Up Arena: Knight's Quest S-RANK MASTERY</title>
-  <meta name="app-version" content="v16.7-full-game-restored-auth">
+  <meta name="app-version" content="v18.0-full-rebuilt">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="PushUpArena">
@@ -13,6 +13,68 @@
   <!-- MediaPipe Pose & Camera Utils -->
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
+
+  <!-- Firebase SDKs -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { 
+      getAuth, 
+      GoogleAuthProvider, 
+      signInWithPopup, 
+      signInWithEmailAndPassword,
+      createUserWithEmailAndPassword,
+      signOut, 
+      onAuthStateChanged 
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAT1A-Em7JMMi-v4eZLEHxSZc7afJs9mpg",
+      authDomain: "push-up-arena-371b9.firebaseapp.com",
+      projectId: "push-up-arena-371b9",
+      storageBucket: "push-up-arena-371b9.firebasestorage.app",
+      messagingSenderId: "428269289235",
+      appId: "1:428269289235:web:3e3706dcfead663442e4e6"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const googleProvider = new GoogleAuthProvider();
+
+    window.fbAuth = auth;
+    window.fbGoogleProvider = googleProvider;
+    window.signInWithPopup = signInWithPopup;
+    window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+    window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
+    window.signOut = signOut;
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        window.state.signedIn = true;
+        window.state.userId = user.uid;
+        window.state.userEmail = user.email || "";
+        window.state.userName = user.displayName || user.email?.split('@')[0] || "Hero";
+        window.state.photoURL = user.photoURL || "";
+
+        const saved = localStorage.getItem('pushup_arena_state_' + user.uid);
+        if (saved) {
+          try { window.state = { ...window.state, ...JSON.parse(saved) }; } catch(e){}
+          document.getElementById('onboarding-modal').classList.remove('active');
+          postLoginInit();
+        } else {
+          // New Account -> Prompt Onboarding Questions
+          showOnboardingSlides();
+        }
+      } else {
+        // Logged Out -> Show Sign In Gate
+        window.state.signedIn = false;
+        document.getElementById('onboarding-modal').classList.add('active');
+        document.getElementById('slide-auth').style.display = 'flex';
+        document.getElementById('onboarding-progress-bar').style.display = 'none';
+        document.getElementById('onboarding-slides-container').style.display = 'none';
+        document.getElementById('onboarding-nav-btns').style.display = 'none';
+      }
+    });
+  </script>
 
   <style>
     :root {
@@ -70,7 +132,7 @@
       padding-bottom: 0;
       justify-content: center;
       align-items: center;
-      z-index: 150;
+      z-index: 250;
       background: radial-gradient(circle at center, #181b24 0%, #0a0b0e 100%);
       display: flex;
       flex-direction: column;
@@ -192,7 +254,6 @@
       font-size: 1.2rem;
       font-family: monospace;
       font-weight: 900;
-      transition: transform 0.15s ease;
     }
     .nav-item.active { color: #fff; }
     .nav-item.active span:first-child { transform: scale(1.2); }
@@ -426,11 +487,31 @@
       color: var(--primary);
     }
 
+    .campaign-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      padding-bottom: 40px;
+    }
+    .campaign-node {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      cursor: pointer;
+    }
+    .campaign-node-title { font-size: 0.95rem; font-weight: 900; color: #fff; }
+    .campaign-node-sub { font-size: 0.72rem; color: var(--subtext); font-weight: 800; }
+    .campaign-rank-badge { font-family: monospace; font-size: 0.85rem; font-weight: 900; color: var(--rank-s); }
+
     .modal {
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(10, 11, 14, 0.98);
-      z-index: 200;
+      z-index: 150;
       display: none;
       flex-direction: column;
       padding: 40px 24px;
@@ -585,62 +666,6 @@
       color: var(--primary);
     }
   </style>
-
-  <!-- FIREBASE INITIALIZATION -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyAT1A-Em7JMMi-v4eZLEHxSZc7afJs9mpg",
-      authDomain: "push-up-arena-371b9.firebaseapp.com",
-      projectId: "push-up-arena-371b9",
-      storageBucket: "push-up-arena-371b9.firebasestorage.app",
-      messagingSenderId: "428269289235",
-      appId: "1:428269289235:web:3e3706dcfead663442e4e6"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const googleProvider = new GoogleAuthProvider();
-
-    window.fbAuth = auth;
-    window.fbGoogleProvider = googleProvider;
-    window.signInWithPopup = signInWithPopup;
-    window.signOut = signOut;
-
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        window.state.signedIn = true;
-        window.state.userName = user.displayName || "Kayden";
-        window.state.photoURL = user.photoURL || "";
-
-        const saved = localStorage.getItem('pushup_arena_state_' + user.uid);
-        if (saved) {
-          try { window.state = { ...window.state, ...JSON.parse(saved) }; } catch(e){}
-          document.getElementById('onboarding-modal').classList.remove('active');
-          postLoginInit();
-        } else {
-          // New account -> Show setup questionnaire
-          document.getElementById('onboarding-modal').classList.add('active');
-          document.getElementById('slide-auth').style.display = 'none';
-          document.getElementById('onboarding-progress-bar').style.display = 'flex';
-          document.getElementById('onboarding-slides-container').style.display = 'flex';
-          document.getElementById('onboarding-nav-btns').style.display = 'flex';
-          document.getElementById('signup-name').value = window.state.userName;
-          updateSlideUI();
-        }
-      } else {
-        // Unauthenticated -> Show Google Sign In screen
-        window.state.signedIn = false;
-        document.getElementById('onboarding-modal').classList.add('active');
-        document.getElementById('slide-auth').style.display = 'flex';
-        document.getElementById('onboarding-progress-bar').style.display = 'none';
-        document.getElementById('onboarding-slides-container').style.display = 'none';
-        document.getElementById('onboarding-nav-btns').style.display = 'none';
-      }
-    });
-  </script>
 </head>
 <body>
 
@@ -886,16 +911,32 @@
 
   <!-- Onboarding Modal (Google Sign In FIRST, Question Setup for NEW accounts) -->
   <div id="onboarding-modal" class="modal">
+    <!-- Google Auth Gate -->
     <div class="onboarding-slide active" id="slide-auth" style="display: flex; flex-direction: column; align-items: center; text-align: center; justify-content: center; height: 100%;">
       <div style="font-size: 3rem; margin-bottom: 15px;">⚔️</div>
       <h1 style="font-size: 1.8rem; font-weight: 800; color: #fff; margin-bottom: 10px;">Push Up Arena</h1>
-      <p style="color: var(--subtext); font-size: 0.95rem; margin-bottom: 30px; line-height: 1.4;">Sign in with Google to sync progress. Returning accounts load instantly; new accounts set up their profile.</p>
-      <button class="btn btn-google" onclick="loginWithGoogle()">
-        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.18v3.15C3.16 21.32 7.23 24 12 24z"/><path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.6H1.18C.43 8.12 0 9.82 0 12s.43 3.88 1.18 5.4l4.09-3.16z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.23 0 3.16 2.68 1.18 6.6l4.09 3.15c.95-2.85 3.6-4.96 6.73-4.96z"/></svg>
-        Sign In with Google
-      </button>
+      <p style="color: var(--subtext); font-size: 0.95rem; margin-bottom: 24px; line-height: 1.4;">Sign in with Google or Email to sync progress across devices.</p>
+      
+      <div style="width: 100%; max-width: 320px; display: flex; flex-direction: column; gap: 12px;">
+        <button class="btn btn-google" onclick="loginWithGoogle()">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.18v3.15C3.16 21.32 7.23 24 12 24z"/><path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.6H1.18C.43 8.12 0 9.82 0 12s.43 3.88 1.18 5.4l4.09-3.16z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.23 0 3.16 2.68 1.18 6.6l4.09 3.15c.95-2.85 3.6-4.96 6.73-4.96z"/></svg>
+          Sign In with Google
+        </button>
+
+        <div style="display:flex; align-items:center; margin: 8px 0; gap: 8px; color: var(--subtext); font-size:0.75rem;">
+          <div style="flex:1; height:1px; background:var(--card-border);"></div>
+          <span>OR EMAIL</span>
+          <div style="flex:1; height:1px; background:var(--card-border);"></div>
+        </div>
+
+        <input type="email" id="email-auth-input" placeholder="Hero Email Address">
+        <input type="password" id="pass-auth-input" placeholder="Password">
+        
+        <button class="btn btn-secondary" onclick="loginWithEmail()">Sign In / Register</button>
+      </div>
     </div>
 
+    <!-- Onboarding Question Steps for New Accounts -->
     <div class="slide-progress" id="onboarding-progress-bar" style="display: none;">
       <div class="progress-step active" id="p-step-1"></div>
       <div class="progress-step" id="p-step-2"></div>
@@ -971,6 +1012,28 @@
         .catch((error) => {
           alert("Google Sign-In Error: " + error.message);
         });
+    }
+
+    function loginWithEmail() {
+      const email = document.getElementById('email-auth-input').value.trim();
+      const pass = document.getElementById('pass-auth-input').value;
+      if (!email || !pass) return alert("Please enter email & password.");
+
+      window.signInWithEmailAndPassword(window.fbAuth, email, pass)
+        .catch(() => {
+          window.createUserWithEmailAndPassword(window.fbAuth, email, pass)
+            .catch(err => alert("Auth Error: " + err.message));
+        });
+    }
+
+    function showOnboardingSlides() {
+      document.getElementById('onboarding-modal').classList.add('active');
+      document.getElementById('slide-auth').style.display = 'none';
+      document.getElementById('onboarding-progress-bar').style.display = 'flex';
+      document.getElementById('onboarding-slides-container').style.display = 'flex';
+      document.getElementById('onboarding-nav-btns').style.display = 'flex';
+      document.getElementById('signup-name').value = window.state.userName;
+      updateSlideUI();
     }
 
     function postLoginInit() {
