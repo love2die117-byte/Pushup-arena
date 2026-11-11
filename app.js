@@ -4,18 +4,61 @@ window.state = {
   weight: 140,
   maxReps: 15,
   aiTargetReps: 18,
-  gold: 150,
+  gold: 250,
+  gems: 25,
   themeColor: "#38bdf8",
   totalReps: 0,
   enemiesDefeated: 0,
-  bossesSlain: 0,
+  sRanksAchieved: 0,
   currentReps: 0,
   routineFormat: "cycle",
   selectedTypes: ["standard", "diamond"],
-  storyStage: 1,
+  formStrictness: "standard",
+  unlockedChapter: 1,
+  unlockedLevel: 1,
+  campaignProgress: {},
   signedIn: false,
   photoURL: ""
 };
+
+window.storyChapters = [
+  {
+    id: 1,
+    name: "Whispering Crypts",
+    desc: "Awaken your core strength amidst decaying catacombs.",
+    bosses: [
+      { name: "Undead Warden", reps: 15 },
+      { name: "Skeletal Vanguard", reps: 18 },
+      { name: "Crypt Ghoul Lord", reps: 20 },
+      { name: "Banshee of Sorrows", reps: 22 },
+      { name: "Lich King Malakor", reps: 25 }
+    ]
+  },
+  {
+    id: 2,
+    name: "Sunken Obsidian Citadel",
+    desc: "Molten chambers testing lower-body and core endurance.",
+    bosses: [
+      { name: "Magma Golem", reps: 25 },
+      { name: "Obsidian Knight", reps: 28 },
+      { name: "Flame Pyromancer", reps: 30 },
+      { name: "Cinder Drake", reps: 35 },
+      { name: "Ignis Titan", reps: 40 }
+    ]
+  },
+  {
+    id: 3,
+    name: "Celestial Spire",
+    desc: "Ascend into the divine clouds where form precision is absolute.",
+    bosses: [
+      { name: "Acolyte of Light", reps: 35 },
+      { name: "Solar Guardian", reps: 40 },
+      { name: "Astral Valkyrie", reps: 45 },
+      { name: "Seraphim Sentinel", reps: 50 },
+      { name: "Archangel Michael", reps: 60 }
+    ]
+  }
+];
 
 let currentSlide = 1;
 const totalSlides = 4;
@@ -29,8 +72,8 @@ function loginWithGoogle() {
 
 function postLoginInit() {
   runAiTargetCalculation();
-  updateThemeColor(window.state.themeColor);
   document.getElementById('header-gold-val').innerText = window.state.gold;
+  document.getElementById('header-gems-val').innerText = window.state.gems;
   document.getElementById('header-user-name').innerText = window.state.userName;
 
   const avatarEl = document.getElementById('avatar');
@@ -44,23 +87,48 @@ function postLoginInit() {
   document.getElementById('account-age-input').value = window.state.age;
   document.getElementById('account-weight-input').value = window.state.weight;
   document.getElementById('account-max-reps-input').value = window.state.maxReps;
-  document.getElementById('ai-target-reps-input').value = window.state.aiTargetReps;
 
   updateStatsDisplay();
+  renderStoryCampaignMap();
   drawPixelHelmet();
+}
+
+function renderStoryCampaignMap() {
+  const container = document.getElementById('campaign-map-container');
+  container.innerHTML = "";
+
+  window.storyChapters.forEach((chap) => {
+    let html = `
+      <div class="chapter-card">
+        <div class="chapter-title">Chapter ${chap.id}: ${chap.name}</div>
+        <p style="color:var(--subtext); font-size:0.8rem;">${chap.desc}</p>
+        <div class="levels-grid">
+    `;
+
+    chap.bosses.forEach((boss, idx) => {
+      let lvlNum = idx + 1;
+      let isUnlocked = chap.id < window.state.unlockedChapter || (chap.id === window.state.unlockedChapter && lvlNum <= window.state.unlockedLevel);
+      let rank = window.state.campaignProgress[chap.id]?.[lvlNum] || "-";
+      let nodeClass = isUnlocked ? (rank !== "-" ? "level-node completed" : "level-node unlocked") : "level-node";
+
+      html += `
+        <div class="${nodeClass}" ${isUnlocked ? `onclick="startCampaignLevel(${chap.id}, ${lvlNum})"` : ''}>
+          <div class="level-node-num">${chap.id}-${lvlNum}</div>
+          <div class="level-node-rank">${rank}</div>
+        </div>
+      `;
+    });
+
+    html += `</div></div>`;
+    container.innerHTML += html;
+  });
 }
 
 function runAiTargetCalculation() {
   let base = parseInt(window.state.maxReps) || 15;
-  let ageFactor = window.state.age < 25 ? 1.2 : (window.state.age > 40 ? 0.9 : 1.1);
-  let weightFactor = window.state.weight > 180 ? 0.95 : 1.05;
-
-  let calculated = Math.round(base * 1.2 * ageFactor * weightFactor);
-  window.state.aiTargetReps = Math.max(5, calculated);
-
-  document.getElementById('header-user-level').innerText = `AI Goal: ${window.state.aiTargetReps} Reps`;
-  document.getElementById('hero-goal-title').innerText = `Target: ${window.state.aiTargetReps} Reps / Wave`;
-  document.getElementById('hero-goal-desc').innerText = `AI calibrated for ${window.state.userName} (Max baseline: ${base}).`;
+  window.state.aiTargetReps = Math.max(10, Math.round(base * 1.2));
+  document.getElementById('hero-goal-title').innerText = `Chapter ${window.state.unlockedChapter} Raid`;
+  document.getElementById('hero-goal-desc').innerText = `AI tailored target: ${window.state.aiTargetReps} Reps per wave.`;
 }
 
 function recalculateAiGoals() {
@@ -68,13 +136,6 @@ function recalculateAiGoals() {
   window.state.weight = parseInt(document.getElementById('account-weight-input').value) || 140;
   window.state.maxReps = parseInt(document.getElementById('account-max-reps-input').value) || 15;
   runAiTargetCalculation();
-  saveState();
-}
-
-function updateAiTargetReps(val) {
-  window.state.aiTargetReps = parseInt(val) || 18;
-  document.getElementById('header-user-level').innerText = `AI Goal: ${window.state.aiTargetReps} Reps`;
-  document.getElementById('hero-goal-title').innerText = `Target: ${window.state.aiTargetReps} Reps / Wave`;
   saveState();
 }
 
@@ -96,6 +157,11 @@ function syncTypePillsUI() {
   });
 }
 
+function saveStrictnessSetting() {
+  window.state.formStrictness = document.getElementById('form-strictness-select').value;
+  saveState();
+}
+
 function saveRoutineSettings() {
   window.state.routineFormat = document.getElementById('routine-format-select').value;
   saveState();
@@ -109,6 +175,10 @@ function switchTab(tabName) {
   if (tabName === 'home') {
     document.getElementById('home-screen').classList.add('active');
     document.getElementById('nav-home').classList.add('active');
+  } else if (tabName === 'story') {
+    document.getElementById('story-screen').classList.add('active');
+    document.getElementById('nav-story').classList.add('active');
+    renderStoryCampaignMap();
   } else if (tabName === 'types') {
     document.getElementById('types-screen').classList.add('active');
     document.getElementById('nav-types').classList.add('active');
@@ -119,9 +189,6 @@ function switchTab(tabName) {
   } else if (tabName === 'account') {
     document.getElementById('account-screen').classList.add('active');
     document.getElementById('nav-account').classList.add('active');
-  } else if (tabName === 'settings') {
-    document.getElementById('settings-screen').classList.add('active');
-    document.getElementById('nav-settings').classList.add('active');
   } else if (tabName === 'leaderboard') {
     document.getElementById('leaderboard-screen').classList.add('active');
     document.getElementById('nav-leaderboard').classList.add('active');
@@ -132,15 +199,15 @@ function switchTab(tabName) {
 function updateStatsDisplay() {
   document.getElementById('stats-total-reps').innerText = window.state.totalReps;
   document.getElementById('stats-enemies-killed').innerText = window.state.enemiesDefeated;
-  document.getElementById('stats-bosses-slain').innerText = window.state.bossesSlain;
+  document.getElementById('stats-s-ranks').innerText = window.state.sRanksAchieved;
   document.getElementById('header-gold-val').innerText = window.state.gold;
+  document.getElementById('header-gems-val').innerText = window.state.gems;
 }
 
 function updateAccountName(val) {
   window.state.userName = val || "Kayden";
   document.getElementById('header-user-name').innerText = window.state.userName;
   document.getElementById('avatar').innerText = window.state.userName.charAt(0).toUpperCase();
-  runAiTargetCalculation();
   saveState();
 }
 
@@ -150,7 +217,7 @@ function updateSlideUI() {
     document.getElementById(`p-step-${i}`).classList.toggle('active', i <= currentSlide);
   }
   document.getElementById('back-btn').style.display = currentSlide === 1 ? 'none' : 'block';
-  document.getElementById('next-btn').innerText = currentSlide === totalSlides ? 'Finish & Start' : 'Next';
+  document.getElementById('next-btn').innerText = currentSlide === totalSlides ? 'Enter Realm' : 'Next';
 }
 
 function nextSlide() {
@@ -188,6 +255,7 @@ function triggerSignOut() {
 
 function drawPixelHelmet() {
   const cvs = document.getElementById('helmet-canvas');
+  if(!cvs) return;
   const ctx = cvs.getContext('2d');
   ctx.fillStyle = window.state.themeColor || "#38bdf8";
   ctx.fillRect(16, 8, 32, 12);
@@ -196,45 +264,22 @@ function drawPixelHelmet() {
   ctx.fillRect(20, 28, 24, 8);
 }
 
-function updateThemeColor(hex) {
-  window.state.themeColor = hex;
-  document.documentElement.style.setProperty('--primary', hex);
-  document.documentElement.style.setProperty('--primary-glow', hex + '55');
-  saveState();
-  drawPixelHelmet();
-}
-
 function saveState() {
   const user = window.firebaseAuth.currentUser;
-  const key = user ? 'pushup_arena_state_' + user.uid : 'pushup_arena_state_guest';
+  const key = user ? 'pushup_realm_state_' + user.uid : 'pushup_realm_state_guest';
   localStorage.setItem(key, JSON.stringify(window.state));
 }
 
-function resetAllData() {
-  if (confirm("Are you sure you want to reset all app stats and progress?")) {
-    const user = window.firebaseAuth.currentUser;
-    const key = user ? 'pushup_arena_state_' + user.uid : 'pushup_arena_state_guest';
-    localStorage.removeItem(key);
-    location.reload();
-  }
-}
-
-function openStoryCampaign() {
-  if (confirm(`📜 STORY CAMPAIGN\nCurrent Stage: ${window.state.storyStage}\n\nEnter battle?`)) {
-    window.startArena('story');
-  }
-}
-
 function openArmory() {
-  alert(`🛡️ HERO ARMORY\nYour Gold: 🪙 ${window.state.gold}`);
+  alert(`🛡️ ARMORY & ARTIFACT SHOP\nGold: 🪙 ${window.state.gold} | Gems: 💎 ${window.state.gems}\n\nLegendary Gear Unlocked!`);
 }
 
 function renderLeaderboard() {
   const container = document.getElementById('leaderboard-list-container');
   container.innerHTML = `
     <div class="setting-item" style="flex-direction: row; justify-content: space-between;">
-      <div><strong>${window.state.userName} (You)</strong></div>
-      <div>💪 ${window.state.totalReps} Reps</div>
+      <div><strong>1. ${window.state.userName} (You)</strong></div>
+      <div style="color:var(--rank-s); font-weight:900;">👑 SSS Ranks: ${window.state.sRanksAchieved}</div>
     </div>
   `;
 }
@@ -244,11 +289,15 @@ window.onload = () => {
   let progress = 0;
   const interval = setInterval(() => {
     progress += 25;
-    document.getElementById('loading-progress').style.width = progress + '%';
+    const pBar = document.getElementById('loading-progress');
+    if (pBar) pBar.style.width = progress + '%';
     if (progress >= 100) {
       clearInterval(interval);
-      document.getElementById('loading-screen').style.opacity = '0';
-      setTimeout(() => { document.getElementById('loading-screen').style.display = 'none'; }, 300);
+      const lScreen = document.getElementById('loading-screen');
+      if (lScreen) {
+        lScreen.style.opacity = '0';
+        setTimeout(() => { lScreen.style.display = 'none'; }, 300);
+      }
     }
   }, 80);
 };
@@ -256,17 +305,14 @@ window.onload = () => {
 window.loginWithGoogle = loginWithGoogle;
 window.postLoginInit = postLoginInit;
 window.recalculateAiGoals = recalculateAiGoals;
-window.updateAiTargetReps = updateAiTargetReps;
 window.togglePushupType = togglePushupType;
 window.saveRoutineSettings = saveRoutineSettings;
+window.saveStrictnessSetting = saveStrictnessSetting;
 window.switchTab = switchTab;
 window.updateAccountName = updateAccountName;
 window.updateSlideUI = updateSlideUI;
 window.nextSlide = nextSlide;
 window.prevSlide = prevSlide;
 window.triggerSignOut = triggerSignOut;
-window.updateThemeColor = updateThemeColor;
-window.resetAllData = resetAllData;
-window.openStoryCampaign = openStoryCampaign;
 window.openArmory = openArmory;
 window.saveState = saveState;
