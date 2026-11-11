@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Push Up Arena: The Iron Oath (S-RANK MASTERY)</title>
-  <meta name="app-version" content="v22.0-advanced-skeleton-auth">
+  <title>Push Up Arena: The Iron Oath (AI Neural S-Rank Edition)</title>
+  <meta name="app-version" content="v23.0-neural-skeleton-engine">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#0a0b0e">
 
-  <!-- MediaPipe Pose & Camera Utils -->
+  <!-- MediaPipe Pose & Camera Modules -->
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
 
@@ -616,7 +616,7 @@
     .onboarding-slide { display: none; flex-direction: column; gap: 14px; }
     .onboarding-slide.active { display: flex; }
 
-    /* Arena & Neon Skeleton HUD Styles */
+    /* Arena & Neural Skeleton HUD Styles */
     #arena-screen { background: #000; padding-bottom: 0; }
     #video-container {
       position: relative;
@@ -712,7 +712,7 @@
       z-index: 25;
       backdrop-filter: blur(10px);
       box-shadow: 0 8px 25px rgba(0,0,0,0.5);
-      transition: border-color 0.3s ease;
+      transition: border-color 0.3s ease, background 0.3s ease;
     }
     .bottom-hud {
       position: absolute;
@@ -753,7 +753,7 @@
   <div id="loading-screen">
     <canvas id="helmet-canvas" width="64" height="64" class="helmet-logo"></canvas>
     <div class="loading-title">The Iron Oath</div>
-    <div class="loading-sub">Forging Legend Status...</div>
+    <div class="loading-sub">Calibrating Neural Vision Mesh...</div>
     <div class="progress-bar-bg">
       <div id="loading-progress" class="progress-bar-fill"></div>
     </div>
@@ -968,7 +968,7 @@
         </div>
       </div>
 
-      <div id="sensor-banner" class="sensor-status-banner">AI Sensor Locked: Lower chest until elbow breaks 85°</div>
+      <div id="sensor-banner" class="sensor-status-banner">Neural AI Scanning: Step back to align full-body skeleton mesh</div>
 
       <div class="bottom-hud">
         <div class="stat-box">
@@ -980,7 +980,7 @@
 
         <div class="stat-box">
           <div id="elbow-angle-val" class="stat-val">170°</div>
-          <div class="stat-lbl">Elbow Angle</div>
+          <div class="stat-lbl">Joint Depth</div>
         </div>
       </div>
     </div>
@@ -1221,7 +1221,7 @@
     });
   </script>
 
-  <!-- GAME APP & SKELETAL SENSOR ENGINE SCRIPT -->
+  <!-- GAME APP & REVAMPED NEURAL SKELETAL SENSOR ENGINE SCRIPT -->
   <script>
     window.state = {
       userName: "Kayden",
@@ -1539,7 +1539,7 @@
     }
 
     /* ========================================================
-       REVAMPED AI SKELETAL TRACKING & CAMERA SENSOR ENGINE
+       REVAMPED NEURAL SKELETAL TRACKING & SENSOR ENGINE
        ======================================================== */
     let camera = null;
     let pose = null;
@@ -1576,10 +1576,10 @@
         canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
 
         if (results.poseLandmarks) {
-          drawNeonSkeleton(canvasCtx, results.poseLandmarks, canvasElement.width, canvasElement.height);
-          processAdvancedSensorEngine(results.poseLandmarks);
+          drawNeuralSkeletonMesh(canvasCtx, results.poseLandmarks, canvasElement.width, canvasElement.height);
+          processNeuralSensorEngine(results.poseLandmarks);
         } else {
-          updateSensorBanner("⚠️ Step back so full body is visible!", "#f87171");
+          updateSensorBanner("⚠️ Neural Mesh Lost: Step back to frame full body", "#f87171");
         }
         canvasCtx.restore();
       });
@@ -1605,26 +1605,26 @@
       startArena('story');
     }
 
-    const BONE_CONNECTIONS = [
-      [11, 12], [11, 13], [13, 15], [12, 14], [14, 16],
-      [11, 23], [12, 24], [23, 24],
-      [23, 25], [25, 27], [24, 26], [26, 28]
+    const NEURAL_CONNECTIONS = [
+      [11, 12], [11, 13], [13, 15], [12, 14], [14, 16], // Arms
+      [11, 23], [12, 24], [23, 24],                    // Core / Hips
+      [23, 25], [25, 27], [24, 26], [26, 28]             // Legs
     ];
 
-    function drawNeonSkeleton(ctx, landmarks, width, height) {
-      let glowColor = "#38bdf8";
-      if (repPhase === "BOTTOM_STRIKE") glowColor = "#34d399";
-      if (repPhase === "DESCENDING") glowColor = "#fbbf24";
+    function drawNeuralSkeletonMesh(ctx, landmarks, width, height) {
+      let meshColor = "#38bdf8"; // Cyan
+      if (repPhase === "BOTTOM_STRIKE") meshColor = "#34d399"; // Green
+      if (repPhase === "DESCENDING") meshColor = "#fbbf24"; // Gold
 
-      ctx.lineWidth = 4;
-      ctx.strokeStyle = glowColor;
-      ctx.shadowColor = glowColor;
-      ctx.shadowBlur = 12;
+      ctx.lineWidth = 5;
+      ctx.strokeStyle = meshColor;
+      ctx.shadowColor = meshColor;
+      ctx.shadowBlur = 15;
 
-      BONE_CONNECTIONS.forEach(([i, j]) => {
+      NEURAL_CONNECTIONS.forEach(([i, j]) => {
         const p1 = landmarks[i];
         const p2 = landmarks[j];
-        if (p1 && p2 && p1.visibility > 0.6 && p2.visibility > 0.6) {
+        if (p1 && p2 && p1.visibility > 0.65 && p2.visibility > 0.65) {
           ctx.beginPath();
           ctx.moveTo(p1.x * width, p1.y * height);
           ctx.lineTo(p2.x * width, p2.y * height);
@@ -1633,22 +1633,22 @@
       });
 
       landmarks.forEach((lm) => {
-        if (lm && lm.visibility > 0.6) {
-          ctx.fillStyle = "#fff";
+        if (lm && lm.visibility > 0.65) {
+          ctx.fillStyle = "#ffffff";
           ctx.beginPath();
-          ctx.arc(lm.x * width, lm.y * height, 5, 0, 2 * Math.PI);
+          ctx.arc(lm.x * width, lm.y * height, 6, 0, 2 * Math.PI);
           ctx.fill();
         }
       });
       ctx.shadowBlur = 0;
     }
 
-    function processAdvancedSensorEngine(landmarks) {
+    function processNeuralSensorEngine(landmarks) {
       const lShoulder = landmarks[11], lElbow = landmarks[13], lWrist = landmarks[15];
       const rShoulder = landmarks[12], rElbow = landmarks[14], rWrist = landmarks[16];
 
       if (!lShoulder || !lElbow || !lWrist || !rShoulder || !rElbow || !rWrist) {
-        updateSensorBanner("⚠️ Adjust camera angle to show upper body", "#f87171");
+        updateSensorBanner("⚠️ Align upper body inside camera frame", "#f87171");
         return;
       }
 
@@ -1656,7 +1656,7 @@
       const rightAngle = calculateAngle(rShoulder, rElbow, rWrist);
       const rawAngle = (leftAngle + rightAngle) / 2;
 
-      smoothedAngle = (smoothedAngle * 0.4) + (rawAngle * 0.6);
+      smoothedAngle = (smoothedAngle * 0.35) + (rawAngle * 0.65);
       document.getElementById('elbow-angle-val').innerText = Math.round(smoothedAngle) + '°';
 
       let bottomThreshold = window.state.formStrictness === 'master' ? 75 : (window.state.formStrictness === 'lenient' ? 95 : 85);
@@ -1664,15 +1664,15 @@
 
       if (repPhase === "TOP_LOCKOUT" && smoothedAngle < 135) {
         repPhase = "DESCENDING";
-        updateSensorBanner("⬇️ Lowering... Keep core rigid!", "#fbbf24");
+        updateSensorBanner("⬇️ Neural Scan: Descent detected. Keep core tight!", "#fbbf24");
       } 
       else if (repPhase === "DESCENDING" && smoothedAngle <= bottomThreshold) {
         repPhase = "BOTTOM_STRIKE";
-        updateSensorBanner("🔥 PERFECT DEPTH! Press up!", "#34d399");
+        updateSensorBanner("🔥 S-RANK DEPTH LOCKED! Push upward!", "#34d399");
       } 
       else if (repPhase === "BOTTOM_STRIKE" && smoothedAngle > 105) {
         repPhase = "ASCENDING";
-        updateSensorBanner("⬆️ Exploding upward!", "#38bdf8");
+        updateSensorBanner("⬆️ Explosive Ascent active...", "#38bdf8");
       } 
       else if (repPhase === "ASCENDING" && smoothedAngle >= lockoutThreshold) {
         repPhase = "TOP_LOCKOUT";
@@ -1685,7 +1685,7 @@
         document.getElementById('header-gold-val').innerText = window.state.gold;
         updateArenaHpDisplay();
 
-        updateSensorBanner("✅ REP COUNTED! +15 Gold", "#34d399");
+        updateSensorBanner("✅ NEURAL REP VERIFIED! +15 Gold", "#34d399");
 
         if (window.state.currentReps >= window.state.aiTargetReps) {
           triggerVictoryCondition();
