@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Push Up Arena: The Iron Oath (AI Neural S-Rank Edition)</title>
-  <meta name="app-version" content="v23.0-neural-skeleton-engine">
+  <title>Push Up Arena: The Iron Oath (Neural Vision S-Rank Edition)</title>
+  <meta name="app-version" content="v24.0-anatomic-neural-engine">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#0a0b0e">
@@ -753,7 +753,7 @@
   <div id="loading-screen">
     <canvas id="helmet-canvas" width="64" height="64" class="helmet-logo"></canvas>
     <div class="loading-title">The Iron Oath</div>
-    <div class="loading-sub">Calibrating Neural Vision Mesh...</div>
+    <div class="loading-sub">Calibrating Anatomic Neural Vision...</div>
     <div class="progress-bar-bg">
       <div id="loading-progress" class="progress-bar-fill"></div>
     </div>
@@ -1221,7 +1221,7 @@
     });
   </script>
 
-  <!-- GAME APP & REVAMPED NEURAL SKELETAL SENSOR ENGINE SCRIPT -->
+  <!-- GAME APP & ANATOMIC NEURAL SENSORY ENGINE SCRIPT -->
   <script>
     window.state = {
       userName: "Kayden",
@@ -1539,7 +1539,7 @@
     }
 
     /* ========================================================
-       REVAMPED NEURAL SKELETAL TRACKING & SENSOR ENGINE
+       REVAMPED ANATOMICALLY CORRECT NEURAL SKELETAL ENGINE
        ======================================================== */
     let camera = null;
     let pose = null;
@@ -1576,10 +1576,10 @@
         canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
 
         if (results.poseLandmarks) {
-          drawNeuralSkeletonMesh(canvasCtx, results.poseLandmarks, canvasElement.width, canvasElement.height);
-          processNeuralSensorEngine(results.poseLandmarks);
+          drawAnatomicNeuralSkeleton(canvasCtx, results.poseLandmarks, canvasElement.width, canvasElement.height);
+          processAnatomicSensorEngine(results.poseLandmarks);
         } else {
-          updateSensorBanner("⚠️ Neural Mesh Lost: Step back to frame full body", "#f87171");
+          updateSensorBanner("⚠️ Step back: Align full body in camera view", "#f87171");
         }
         canvasCtx.restore();
       });
@@ -1605,23 +1605,28 @@
       startArena('story');
     }
 
-    const NEURAL_CONNECTIONS = [
-      [11, 12], [11, 13], [13, 15], [12, 14], [14, 16], // Arms
-      [11, 23], [12, 24], [23, 24],                    // Core / Hips
-      [23, 25], [25, 27], [24, 26], [26, 28]             // Legs
+    // CORRECTED ANATOMICAL CONNECTIONS (No distorted cross-wires)
+    const ANATOMIC_CONNECTIONS = [
+      [11, 12], // Left Shoulder to Right Shoulder
+      [11, 13], [13, 15], // Left Arm: Shoulder -> Elbow -> Wrist
+      [12, 14], [14, 16], // Right Arm: Shoulder -> Elbow -> Wrist
+      [11, 23], [12, 24], // Torso: Shoulders to Hips
+      [23, 24], // Hips connection
+      [23, 25], [25, 27], // Left Leg: Hip -> Knee -> Ankle
+      [24, 26], [26, 28]  // Right Leg: Hip -> Knee -> Ankle
     ];
 
-    function drawNeuralSkeletonMesh(ctx, landmarks, width, height) {
-      let meshColor = "#38bdf8"; // Cyan
-      if (repPhase === "BOTTOM_STRIKE") meshColor = "#34d399"; // Green
-      if (repPhase === "DESCENDING") meshColor = "#fbbf24"; // Gold
+    function drawAnatomicNeuralSkeleton(ctx, landmarks, width, height) {
+      let meshColor = "#38bdf8"; // Cyan default
+      if (repPhase === "BOTTOM_STRIKE") meshColor = "#34d399"; // Green at depth
+      if (repPhase === "DESCENDING") meshColor = "#fbbf24"; // Gold during drop
 
-      ctx.lineWidth = 5;
+      ctx.lineWidth = 4;
       ctx.strokeStyle = meshColor;
       ctx.shadowColor = meshColor;
-      ctx.shadowBlur = 15;
+      ctx.shadowBlur = 12;
 
-      NEURAL_CONNECTIONS.forEach(([i, j]) => {
+      ANATOMIC_CONNECTIONS.forEach(([i, j]) => {
         const p1 = landmarks[i];
         const p2 = landmarks[j];
         if (p1 && p2 && p1.visibility > 0.65 && p2.visibility > 0.65) {
@@ -1632,23 +1637,24 @@
         }
       });
 
-      landmarks.forEach((lm) => {
-        if (lm && lm.visibility > 0.65) {
+      // Draw Joint Nodes
+      landmarks.forEach((lm, idx) => {
+        if (lm && lm.visibility > 0.65 && [11, 12, 13, 14, 15, 16, 23, 24].includes(idx)) {
           ctx.fillStyle = "#ffffff";
           ctx.beginPath();
-          ctx.arc(lm.x * width, lm.y * height, 6, 0, 2 * Math.PI);
+          ctx.arc(lm.x * width, lm.y * height, 5, 0, 2 * Math.PI);
           ctx.fill();
         }
       });
       ctx.shadowBlur = 0;
     }
 
-    function processNeuralSensorEngine(landmarks) {
+    function processAnatomicSensorEngine(landmarks) {
       const lShoulder = landmarks[11], lElbow = landmarks[13], lWrist = landmarks[15];
       const rShoulder = landmarks[12], rElbow = landmarks[14], rWrist = landmarks[16];
 
       if (!lShoulder || !lElbow || !lWrist || !rShoulder || !rElbow || !rWrist) {
-        updateSensorBanner("⚠️ Align upper body inside camera frame", "#f87171");
+        updateSensorBanner("⚠️ Upper body joints obscured. Adjust angle.", "#f87171");
         return;
       }
 
@@ -1656,7 +1662,7 @@
       const rightAngle = calculateAngle(rShoulder, rElbow, rWrist);
       const rawAngle = (leftAngle + rightAngle) / 2;
 
-      smoothedAngle = (smoothedAngle * 0.35) + (rawAngle * 0.65);
+      smoothedAngle = (smoothedAngle * 0.4) + (rawAngle * 0.6);
       document.getElementById('elbow-angle-val').innerText = Math.round(smoothedAngle) + '°';
 
       let bottomThreshold = window.state.formStrictness === 'master' ? 75 : (window.state.formStrictness === 'lenient' ? 95 : 85);
@@ -1664,15 +1670,15 @@
 
       if (repPhase === "TOP_LOCKOUT" && smoothedAngle < 135) {
         repPhase = "DESCENDING";
-        updateSensorBanner("⬇️ Neural Scan: Descent detected. Keep core tight!", "#fbbf24");
+        updateSensorBanner("⬇️ Lowering... Keep back straight!", "#fbbf24");
       } 
       else if (repPhase === "DESCENDING" && smoothedAngle <= bottomThreshold) {
         repPhase = "BOTTOM_STRIKE";
-        updateSensorBanner("🔥 S-RANK DEPTH LOCKED! Push upward!", "#34d399");
+        updateSensorBanner("🔥 PERFECT DEPTH! Push up!", "#34d399");
       } 
       else if (repPhase === "BOTTOM_STRIKE" && smoothedAngle > 105) {
         repPhase = "ASCENDING";
-        updateSensorBanner("⬆️ Explosive Ascent active...", "#38bdf8");
+        updateSensorBanner("⬆️ Exploding upward!", "#38bdf8");
       } 
       else if (repPhase === "ASCENDING" && smoothedAngle >= lockoutThreshold) {
         repPhase = "TOP_LOCKOUT";
@@ -1685,7 +1691,7 @@
         document.getElementById('header-gold-val').innerText = window.state.gold;
         updateArenaHpDisplay();
 
-        updateSensorBanner("✅ NEURAL REP VERIFIED! +15 Gold", "#34d399");
+        updateSensorBanner("✅ REP COUNTED! +15 Gold", "#34d399");
 
         if (window.state.currentReps >= window.state.aiTargetReps) {
           triggerVictoryCondition();
