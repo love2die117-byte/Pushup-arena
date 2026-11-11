@@ -27,7 +27,7 @@ function startArena(mode) {
     canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
 
     if (results.poseLandmarks) {
-      process100xSensor(results.poseLandmarks);
+      processSensorEngine(results.poseLandmarks);
     }
     canvasCtx.restore();
   });
@@ -40,7 +40,20 @@ function startArena(mode) {
   camera.start();
 }
 
-function process100xSensor(landmarks) {
+function startCampaignLevel(chapterId, levelId) {
+  window.currentChapter = chapterId;
+  window.currentLevel = levelId;
+  const chapter = window.storyChapters[chapterId - 1];
+  const boss = chapter.bosses[levelId - 1];
+
+  window.state.aiTargetReps = boss.reps;
+  document.getElementById('arena-boss-title').innerText = `CHAPTER ${chapterId}-${levelId}: ${chapter.name}`;
+  document.getElementById('boss-name-txt').innerText = `Boss: ${boss.name} (${boss.reps} Reps)`;
+
+  startArena('story');
+}
+
+function processSensorEngine(landmarks) {
   const lShoulder = landmarks[11], lElbow = landmarks[13], lWrist = landmarks[15];
   if (!lShoulder || !lElbow || !lWrist) return;
 
@@ -48,25 +61,26 @@ function process100xSensor(landmarks) {
   smoothedAngle = (smoothedAngle * 0.5) + (rawAngle * 0.5);
   document.getElementById('elbow-angle-val').innerText = Math.round(smoothedAngle) + '°';
 
+  let bottomThreshold = window.state.formStrictness === 'master' ? 75 : (window.state.formStrictness === 'lenient' ? 95 : 85);
+
   if (repPhase === "TOP" && smoothedAngle < 130) {
     repPhase = "DESCENDING";
-  } else if (repPhase === "DESCENDING" && smoothedAngle <= 85) {
+  } else if (repPhase === "DESCENDING" && smoothedAngle <= bottomThreshold) {
     repPhase = "BOTTOM";
-  } else if (repPhase === "BOTTOM" && smoothedAngle > 100) {
+  } else if (repPhase === "BOTTOM" && smoothedAngle > 105) {
     repPhase = "ASCENDING";
   } else if (repPhase === "ASCENDING" && smoothedAngle >= 145) {
     repPhase = "TOP";
     window.state.currentReps++;
     window.state.totalReps++;
-    window.state.gold += 5;
+    window.state.gold += 10;
     document.getElementById('rep-circle-val').innerText = window.state.currentReps;
     document.getElementById('total-reps-val').innerText = window.state.currentReps;
     document.getElementById('header-gold-val').innerText = window.state.gold;
     updateArenaHpDisplay();
 
     if (window.state.currentReps >= window.state.aiTargetReps) {
-      alert("VICTORY! Target Reached!");
-      exitArena();
+      triggerVictoryCondition();
     }
     saveState();
   }
@@ -80,9 +94,43 @@ function calculateAngle(A, B, C) {
 }
 
 function updateArenaHpDisplay() {
+  const rem = Math.max(0, window.state.aiTargetReps - window.state.currentReps);
   const pct = Math.min(100, (window.state.currentReps / window.state.aiTargetReps) * 100);
   document.getElementById('hp-bar').style.width = pct + '%';
-  document.getElementById('hp-txt').innerText = `${window.state.currentReps} / ${window.state.aiTargetReps} Reps`;
+  document.getElementById('hp-txt').innerText = `${rem} Reps Remaining`;
+}
+
+function triggerVictoryCondition() {
+  if (camera) camera.stop();
+  window.state.enemiesDefeated++;
+  window.state.sRanksAchieved++;
+  window.state.gems += 5;
+
+  if (window.currentChapter && window.currentLevel) {
+    if (!window.state.campaignProgress[window.currentChapter]) {
+      window.state.campaignProgress[window.currentChapter] = {};
+    }
+    window.state.campaignProgress[window.currentChapter][window.currentLevel] = "SSS";
+    
+    // Unlock next level
+    if (window.currentLevel < 5) {
+      window.state.unlockedLevel = Math.max(window.state.unlockedLevel, window.currentLevel + 1);
+    } else if (window.currentChapter < 5) {
+      window.state.unlockedChapter = Math.max(window.state.unlockedChapter, window.currentChapter + 1);
+      window.state.unlockedLevel = 1;
+    }
+  }
+
+  document.getElementById('arena-screen').classList.remove('active');
+  document.getElementById('victory-modal').classList.add('active');
+  saveState();
+}
+
+function closeVictoryModal() {
+  document.getElementById('victory-modal').classList.remove('active');
+  document.querySelector('.bottom-nav').style.display = 'flex';
+  switchTab('story');
+  renderStoryCampaignMap();
 }
 
 function exitArena() {
@@ -94,4 +142,6 @@ function exitArena() {
 }
 
 window.startArena = startArena;
+window.startCampaignLevel = startCampaignLevel;
 window.exitArena = exitArena;
+window.closeVictoryModal = closeVictoryModal;
